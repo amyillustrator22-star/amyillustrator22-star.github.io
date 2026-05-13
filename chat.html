@@ -93,8 +93,11 @@
         };
 
         firebase.initializeApp(firebaseConfig);
-        const appCheck = firebase.appCheck();
-        appCheck.activate('6LcbjugsAAAAALn_rfa17k5KG2Wbvv8QKl4Zm-ZT', true);
+        
+        // 🛑 COMENTADO PARA DIAGNÓSTICO: Si el chat no envía, es probable que reCAPTCHA/App Check 
+        // esté bloqueando el dominio de GitHub Pages. Desactívalo aquí para probar la conexión directa.
+        // const appCheck = firebase.appCheck();
+        // appCheck.activate('6LcbjugsAAAAALn_rfa17k5KG2Wbvv8QKl4Zm-ZT', true);
 
         // ✅ Usamos Firestore para sincronizar con la App móvil
         const db = firebase.firestore();
@@ -130,6 +133,11 @@
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 }).then(() => {
                     inputField.value = '';
+                    console.log("Mensaje enviado con éxito a Firestore.");
+                }).catch((error) => {
+                    // Si el mensaje no llega, este alert te dirá por qué (ej. falta de permisos o App Check)
+                    console.error("Error al enviar a Firestore:", error);
+                    alert("Error al enviar: " + error.message);
                 });
             }
         }
@@ -157,6 +165,8 @@
                           }
                       }
                   });
+              }, (error) => {
+                  console.error("Error en el Snapshot de Firestore:", error);
               });
         }
 
