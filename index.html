@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -7,100 +7,112 @@
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            /* Fondo degradado más vivo y alegre */
+            /* Fondo degradado vibrante y alegre */
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
             padding: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
         }
 
-        .top-logo {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 70px;
-            height: auto;
-            border-radius: 50%;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            border: 2px solid white;
-        }
-
-        /* La "Ventana" central */
-        .window {
-            background: rgba(255, 255, 255, 0.9);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-        }
-
-        h1 {
+        /* Tu nombre justo arriba de la ventana */
+        .user-name {
             font-family: 'Syne', sans-serif;
-            font-size: 3rem;
-            margin: 0 0 30px 0;
-            /* Verde más claro para que no se vea oscuro */
+            font-size: 3.5rem;
+            margin-bottom: 20px;
             background: linear-gradient(to bottom, #2ecc71, #27ae60);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            /* Borde negro fino para legibilidad */
             -webkit-text-stroke: 1px #0b3d1c;
-            /* El halo amarillo que pediste */
-            filter: drop-shadow(0 0 8px rgba(241, 196, 15, 0.6));
+            filter: drop-shadow(0 0 10px rgba(241, 196, 15, 0.7));
             text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
-        .apps-container {
-            text-align: left; /* Apps a la izquierda */
-            border-top: 1px solid #eee;
-            padding-top: 20px;
+        /* La ventana blanca */
+        .window {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 550px;
+            position: relative;
+            text-align: left; /* Contenido a la izquierda */
+        }
+
+        /* Tu logo de la serpiente y la A dentro de la ventana (arriba a la derecha) */
+        .inner-logo {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 100px;
+            height: auto;
+            border-radius: 15px;
+        }
+
+        h2.section-title {
+            color: #2c3e50;
+            font-size: 1.4rem;
+            margin-top: 0;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #2ecc71;
+            display: inline-block;
+            padding-bottom: 5px;
         }
 
         .app-entry {
             margin-bottom: 20px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            border-left: 5px solid #2ecc71;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-left: 6px solid #2ecc71;
+            transition: transform 0.2s ease;
+        }
+
+        .app-entry:hover {
+            transform: translateX(10px);
         }
 
         .app-title {
             font-weight: 700;
             color: #2c3e50;
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             display: block;
+            text-transform: uppercase;
         }
 
         .app-desc {
-            color: #7f8c8d;
-            font-size: 0.9rem;
-            margin-top: 5px;
+            color: #5d6d7e;
+            font-size: 1rem;
+            margin-top: 8px;
         }
     </style>
 </head>
 <body>
 
-    <img src="AmySoftwareLogo.jpg" alt="Logo" class="top-logo">
+    <!-- Tu nombre fuera, justo arriba -->
+    <div class="user-name">AMY SOFTWARE</div>
 
     <div class="window">
-        <h1>AMY SOFTWARE</h1>
-        
-        <div class="apps-container">
-            <div class="app-entry">
-                <span class="app-title">VibezMatch</span>
-                <span class="app-desc">Desarrollo Android Nativo (Java 17)</span>
-            </div>
+        <!-- Tu logo real dentro de la ventana -->
+        <img src="AmySoftwareLogo.jpg" alt="Logo Amy Software" class="inner-logo">
 
-            <div class="app-entry">
-                <span class="app-title">DietCheck</span>
-                <span class="app-desc">Escaneo QR e IA (Kotlin)</span>
-            </div>
+        <h2 class="section-title">Aplicaciones disponibles</h2>
+        
+        <div class="app-entry">
+            <span class="app-title">VibezMatch</span>
+            <span class="app-desc">Encuentra tu pareja ideal basándote en la química y las vibras personales.</span>
+        </div>
+
+        <div class="app-entry">
+            <span class="app-title">DietCheck</span>
+            <span class="app-desc">Análisis inteligente de alimentos mediante escaneo QR e inteligencia artificial.</span>
         </div>
     </div>
 
