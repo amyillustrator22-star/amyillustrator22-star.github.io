@@ -4,35 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amy Software</title>
-    <!-- Importamos Syne para el logo retro y Righteous para el resto -->
     <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Syne:wght@800&display=swap" rel="stylesheet">
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
-            padding: 20px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             font-family: 'Righteous', cursive;
+            overflow-x: hidden; /* Evita que la pantalla se mueva de lado */
         }
 
-        /* Recuperamos el estilo Retro para el nombre */
         .user-name {
-            font-family: 'Syne', sans-serif; /* Tipografía Retro */
+            font-family: 'Syne', sans-serif;
             font-weight: 800;
             font-size: 3.8rem;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             background: linear-gradient(to bottom, #2ecc71, #27ae60);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             -webkit-text-stroke: 1.5px #000;
             filter: drop-shadow(0 0 12px rgba(241, 196, 15, 0.8));
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 2px;
             text-align: center;
+            width: 100%;
         }
 
         .window {
@@ -40,64 +40,87 @@
             border-radius: 25px;
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 95%;
+            width: 90%;
             max-width: 700px;
             position: relative;
             text-align: left;
+            box-sizing: border-box;
         }
 
         .inner-logo {
             position: absolute;
             top: 20px;
             right: 20px;
-            width: 90px;
+            width: 80px;
             height: auto;
             border-radius: 12px;
         }
 
         h2.section-title {
             color: #2c3e50;
-            font-size: 1.6rem;
-            margin: 0 0 25px 0;
+            font-size: 1.5rem;
+            margin: 0 0 20px 0;
             border-bottom: 3px solid #2ecc71;
             display: inline-block;
             padding-bottom: 5px;
         }
 
         .app-entry {
-            margin-bottom: 25px;
-            padding: 25px;
+            margin-bottom: 20px;
+            padding: 20px;
             background: #ffffff;
             border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            border-left: 8px solid #2ecc71;
-            transition: transform 0.2s ease;
-        }
-
-        .app-entry:hover {
-            transform: translateX(10px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            border-left: 6px solid #2ecc71;
         }
 
         .app-title {
             font-weight: 700;
             color: #2c3e50;
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             display: block;
             text-transform: uppercase;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
 
         .app-desc {
             color: #34495e;
-            font-size: 1.05rem;
-            line-height: 1.6;
+            font-size: 1rem;
+            line-height: 1.5;
         }
 
         .welcome-note {
             font-style: italic;
             color: #16a085;
-            margin-top: 10px;
+            margin-top: 8px;
             display: block;
+        }
+
+        /* --- ARREGLO PARA MÓVILES --- */
+        @media (max-width: 600px) {
+            .user-name {
+                font-size: 2.2rem; /* Texto más pequeño en móvil */
+                letter-spacing: 1px;
+            }
+            .window {
+                padding: 20px;
+                padding-top: 80px; /* Espacio para el logo que se mueve */
+                width: 95%;
+            }
+            .inner-logo {
+                width: 60px;
+                top: 15px;
+                right: 15px;
+            }
+            h2.section-title {
+                font-size: 1.2rem;
+            }
+            .app-title {
+                font-size: 1.1rem;
+            }
+            .app-desc {
+                font-size: 0.95rem;
+            }
         }
     </style>
 </head>
@@ -106,7 +129,6 @@
     <div class="user-name">AMY SOFTWARE</div>
 
     <div class="window">
-        <!-- Tu logo de la serpiente y la A (AmySoftwareLogo.jpg) -->
         <img src="AmySoftwareLogo.jpg" alt="Logo Amy Software" class="inner-logo">
 
         <h2 class="section-title">Aplicaciones disponibles</h2>
@@ -114,7 +136,7 @@
         <div class="app-entry">
             <span class="app-title">VibezMatch</span>
             <span class="app-desc">
-                Citas para todo tipo de neurotipo: neurodivergentes, personas con discapacidad y colectivo LGTBI+. También con zona de juegos por si te aburre o te abruma seguir una conversación. Con modo monocromático para los dias de mucho estrés sensorial. Próximamente con chat general pero solo en la web.
+                Citas para todo tipo de neurotipo: neurodivergentes, personas con discapacidad y colectivo LGTBI+. Con zona de juegos y modo monocromático para cuando tengas mucho estrés sensorial.
                 <span class="welcome-note">Todo el mundo es bienvenido siempre que respetes a los demás.</span>
             </span>
         </div>
@@ -122,11 +144,13 @@
         <div class="app-entry">
             <span class="app-title">DietCheck</span>
             <span class="app-desc">
-                Escanea el código QR de un restaurante para ver tu menú ideal o el código de barras de cualquier producto de supermercado para saber si te viene bien comer lo que tienes pensado comer.
-                Incluye un asistente inteligente que, basándose en tu perfil (diabetes, alergias, etc.), te indica lo más factible para comer y genera dietas personalizadas.
+                Escanea el código QR de un restaurante para saber que comer dependiendo de tu perfil o el código de barras de productos de supermercado para ver si te viene bien elegir el producto que deseas.
+                Incluye un asistente inteligente que genera dietas personalizadas según tus necesidades (diabetes, alergias, etc.).
             </span>
         </div>
     </div>
 
 </body>
 </html>
+ 
+ 
