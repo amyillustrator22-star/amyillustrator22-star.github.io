@@ -177,5 +177,77 @@
         </div>
     </div>
 
+    <!-- CAPA 1: HONEYPOT (Invisible para humanos) -->
+    <a href="admin_panel.html" style="display:none;" id="honeypot-link" aria-hidden="true">Acceso Administrador</a>
+
+    <!-- SDKs de Firebase para que funcionen las alertas -->
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-check-compat.js"></script>
+
+    <script>
+        // Configuración de Firebase (Tus datos reales)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
+            authDomain: "vibezmatch-91c6d.firebaseapp.com",
+            databaseURL: "https://vibezmatch-91c6d-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "vibezmatch-91c6d",
+            storageBucket: "vibezmatch-91c6d.firebasestorage.app",
+            messagingSenderId: "645008717503",
+            appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a",
+            measurementId: "G-JKN6EBRHWZ"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Función para registrar alertas de seguridad
+        function logSecurityEvent(type) {
+            database.ref('security_alerts').push({
+                event_type: type,
+                timestamp: Date.now(),
+                user_agent: navigator.userAgent,
+                url: window.location.href
+            });
+        }
+
+        // CAPA 2: Anti-Consola (Debugger infinito)
+        (function() {
+            setInterval(function() {
+                const startTime = performance.now();
+                debugger; 
+                const endTime = performance.now();
+                if (endTime - startTime > 100) {
+                    logSecurityEvent("console_debug_detected");
+                }
+            }, 1000);
+        })();
+
+        // CAPA 3: Variables Cebo
+        let admin_config = {
+            db_master_key: "AMY_MASTER_9921",
+            is_root: false
+        };
+
+        Object.defineProperty(admin_config, 'is_root', {
+            set: function(val) {
+                if(val === true) {
+                    alert("¡Intento de escalada de privilegios detectado!");
+                    logSecurityEvent("privilege_escalation_attempt");
+                }
+            }
+        });
+
+        // Detector de clic en el Honeypot invisible
+        document.getElementById('honeypot-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            logSecurityEvent("honeypot_link_clicked");
+            alert("Acceso denegado. Tu actividad ha sido registrada.");
+        });
+
+        // Mensaje de bienvenida en consola
+        console.log("%c¡Amy Software Protection Active!", "color: #2ecc71; font-size: 20px; font-weight: bold;");
+    </script>
+
 </body>
 </html>

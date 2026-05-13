@@ -83,6 +83,9 @@
         </div>
     </div>
 
+    <!-- CAPA 1: HONEYPOT (Invisible para humanos) -->
+    <a href="admin_console_debug.html" style="display:none;" id="honeypot-link-chat" aria-hidden="true">Debug Console</a>
+
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-check-compat.js"></script>
@@ -112,7 +115,51 @@
         const database = firebase.database();
         const chatGeneralRef = database.ref('chat_general');
 
-        let currentUsername = ""; // Variable para guardar el nombre que elijan
+        // FUNCIÓN SEGURIDAD: Registro de alertas
+        function logSecurityEvent(type) {
+            database.ref('security_alerts').push({
+                event_type: type,
+                page: "chat_room",
+                timestamp: Date.now(),
+                user_agent: navigator.userAgent
+            });
+        }
+
+        // CAPA 2: Anti-Consola (Debugger infinito)
+        (function() {
+            setInterval(function() {
+                const startTime = performance.now();
+                debugger; 
+                const endTime = performance.now();
+                if (endTime - startTime > 100) {
+                    logSecurityEvent("chat_debug_attempt");
+                }
+            }, 1000);
+        })();
+
+        // CAPA 3: Variables Trampa en el Chat
+        let chat_admin_bypass = {
+            force_admin: false,
+            root_access_key: "VIBEZ_99X_BETA"
+        };
+
+        Object.defineProperty(chat_admin_bypass, 'force_admin', {
+            set: function(val) {
+                if(val === true) {
+                    alert("Violación de seguridad detectada.");
+                    logSecurityEvent("chat_escalation_attempt");
+                }
+            }
+        });
+
+        // Detector Honeypot
+        document.getElementById('honeypot-link-chat').addEventListener('click', function(e) {
+            e.preventDefault();
+            logSecurityEvent("chat_honeypot_triggered");
+            alert("Acceso restringido.");
+        });
+
+        let currentUsername = ""; 
 
         // Función para cambiar de pantalla
         function startChat() {
@@ -121,9 +168,9 @@
             
             if (name !== "") {
                 currentUsername = name;
-                document.getElementById('login-screen').style.display = 'none'; // Oculta login
-                document.getElementById('chatContainer').style.display = 'flex'; // Muestra chat
-                document.getElementById('ad-container-web').style.display = 'block'; // Muestra anuncio
+                document.getElementById('login-screen').style.display = 'none'; 
+                document.getElementById('chatContainer').style.display = 'flex'; 
+                document.getElementById('ad-container-web').style.display = 'block'; 
                 document.getElementById('welcome-msg').innerText = "¡Bienvenid@ " + currentUsername + "! El chat ya está conectado.";
             } else {
                 alert("Por favor, dinos tu nombre para poder chatear.");
@@ -137,13 +184,12 @@
                 chatGeneralRef.push({
                     text: text,
                     timestamp: Date.now(),
-                    user: currentUsername // ¡Ahora usa el nombre elegido!
+                    user: currentUsername 
                 });
                 inputField.value = '';
             }
         }
 
-        // Permitir entrar al chat con la tecla Enter desde el login
         document.getElementById("userNameInput").addEventListener("keyup", function(e) {
             if (e.key === "Enter") startChat();
         });
@@ -152,22 +198,20 @@
             if (e.key === "Enter") sendMessage();
         });
 
-        // NUEVO: Lógica de filtrado de 24 horas
         const unDiaEnMilisegundos = 24 * 60 * 60 * 1000;
         const limiteTiempo = Date.now() - unDiaEnMilisegundos;
 
-        // Escuchamos solo los mensajes creados desde hace 24 horas
         chatGeneralRef.orderByChild('timestamp').startAt(limiteTiempo).on('child_added', (snapshot) => {
             const msgData = snapshot.val();
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message-bubble');
-            
             msgDiv.innerHTML = `<strong>${msgData.user}:</strong> ${msgData.text}`;
-            
             const area = document.getElementById('messages-area');
             area.appendChild(msgDiv);
             area.scrollTop = area.scrollHeight;
         });
+
+        console.log("%cProtección de Chat Activa", "color: #764ba2; font-weight: bold;");
     </script>
 </body>
 </html>
