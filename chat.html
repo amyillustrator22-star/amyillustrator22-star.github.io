@@ -11,9 +11,18 @@
             margin: 0; padding: 10px; display: flex; justify-content: center;
             align-items: center; min-height: 100vh; font-family: 'Inter', sans-serif;
         }
+        /* Nueva zona para pedir el nombre */
+        #login-screen {
+            background: rgba(255, 255, 255, 0.95); padding: 30px; border-radius: 20px;
+            text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+        #login-screen h3 { font-family: 'Righteous', cursive; color: #764ba2; }
+        #userNameInput { padding: 12px; border: 2px solid #ddd; border-radius: 25px; outline: none; margin-bottom: 10px; width: 80%; }
+
+        /* Tu contenedor original (ahora oculto al inicio) */
         .chat-container {
             background: rgba(255, 255, 255, 0.95); border-radius: 20px;
-            width: 100%; max-width: 600px; height: 85vh; display: flex;
+            width: 100%; max-width: 600px; height: 85vh; display: none; /* Oculto por defecto */
             flex-direction: column; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.3);
         }
         .chat-header {
@@ -24,15 +33,25 @@
         .message-bubble { background: #e1f5fe; color: #2c3e50; padding: 10px 15px; border-radius: 15px; align-self: flex-start; max-width: 80%; }
         .input-area { display: flex; padding: 15px; background: white; border-top: 1px solid #eee; gap: 10px; }
         #messageInput { flex-grow: 1; padding: 12px; border: 2px solid #ddd; border-radius: 25px; outline: none; }
-        button { background: #2ecc71; color: white; border: none; border-radius: 25px; padding: 0 20px; font-family: 'Righteous', cursive; cursor: pointer; }
+        button { background: #2ecc71; color: white; border: none; border-radius: 25px; padding: 10px 20px; font-family: 'Righteous', cursive; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <div class="chat-container">
+    <!-- Pantalla de Login -->
+    <div id="login-screen">
+        <h3>BIENVENIDO A VIBEZMATCH</h3>
+        <p>¿Cómo quieres que te llamen?</p>
+        <input type="text" id="userNameInput" placeholder="Tu nombre o nick..." autocomplete="off">
+        <br>
+        <button onclick="startChat()">ENTRAR AL CHAT</button>
+    </div>
+
+    <!-- Tu contenedor de Chat Original -->
+    <div class="chat-container" id="chatContainer">
         <div class="chat-header">VIBEZMATCH CHAT SOCIAL</div>
         <div id="messages-area">
-            <div class="message-bubble" style="background:#d4edda;">¡Bienvenid@ Amy! El chat ya está conectado.</div>
+            <div class="message-bubble" id="welcome-msg" style="background:#d4edda;">Conectando...</div>
         </div>
         <div class="input-area">
             <input type="text" id="messageInput" placeholder="Escribe un mensaje..." autocomplete="off">
@@ -61,6 +80,23 @@
         const database = firebase.database();
         const chatGeneralRef = database.ref('chat_general');
 
+        let currentUsername = ""; // Variable para guardar el nombre que elijan
+
+        // Función para cambiar de pantalla
+        function startChat() {
+            const nameInput = document.getElementById('userNameInput');
+            const name = nameInput.value.trim();
+            
+            if (name !== "") {
+                currentUsername = name;
+                document.getElementById('login-screen').style.display = 'none'; // Oculta login
+                document.getElementById('chatContainer').style.display = 'flex'; // Muestra chat
+                document.getElementById('welcome-msg').innerText = "¡Bienvenid@ " + currentUsername + "! El chat ya está conectado.";
+            } else {
+                alert("Por favor, dinos tu nombre para poder chatear.");
+            }
+        }
+
         function sendMessage() {
             const inputField = document.getElementById('messageInput');
             const text = inputField.value.trim();
@@ -68,11 +104,16 @@
                 chatGeneralRef.push({
                     text: text,
                     timestamp: Date.now(),
-                    user: "Usuario de VibezMatch" 
+                    user: currentUsername // ¡Ahora usa el nombre elegido!
                 });
                 inputField.value = '';
             }
         }
+
+        // Permitir entrar al chat con la tecla Enter desde el login
+        document.getElementById("userNameInput").addEventListener("keyup", function(e) {
+            if (e.key === "Enter") startChat();
+        });
 
         document.getElementById("messageInput").addEventListener("keyup", function(e) {
             if (e.key === "Enter") sendMessage();
@@ -82,7 +123,10 @@
             const msgData = snapshot.val();
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message-bubble');
-            msgDiv.innerText = msgData.text;
+            
+            // He añadido el nombre del usuario antes del mensaje para que sepa quién habla
+            msgDiv.innerHTML = `<strong>${msgData.user}:</strong> ${msgData.text}`;
+            
             const area = document.getElementById('messages-area');
             area.appendChild(msgDiv);
             area.scrollTop = area.scrollHeight;
