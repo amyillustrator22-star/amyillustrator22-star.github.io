@@ -16,7 +16,6 @@
             margin: 0; padding: 10px; display: flex; flex-direction: column; justify-content: center;
             align-items: center; min-height: 100vh; font-family: 'Inter', sans-serif;
         }
-        /* Nueva zona para pedir el nombre */
         #login-screen {
             background: rgba(255, 255, 255, 0.95); padding: 30px; border-radius: 20px;
             text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.3);
@@ -24,10 +23,9 @@
         #login-screen h3 { font-family: 'Righteous', cursive; color: #764ba2; }
         #userNameInput { padding: 12px; border: 2px solid #ddd; border-radius: 25px; outline: none; margin-bottom: 10px; width: 80%; }
 
-        /* Tu contenedor original (ahora ajustable para el anuncio) */
         .chat-container {
             background: rgba(255, 255, 255, 0.95); border-radius: 20px;
-            width: 100%; max-width: 600px; height: 75vh; display: none; /* Ajustado a 75vh para el banner */
+            width: 100%; max-width: 600px; height: 75vh; display: none; 
             flex-direction: column; overflow: hidden; box-shadow: 0 15px 40px rgba(0,0,0,0.3);
             margin-bottom: 10px;
         }
@@ -41,15 +39,9 @@
         #messageInput { flex-grow: 1; padding: 12px; border: 2px solid #ddd; border-radius: 25px; outline: none; }
         button { background: #2ecc71; color: white; border: none; border-radius: 25px; padding: 10px 20px; font-family: 'Righteous', cursive; cursor: pointer; }
 
-        /* Contenedor para el Banner de Anuncios Web */
         #ad-container-web {
-            width: 100%;
-            max-width: 600px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 10px;
-            padding: 5px;
-            display: none; /* Se activará al entrar al chat */
+            width: 100%; max-width: 600px; text-align: center;
+            background: rgba(255, 255, 255, 0.9); border-radius: 10px; padding: 5px; display: none; 
         }
     </style>
 </head>
@@ -74,24 +66,21 @@
         </div>
     </div>
 
-    <!-- ZONA DE ANUNCIO ADSENSE -->
     <div id="ad-container-web">
         <p style="font-size: 10px; color: #666; margin: 2px;">Publicidad</p>
-        <!-- Marcador de posición para cuando Google apruebe el sitio -->
         <div style="width: 100%; height: 90px; background: #eee; border: 1px dashed #ccc; line-height: 90px; color: #999;">
             Bloque de Anuncio (AdSense)
         </div>
     </div>
 
-    <!-- CAPA 1: HONEYPOT (Invisible para humanos) -->
     <a href="admin_console_debug.html" style="display:none;" id="honeypot-link-chat" aria-hidden="true">Debug Console</a>
 
+    <!-- SDKs de Firebase (Firestore en lugar de Realtime Database) -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-check-compat.js"></script>
 
     <script>
-        // Tus datos reales de VibezMatch
         const firebaseConfig = {
             apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
             authDomain: "vibezmatch-91c6d.firebaseapp.com",
@@ -104,64 +93,14 @@
         };
 
         firebase.initializeApp(firebaseConfig);
-
-        // NUEVO: Implementación de App Check
         const appCheck = firebase.appCheck();
-        appCheck.activate(
-            '6LcbjugsAAAAALn_rfa17k5KG2Wbvv8QKl4Zm-ZT', 
-            true
-        );
+        appCheck.activate('6LcbjugsAAAAALn_rfa17k5KG2Wbvv8QKl4Zm-ZT', true);
 
-        const database = firebase.database();
-        const chatGeneralRef = database.ref('chat_general');
-
-        // FUNCIÓN SEGURIDAD: Registro de alertas
-        function logSecurityEvent(type) {
-            database.ref('security_alerts').push({
-                event_type: type,
-                page: "chat_room",
-                timestamp: Date.now(),
-                user_agent: navigator.userAgent
-            });
-        }
-
-        // CAPA 2: Anti-Consola (Debugger infinito)
-        (function() {
-            setInterval(function() {
-                const startTime = performance.now();
-                debugger; 
-                const endTime = performance.now();
-                if (endTime - startTime > 100) {
-                    logSecurityEvent("chat_debug_attempt");
-                }
-            }, 1000);
-        })();
-
-        // CAPA 3: Variables Trampa en el Chat
-        let chat_admin_bypass = {
-            force_admin: false,
-            root_access_key: "VIBEZ_99X_BETA"
-        };
-
-        Object.defineProperty(chat_admin_bypass, 'force_admin', {
-            set: function(val) {
-                if(val === true) {
-                    alert("Violación de seguridad detectada.");
-                    logSecurityEvent("chat_escalation_attempt");
-                }
-            }
-        });
-
-        // Detector Honeypot
-        document.getElementById('honeypot-link-chat').addEventListener('click', function(e) {
-            e.preventDefault();
-            logSecurityEvent("chat_honeypot_triggered");
-            alert("Acceso restringido.");
-        });
+        // ✅ Usamos Firestore para sincronizar con la App móvil
+        const db = firebase.firestore();
 
         let currentUsername = ""; 
 
-        // Función para cambiar de pantalla
         function startChat() {
             const nameInput = document.getElementById('userNameInput');
             const name = nameInput.value.trim();
@@ -171,47 +110,74 @@
                 document.getElementById('login-screen').style.display = 'none'; 
                 document.getElementById('chatContainer').style.display = 'flex'; 
                 document.getElementById('ad-container-web').style.display = 'block'; 
-                document.getElementById('welcome-msg').innerText = "¡Bienvenid@ " + currentUsername + "! El chat ya está conectado.";
+                document.getElementById('welcome-msg').innerText = "¡Bienvenid@ " + currentUsername + "!";
+                
+                escucharMensajes();
             } else {
                 alert("Por favor, dinos tu nombre para poder chatear.");
             }
         }
 
+        // ✅ Corregido: envía a 'chat_global' con las claves 'usuario' y 'texto'
         function sendMessage() {
             const inputField = document.getElementById('messageInput');
             const text = inputField.value.trim();
+            
             if (text !== '') {
-                chatGeneralRef.push({
-                    text: text,
-                    timestamp: Date.now(),
-                    user: currentUsername 
+                db.collection("chat_global").add({
+                    texto: text,
+                    usuario: currentUsername,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                }).then(() => {
+                    inputField.value = '';
                 });
-                inputField.value = '';
             }
         }
 
-        document.getElementById("userNameInput").addEventListener("keyup", function(e) {
-            if (e.key === "Enter") startChat();
-        });
+        function escucharMensajes() {
+            // Escuchamos los mensajes de las últimas 24 horas ordenados por tiempo
+            const limite = new Date();
+            limite.setDate(limite.getDate() - 1);
 
-        document.getElementById("messageInput").addEventListener("keyup", function(e) {
-            if (e.key === "Enter") sendMessage();
-        });
+            db.collection("chat_global")
+              .where("timestamp", ">=", limite)
+              .orderBy("timestamp", "asc")
+              .onSnapshot((snapshot) => {
+                  snapshot.docChanges().forEach((change) => {
+                      if (change.type === "added") {
+                          const msgData = change.doc.data();
+                          // Solo mostramos si tiene los campos que usa la app
+                          if (msgData.usuario && msgData.texto) {
+                              const msgDiv = document.createElement('div');
+                              msgDiv.classList.add('message-bubble');
+                              msgDiv.innerHTML = `<strong>${msgData.usuario}:</strong> ${msgData.texto}`;
+                              const area = document.getElementById('messages-area');
+                              area.appendChild(msgDiv);
+                              area.scrollTop = area.scrollHeight;
+                          }
+                      }
+                  });
+              });
+        }
 
-        const unDiaEnMilisegundos = 24 * 60 * 60 * 1000;
-        const limiteTiempo = Date.now() - unDiaEnMilisegundos;
+        // --- CAPAS DE SEGURIDAD AMY SOFTWARE ---
+        (function() {
+            setInterval(function() {
+                const startTime = performance.now();
+                debugger; 
+                if (performance.now() - startTime > 100) {
+                    db.collection('security_alerts').add({
+                        event_type: "chat_debug_attempt",
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            }, 1000);
+        })();
 
-        chatGeneralRef.orderByChild('timestamp').startAt(limiteTiempo).on('child_added', (snapshot) => {
-            const msgData = snapshot.val();
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('message-bubble');
-            msgDiv.innerHTML = `<strong>${msgData.user}:</strong> ${msgData.text}`;
-            const area = document.getElementById('messages-area');
-            area.appendChild(msgDiv);
-            area.scrollTop = area.scrollHeight;
-        });
+        document.getElementById("userNameInput").addEventListener("keyup", (e) => { if (e.key === "Enter") startChat(); });
+        document.getElementById("messageInput").addEventListener("keyup", (e) => { if (e.key === "Enter") sendMessage(); });
 
-        console.log("%cProtección de Chat Activa", "color: #764ba2; font-weight: bold;");
+        console.log("%cProtección de Chat Activa - Sincronizado con App Móvil", "color: #764ba2; font-weight: bold;");
     </script>
 </body>
 </html>
