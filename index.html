@@ -1,4 +1,4 @@
-echo '<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -7,74 +7,91 @@ echo '<!DOCTYPE html>
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e);
-            background-size: 400% 400%;
-            animation: gradient-slow 20s ease infinite;
-            color: #bb86fc;
-            text-align: center;
-            font-family: "Inter", sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            color: white;
+            font-family: 'Inter', sans-serif;
             margin: 0;
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
         }
-        @keyframes gradient-slow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        .container {
-            max-width: 700px;
-            background: rgba(0, 0, 0, 0.5);
-            padding: 50px;
-            border-radius: 25px;
-            backdrop-filter: blur(10px);
-            position: relative;
-            border: 1px solid rgba(187, 134, 252, 0.1);
-        }
-        .logo-watermark {
+
+        /* Tu logo arriba a la derecha */
+        .top-logo {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            opacity: 0.12;
-            z-index: 1;
-            width: 80%;
+            top: 20px;
+            right: 20px;
+            width: 80px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
-        .content { position: relative; z-index: 2; }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 60px;
+            border-radius: 30px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 600px;
+            width: 90%;
+        }
+
         h1 {
-            font-family: "Syne", sans-serif;
-            font-size: 4.5rem;
-            margin: 0;
+            font-family: 'Syne', sans-serif;
+            font-size: 4rem;
+            margin-bottom: 40px;
             background: linear-gradient(to bottom, #114B0B, #2ECC71);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(255, 255, 0, 0.7));
-            -webkit-text-stroke: 1.5px #000;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 0, 0.5));
+            -webkit-text-stroke: 1px #000;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
-        .app-item {
-            background: rgba(255, 255, 255, 0.05);
+
+        .app-card {
+            background: rgba(255, 255, 255, 0.1);
             margin: 15px 0;
-            padding: 15px;
-            border-radius: 12px;
+            padding: 20px;
+            border-radius: 15px;
             text-align: left;
-            border-left: 4px solid #F1C40F;
+            border-left: 5px solid #F1C40F;
+            transition: transform 0.3s ease;
+        }
+
+        .app-card:hover {
+            transform: scale(1.02);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .app-title {
+            font-weight: 800;
+            color: #F1C40F;
+            font-size: 1.2rem;
         }
     </style>
 </head>
 <body>
+
+    <img src="AmySoftwareLogo.jpg" alt="Logo" class="top-logo">
+
     <div class="container">
-        <img src="AmySoftwareLogo.jpg" class="logo-watermark">
-        <div class="content">
-            <h1>Amy Software</h1>
-            <div class="app-item">
-                <strong>VibezMatch</strong> - Desarrollo Android
-            </div>
-            <div class="app-item">
-                <strong>DietCheck</strong> - QR & AI (Kotlin)
-            </div>
+        <h1>AMYSOFTWARE</h1>
+        
+        <div class="app-card">
+            <div class="app-title">VIBEZMATCH</div>
+            <p>Desarrollo Android Nativo</p>
+        </div>
+
+        <div class="app-card">
+            <div class="app-title">DIETCHECK</div>
+            <p>Innovación con QR y AI</p>
         </div>
     </div>
+
 </body>
-</html>' > index.html
+</html>
