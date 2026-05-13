@@ -38,7 +38,6 @@
 </head>
 <body>
 
-    <!-- Pantalla de Login -->
     <div id="login-screen">
         <h3>BIENVENIDO A VIBEZMATCH</h3>
         <p>¿Cómo quieres que te llamen?</p>
@@ -47,7 +46,6 @@
         <button onclick="startChat()">ENTRAR AL CHAT</button>
     </div>
 
-    <!-- Tu contenedor de Chat Original -->
     <div class="chat-container" id="chatContainer">
         <div class="chat-header">VIBEZMATCH CHAT SOCIAL</div>
         <div id="messages-area">
@@ -59,9 +57,9 @@
         </div>
     </div>
 
-    <!-- Firebase Compat SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-check-compat.js"></script>
 
     <script>
         // Tus datos reales de VibezMatch
@@ -77,6 +75,15 @@
         };
 
         firebase.initializeApp(firebaseConfig);
+
+        // NUEVO: Implementación de App Check
+        // RECUERDA: Cambia el texto de abajo por tu "Clave de Sitio" (Site Key)
+        const appCheck = firebase.appCheck();
+        appCheck.activate(
+            '6LcbjugsAAAAALn_rfa17k5KG2Wbvv8QKl4Zm-ZT', 
+            true
+        );
+
         const database = firebase.database();
         const chatGeneralRef = database.ref('chat_general');
 
