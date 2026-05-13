@@ -4,24 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amy Software</title>
-    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@800&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Importamos la tipografía Righteous -->
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Inter:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
-            /* Fondo degradado vibrante y alegre */
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             margin: 0;
-            padding: 0;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Righteous', cursive; /* Tipografía Righteous para todo */
         }
 
-        /* Tu nombre justo arriba de la ventana */
         .user-name {
-            font-family: 'Syne', sans-serif;
             font-size: 3.5rem;
             margin-bottom: 20px;
             background: linear-gradient(to bottom, #2ecc71, #27ae60);
@@ -31,47 +29,46 @@
             filter: drop-shadow(0 0 10px rgba(241, 196, 15, 0.7));
             text-transform: uppercase;
             letter-spacing: 2px;
+            text-align: center;
         }
 
-        /* La ventana blanca */
         .window {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 25px;
             padding: 40px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            width: 90%;
-            max-width: 550px;
+            width: 95%;
+            max-width: 700px;
             position: relative;
-            text-align: left; /* Contenido a la izquierda */
+            text-align: left;
         }
 
-        /* Tu logo de la serpiente y la A dentro de la ventana (arriba a la derecha) */
         .inner-logo {
             position: absolute;
             top: 20px;
             right: 20px;
-            width: 100px;
+            width: 90px;
             height: auto;
-            border-radius: 15px;
+            border-radius: 12px;
         }
 
         h2.section-title {
             color: #2c3e50;
-            font-size: 1.4rem;
+            font-size: 1.6rem;
             margin-top: 0;
             margin-bottom: 25px;
-            border-bottom: 2px solid #2ecc71;
+            border-bottom: 3px solid #2ecc71;
             display: inline-block;
             padding-bottom: 5px;
         }
 
         .app-entry {
-            margin-bottom: 20px;
-            padding: 20px;
+            margin-bottom: 25px;
+            padding: 25px;
             background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-left: 6px solid #2ecc71;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border-left: 8px solid #2ecc71;
             transition: transform 0.2s ease;
         }
 
@@ -82,37 +79,53 @@
         .app-title {
             font-weight: 700;
             color: #2c3e50;
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             display: block;
             text-transform: uppercase;
+            margin-bottom: 10px;
         }
 
         .app-desc {
-            color: #5d6d7e;
-            font-size: 1rem;
-            margin-top: 8px;
+            color: #34495e;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            font-family: 'Righteous', cursive; /* Mantenemos la tipografía coherente */
+        }
+
+        /* Estilo para resaltar la bienvenida inclusiva */
+        .welcome-note {
+            font-style: italic;
+            color: #16a085;
+            margin-top: 10px;
+            display: block;
         }
     </style>
 </head>
 <body>
 
-    <!-- Tu nombre fuera, justo arriba -->
     <div class="user-name">AMY SOFTWARE</div>
 
     <div class="window">
-        <!-- Tu logo real dentro de la ventana -->
         <img src="AmySoftwareLogo.jpg" alt="Logo Amy Software" class="inner-logo">
 
         <h2 class="section-title">Aplicaciones disponibles</h2>
         
+        <!-- Descripción de VibezMatch -->
         <div class="app-entry">
             <span class="app-title">VibezMatch</span>
-            <span class="app-desc">Encuentra tu pareja ideal basándote en la química y las vibras personales.</span>
+            <span class="app-desc">
+                Citas para todo tipo de neurotipo: neurodivergentes, personas con discapacidad y colectivo LGTBI+. 
+                <span class="welcome-note">Todo el mundo es bienvenido siempre que respetes a los demás.</span>
+            </span>
         </div>
 
+        <!-- Descripción de DietCheck -->
         <div class="app-entry">
             <span class="app-title">DietCheck</span>
-            <span class="app-desc">Análisis inteligente de alimentos mediante escaneo QR e inteligencia artificial.</span>
+            <span class="app-desc">
+                Escanea el código QR de un restaurante o el código de barras de cualquier producto de supermercado. 
+                Incluye un asistente inteligente que, basándose en tu perfil (diabetes, alergias, etc.), te indica lo más factible para comer y genera dietas personalizadas según tus preferencias.
+            </span>
         </div>
     </div>
 
