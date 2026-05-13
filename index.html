@@ -96,6 +96,27 @@
             display: block;
         }
 
+        /* --- NUEVO ESTILO PARA EL BOTÓN DEL CHAT --- */
+        .btn-chat {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 12px 25px;
+            background: #2ecc71;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            font-family: 'Righteous', cursive;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
+            border: none;
+        }
+
+        .btn-chat:hover {
+            background: #27ae60;
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+        }
+
         /* --- ARREGLO PARA MÓVILES --- */
         @media (max-width: 600px) {
             .user-name {
@@ -139,6 +160,8 @@
                 Citas para todo tipo de neurotipo: neurodivergentes, personas con discapacidad y colectivo LGTBI+. Con zona de juegos y modo monocromático para cuando tengas mucho estrés sensorial.
                 <span class="welcome-note">Todo el mundo es bienvenido siempre que respetes a los demás.</span>
             </span>
+            <!-- Botón añadido para conectar con chat.html -->
+            <a href="chat.html" class="btn-chat">ENTRAR AL CHAT SOCIAL</a>
         </div>
 
         <div class="app-entry">
