@@ -77,7 +77,6 @@
         firebase.initializeApp(firebaseConfig);
 
         // NUEVO: Implementación de App Check
-        // RECUERDA: Cambia el texto de abajo por tu "Clave de Sitio" (Site Key)
         const appCheck = firebase.appCheck();
         appCheck.activate(
             '6LcbjugsAAAAALn_rfa17k5KG2Wbvv8QKl4Zm-ZT', 
@@ -126,12 +125,16 @@
             if (e.key === "Enter") sendMessage();
         });
 
-        chatGeneralRef.on('child_added', (snapshot) => {
+        // NUEVO: Lógica de filtrado de 24 horas
+        const unDiaEnMilisegundos = 24 * 60 * 60 * 1000;
+        const limiteTiempo = Date.now() - unDiaEnMilisegundos;
+
+        // Escuchamos solo los mensajes creados desde hace 24 horas
+        chatGeneralRef.orderByChild('timestamp').startAt(limiteTiempo).on('child_added', (snapshot) => {
             const msgData = snapshot.val();
             const msgDiv = document.createElement('div');
             msgDiv.classList.add('message-bubble');
             
-            // He añadido el nombre del usuario antes del mensaje para que sepa quién habla
             msgDiv.innerHTML = `<strong>${msgData.user}:</strong> ${msgData.text}`;
             
             const area = document.getElementById('messages-area');
