@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amy Software</title>
-    <!-- Importamos la tipografía Righteous -->
-    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Importamos Syne para el logo retro y Righteous para el resto -->
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Syne:wght@800&display=swap" rel="stylesheet">
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -16,19 +16,22 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            font-family: 'Righteous', cursive; /* Tipografía Righteous para todo */
+            font-family: 'Righteous', cursive;
         }
 
+        /* Recuperamos el estilo Retro para el nombre */
         .user-name {
-            font-size: 3.5rem;
-            margin-bottom: 20px;
+            font-family: 'Syne', sans-serif; /* Tipografía Retro */
+            font-weight: 800;
+            font-size: 3.8rem;
+            margin-bottom: 25px;
             background: linear-gradient(to bottom, #2ecc71, #27ae60);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            -webkit-text-stroke: 1px #0b3d1c;
-            filter: drop-shadow(0 0 10px rgba(241, 196, 15, 0.7));
+            -webkit-text-stroke: 1.5px #000;
+            filter: drop-shadow(0 0 12px rgba(241, 196, 15, 0.8));
             text-transform: uppercase;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             text-align: center;
         }
 
@@ -55,8 +58,7 @@
         h2.section-title {
             color: #2c3e50;
             font-size: 1.6rem;
-            margin-top: 0;
-            margin-bottom: 25px;
+            margin: 0 0 25px 0;
             border-bottom: 3px solid #2ecc71;
             display: inline-block;
             padding-bottom: 5px;
@@ -89,10 +91,8 @@
             color: #34495e;
             font-size: 1.05rem;
             line-height: 1.6;
-            font-family: 'Righteous', cursive; /* Mantenemos la tipografía coherente */
         }
 
-        /* Estilo para resaltar la bienvenida inclusiva */
         .welcome-note {
             font-style: italic;
             color: #16a085;
@@ -106,11 +106,11 @@
     <div class="user-name">AMY SOFTWARE</div>
 
     <div class="window">
+        <!-- Tu logo de la serpiente y la A (AmySoftwareLogo.jpg) -->
         <img src="AmySoftwareLogo.jpg" alt="Logo Amy Software" class="inner-logo">
 
         <h2 class="section-title">Aplicaciones disponibles</h2>
         
-        <!-- Descripción de VibezMatch -->
         <div class="app-entry">
             <span class="app-title">VibezMatch</span>
             <span class="app-desc">
@@ -119,12 +119,11 @@
             </span>
         </div>
 
-        <!-- Descripción de DietCheck -->
         <div class="app-entry">
             <span class="app-title">DietCheck</span>
             <span class="app-desc">
-                Escanea el código QR de un restaurante o el código de barras de cualquier producto de supermercado. 
-                Incluye un asistente inteligente que, basándose en tu perfil (diabetes, alergias, etc.), te indica lo más factible para comer y genera dietas personalizadas según tus preferencias.
+                Escanea el código QR de un restaurante para ver tu menú ideal o el código de barras de cualquier producto de supermercado para saber si te viene bien comer lo que tienes pensado comer.
+                Incluye un asistente inteligente que, basándose en tu perfil (diabetes, alergias, etc.), te indica lo más factible para comer y genera dietas personalizadas.
             </span>
         </div>
     </div>
