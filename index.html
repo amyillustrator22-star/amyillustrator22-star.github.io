@@ -182,7 +182,7 @@
 
     <!-- SDKs de Firebase para que funcionen las alertas -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-check-compat.js"></script>
 
     <script>
@@ -190,7 +190,6 @@
         const firebaseConfig = {
             apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
             authDomain: "vibezmatch-91c6d.firebaseapp.com",
-            databaseURL: "https://vibezmatch-91c6d-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "vibezmatch-91c6d",
             storageBucket: "vibezmatch-91c6d.firebasestorage.app",
             messagingSenderId: "645008717503",
@@ -199,15 +198,17 @@
         };
 
         firebase.initializeApp(firebaseConfig);
-        const database = firebase.database();
+        const db = firebase.firestore();
 
-        // Función para registrar alertas de seguridad
+        // Función para registrar alertas de seguridad en FIRESTORE
         function logSecurityEvent(type) {
-            database.ref('security_alerts').push({
+            db.collection('security_alerts').add({
                 event_type: type,
-                timestamp: Date.now(),
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                 user_agent: navigator.userAgent,
                 url: window.location.href
+            }).catch(function(error) {
+                console.error("Error guardando la alerta:", error);
             });
         }
 
