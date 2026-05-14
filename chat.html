@@ -18,11 +18,14 @@
         }
         #login-screen {
             background: rgba(255, 255, 255, 0.95); padding: 30px; border-radius: 20px;
-            text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            text-align: center; box-shadow: 0 15px 40px rgba(0,0,0,0.3); width: 90%; max-width: 400px;
         }
-        #login-screen h3 { font-family: 'Righteous', cursive; color: #764ba2; }
-        #userNameInput { padding: 12px; border: 2px solid #ddd; border-radius: 25px; outline: none; margin-bottom: 10px; width: 80%; }
-
+        #login-screen h3 { font-family: 'Righteous', cursive; color: #764ba2; margin-bottom: 20px;}
+        .auth-input { 
+            padding: 12px; border: 2px solid #ddd; border-radius: 25px; outline: none; 
+            margin-bottom: 10px; width: 85%; box-sizing: border-box;
+        }
+        
         .chat-container {
             background: rgba(255, 255, 255, 0.95); border-radius: 20px;
             width: 100%; max-width: 600px; height: 75vh; display: none; 
@@ -31,38 +34,68 @@
         }
         .chat-header {
             background: #2ecc71; color: white; padding: 15px; text-align: center;
-            font-family: 'Righteous', cursive; font-size: 1.5rem;
+            font-family: 'Righteous', cursive; font-size: 1.5rem; display: flex; justify-content: space-between; align-items: center;
         }
+        #logout-btn { font-size: 0.8rem; padding: 5px 10px; background: #e74c3c; }
+        
         #messages-area { flex-grow: 1; padding: 20px; overflow-y: auto; background: #fdfdfd; display: flex; flex-direction: column; gap: 10px; }
-        .message-bubble { background: #e1f5fe; color: #2c3e50; padding: 10px 15px; border-radius: 15px; align-self: flex-start; max-width: 80%; }
+        .message-bubble { background: #e1f5fe; color: #2c3e50; padding: 10px 15px; border-radius: 15px; align-self: flex-start; max-width: 80%; word-wrap: break-word;}
+        .message-bubble.me { background: #2ecc71; color: white; align-self: flex-end; }
+        .msg-uid { font-size: 0.6rem; color: #888; display: block; margin-top: 4px; }
+        
         .input-area { display: flex; padding: 15px; background: white; border-top: 1px solid #eee; gap: 10px; }
         #messageInput { flex-grow: 1; padding: 12px; border: 2px solid #ddd; border-radius: 25px; outline: none; }
-        button { background: #2ecc71; color: white; border: none; border-radius: 25px; padding: 10px 20px; font-family: 'Righteous', cursive; cursor: pointer; }
+        button { background: #2ecc71; color: white; border: none; border-radius: 25px; padding: 10px 20px; font-family: 'Righteous', cursive; cursor: pointer; transition: 0.3s; }
+        button:hover { transform: scale(1.05); }
+        .btn-secondary { background: #3498db; margin-top: 10px; }
 
         #ad-container-web {
             width: 100%; max-width: 600px; text-align: center;
             background: rgba(255, 255, 255, 0.9); border-radius: 10px; padding: 5px; display: none; 
         }
+
+        /* PANEL DE ADMINISTRADORA (Oculto por defecto) */
+        #admin-panel {
+            background: #e74c3c; color: white; padding: 10px; text-align: center; display: none;
+            border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
+        }
+        #admin-panel input { padding: 5px; border-radius: 10px; border: none; outline: none; margin-right: 5px; }
+        #admin-panel button { background: #c0392b; padding: 5px 10px; font-size: 0.9rem;}
     </style>
 </head>
 <body>
 
+    <!-- PANTALLA DE LOGIN / REGISTRO -->
     <div id="login-screen">
-        <h3>BIENVENIDO A VIBEZMATCH</h3>
-        <p>¿Cómo quieres que te llamen?</p>
-        <input type="text" id="userNameInput" placeholder="Tu nombre o nick..." autocomplete="off">
+        <h3>ACCESO AL CHAT</h3>
+        <input type="text" id="regNameInput" class="auth-input" placeholder="Tu Nickname (Solo para registro)" autocomplete="off">
+        <input type="email" id="emailInput" class="auth-input" placeholder="Correo electrónico" autocomplete="off">
+        <input type="password" id="passwordInput" class="auth-input" placeholder="Contraseña" autocomplete="off">
         <br>
-        <button onclick="startChat()">ENTRAR AL CHAT</button>
+        <button onclick="login()">ENTRAR</button>
+        <button class="btn-secondary" onclick="register()">CREAR CUENTA</button>
+        <p id="auth-error" style="color: #e74c3c; font-size: 0.9rem; margin-top: 10px;"></p>
     </div>
 
+    <!-- PANTALLA DEL CHAT -->
     <div class="chat-container" id="chatContainer">
-        <div class="chat-header">VIBEZMATCH CHAT SOCIAL</div>
+        <div class="chat-header">
+            VIBEZMATCH CHAT
+            <button id="logout-btn" onclick="logout()">Salir</button>
+        </div>
         <div id="messages-area">
-            <div class="message-bubble" id="welcome-msg" style="background:#d4edda;">Conectando...</div>
+            <div class="message-bubble" id="welcome-msg" style="background:#d4edda;">Conectando de forma segura...</div>
         </div>
         <div class="input-area">
             <input type="text" id="messageInput" placeholder="Escribe un mensaje..." autocomplete="off">
             <button onclick="sendMessage()">ENVIAR</button>
+        </div>
+        
+        <!-- PANEL SECRETO PARA BANEAR (Aparece si eres administradora) -->
+        <div id="admin-panel">
+            <strong>ADMINISTRADORA:</strong>
+            <input type="text" id="banUidInput" placeholder="Pega el UID a banear">
+            <button onclick="banUser()">Bloquear Usuario</button>
         </div>
     </div>
 
@@ -75,16 +108,16 @@
 
     <a href="admin_console_debug.html" style="display:none;" id="honeypot-link-chat" aria-hidden="true">Debug Console</a>
 
-    <!-- SDKs de Firebase (Firestore en lugar de Realtime Database) -->
+    <!-- SDKs de Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-check-compat.js"></script>
 
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
             authDomain: "vibezmatch-91c6d.firebaseapp.com",
-            databaseURL: "https://vibezmatch-91c6d-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "vibezmatch-91c6d",
             storageBucket: "vibezmatch-91c6d.firebasestorage.app",
             messagingSenderId: "645008717503",
@@ -93,81 +126,157 @@
         };
 
         firebase.initializeApp(firebaseConfig);
-        
-        // 🛑 COMENTADO PARA DIAGNÓSTICO: Si el chat no envía, es probable que reCAPTCHA/App Check 
-        // esté bloqueando el dominio de GitHub Pages. Desactívalo aquí para probar la conexión directa.
-        // const appCheck = firebase.appCheck();
-        // appCheck.activate('6LcbjugsAAAAALn_rfa17k5KG2Wbvv8QKl4Zm-ZT', true);
-
-        // ✅ Usamos Firestore para sincronizar con la App móvil
         const db = firebase.firestore();
+        const auth = firebase.auth();
 
-        let currentUsername = ""; 
+        // ⚠️ CAMBIA ESTO POR TU CORREO REAL DE ADMINISTRADORA
+        const CORREO_ADMIN = "amyillustrator22@gmail.com"; 
+        
+        let unsubscribeChat = null;
 
-        function startChat() {
-            const nameInput = document.getElementById('userNameInput');
-            const name = nameInput.value.trim();
-            
-            if (name !== "") {
-                currentUsername = name;
+        // --- SISTEMA DE CENSURA ---
+        function censurarMensaje(texto) {
+            // Añade aquí las palabras que quieres censurar separadas por comas
+            const palabrasProhibidas = ["insulto1", "insulto2", "spam", "odio"]; 
+            let filtrado = texto;
+            palabrasProhibidas.forEach(palabra => {
+                const regex = new RegExp(palabra, "gi"); // 'gi' hace que no importe si hay mayúsculas
+                filtrado = filtrado.replace(regex, "****");
+            });
+            return filtrado;
+        }
+
+        // --- AUTENTICACIÓN ---
+        function register() {
+            const email = document.getElementById('emailInput').value.trim();
+            const pass = document.getElementById('passwordInput').value.trim();
+            const nick = document.getElementById('regNameInput').value.trim();
+            const errorLabel = document.getElementById('auth-error');
+
+            if(!nick) { errorLabel.innerText = "Necesitas un Nickname para registrarte."; return; }
+
+            auth.createUserWithEmailAndPassword(email, pass)
+                .then((userCredential) => {
+                    // Guardamos el nick en su perfil
+                    return userCredential.user.updateProfile({ displayName: nick });
+                })
+                .catch((error) => { errorLabel.innerText = "Error: " + error.message; });
+        }
+
+        function login() {
+            const email = document.getElementById('emailInput').value.trim();
+            const pass = document.getElementById('passwordInput').value.trim();
+            const errorLabel = document.getElementById('auth-error');
+
+            auth.signInWithEmailAndPassword(email, pass)
+                .catch((error) => { errorLabel.innerText = "Error: Correo o contraseña incorrectos."; });
+        }
+
+        function logout() {
+            auth.signOut();
+        }
+
+        // Detectar si el usuario inicia o cierra sesión
+        auth.onAuthStateChanged((user) => {
+            if (user) {
                 document.getElementById('login-screen').style.display = 'none'; 
                 document.getElementById('chatContainer').style.display = 'flex'; 
                 document.getElementById('ad-container-web').style.display = 'block'; 
-                document.getElementById('welcome-msg').innerText = "¡Bienvenid@ " + currentUsername + "!";
+                document.getElementById('welcome-msg').innerText = "¡Bienvenid@ " + (user.displayName || "Usuario") + "!";
                 
+                // Activar panel de administradora si es tu correo
+                if(user.email === CORREO_ADMIN) {
+                    document.getElementById('admin-panel').style.display = 'block';
+                } else {
+                    document.getElementById('admin-panel').style.display = 'none';
+                }
+
                 escucharMensajes();
             } else {
-                alert("Por favor, dinos tu nombre para poder chatear.");
+                // Si cierra sesión, volvemos a la pantalla principal
+                if(unsubscribeChat) unsubscribeChat(); // Detiene la lectura del chat
+                document.getElementById('login-screen').style.display = 'block'; 
+                document.getElementById('chatContainer').style.display = 'none'; 
+                document.getElementById('ad-container-web').style.display = 'none';
+                document.getElementById('emailInput').value = '';
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('messages-area').innerHTML = '<div class="message-bubble" id="welcome-msg" style="background:#d4edda;">Conectando de forma segura...</div>';
             }
-        }
+        });
 
-        // ✅ Corregido: envía a 'chat_global' con las claves 'usuario' y 'texto'
+        // --- SISTEMA DE CHAT ---
         function sendMessage() {
             const inputField = document.getElementById('messageInput');
-            const text = inputField.value.trim();
+            const rawText = inputField.value.trim();
+            const user = auth.currentUser;
             
-            if (text !== '') {
+            if (rawText !== '' && user) {
+                // Pasamos el texto por el filtro de censura antes de enviarlo
+                const textoLimpio = censurarMensaje(rawText);
+
                 db.collection("chat_global").add({
-                    texto: text,
-                    usuario: currentUsername,
+                    texto: textoLimpio,
+                    usuario: user.displayName || "Anónimo",
+                    uid: user.uid, // Guardamos el UID para que puedas banearlo si es necesario
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 }).then(() => {
                     inputField.value = '';
-                    console.log("Mensaje enviado con éxito a Firestore.");
                 }).catch((error) => {
-                    // Si el mensaje no llega, este alert te dirá por qué (ej. falta de permisos o App Check)
-                    console.error("Error al enviar a Firestore:", error);
-                    alert("Error al enviar: " + error.message);
+                    alert("No se pudo enviar el mensaje. Es posible que hayas sido bloqueado.");
                 });
             }
         }
 
         function escucharMensajes() {
-            // Escuchamos los mensajes de las últimas 24 horas ordenados por tiempo
             const limite = new Date();
             limite.setDate(limite.getDate() - 1);
 
-            db.collection("chat_global")
+            unsubscribeChat = db.collection("chat_global")
               .where("timestamp", ">=", limite)
               .orderBy("timestamp", "asc")
               .onSnapshot((snapshot) => {
                   snapshot.docChanges().forEach((change) => {
                       if (change.type === "added") {
                           const msgData = change.doc.data();
-                          // Solo mostramos si tiene los campos que usa la app
                           if (msgData.usuario && msgData.texto) {
                               const msgDiv = document.createElement('div');
                               msgDiv.classList.add('message-bubble');
-                              msgDiv.innerHTML = `<strong>${msgData.usuario}:</strong> ${msgData.texto}`;
+                              // Si el mensaje es tuyo, le pone otro color
+                              if(msgData.uid === auth.currentUser.uid) {
+                                  msgDiv.classList.add('me');
+                              }
+                              
+                              // Solo si eres admin, verás el UID de la persona debajo de su mensaje
+                              let uidHTML = "";
+                              if(auth.currentUser.email === CORREO_ADMIN) {
+                                  uidHTML = `<span class="msg-uid">UID: ${msgData.uid}</span>`;
+                              }
+
+                              msgDiv.innerHTML = `<strong>${msgData.usuario}:</strong> ${msgData.texto} ${uidHTML}`;
                               const area = document.getElementById('messages-area');
                               area.appendChild(msgDiv);
                               area.scrollTop = area.scrollHeight;
                           }
                       }
                   });
-              }, (error) => {
-                  console.error("Error en el Snapshot de Firestore:", error);
               });
+        }
+
+        // --- SISTEMA DE BANEO (Solo para administradora) ---
+        function banUser() {
+            const uidABanear = document.getElementById('banUidInput').value.trim();
+            if(uidABanear && auth.currentUser.email === CORREO_ADMIN) {
+                // Guardamos el UID en la colección de baneados
+                db.collection("usuarios_baneados").doc(uidABanear).set({
+                    fecha_baneo: firebase.firestore.FieldValue.serverTimestamp(),
+                    baneado_por: auth.currentUser.email
+                }).then(() => {
+                    alert("Usuario baneado correctamente de la plataforma.");
+                    document.getElementById('banUidInput').value = '';
+                }).catch(error => {
+                    alert("Error al banear: " + error.message);
+                });
+            }
         }
 
         // --- CAPAS DE SEGURIDAD AMY SOFTWARE ---
@@ -184,10 +293,7 @@
             }, 1000);
         })();
 
-        document.getElementById("userNameInput").addEventListener("keyup", (e) => { if (e.key === "Enter") startChat(); });
         document.getElementById("messageInput").addEventListener("keyup", (e) => { if (e.key === "Enter") sendMessage(); });
-
-        console.log("%cProtección de Chat Activa - Sincronizado con App Móvil", "color: #764ba2; font-weight: bold;");
     </script>
 </body>
 </html>
