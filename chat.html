@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VibezMatch - Chat Social</title>
     
-    <!-- Script de verificación de Google AdSense -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5491883632835608"
      crossorigin="anonymous"></script>
 
@@ -54,7 +53,6 @@
             background: rgba(255, 255, 255, 0.9); border-radius: 10px; padding: 5px; display: none; 
         }
 
-        /* PANEL DE ADMINISTRADORA (Oculto por defecto) */
         #admin-panel {
             background: #e74c3c; color: white; padding: 10px; text-align: center; display: none;
             border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
@@ -65,7 +63,6 @@
 </head>
 <body>
 
-    <!-- PANTALLA DE LOGIN / REGISTRO -->
     <div id="login-screen">
         <h3>ACCESO AL CHAT</h3>
         <input type="text" id="regNameInput" class="auth-input" placeholder="Tu Nickname (Solo para registro)" autocomplete="off">
@@ -77,7 +74,6 @@
         <p id="auth-error" style="color: #e74c3c; font-size: 0.9rem; margin-top: 10px;"></p>
     </div>
 
-    <!-- PANTALLA DEL CHAT -->
     <div class="chat-container" id="chatContainer">
         <div class="chat-header">
             VIBEZMATCH CHAT
@@ -91,7 +87,6 @@
             <button onclick="sendMessage()">ENVIAR</button>
         </div>
         
-        <!-- PANEL SECRETO PARA BANEAR (Aparece si eres administradora) -->
         <div id="admin-panel">
             <strong>ADMINISTRADORA:</strong>
             <input type="text" id="banUidInput" placeholder="Pega el UID a banear">
@@ -108,7 +103,6 @@
 
     <a href="admin_console_debug.html" style="display:none;" id="honeypot-link-chat" aria-hidden="true">Debug Console</a>
 
-    <!-- SDKs de Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
@@ -129,24 +123,19 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        // ⚠️ CAMBIA ESTO POR TU CORREO REAL DE ADMINISTRADORA
         const CORREO_ADMIN = "amyillustrator22@gmail.com"; 
-        
         let unsubscribeChat = null;
 
-        // --- SISTEMA DE CENSURA ---
         function censurarMensaje(texto) {
-            // Añade aquí las palabras que quieres censurar separadas por comas
             const palabrasProhibidas = ["insulto1", "insulto2", "spam", "odio"]; 
             let filtrado = texto;
             palabrasProhibidas.forEach(palabra => {
-                const regex = new RegExp(palabra, "gi"); // 'gi' hace que no importe si hay mayúsculas
+                const regex = new RegExp(palabra, "gi");
                 filtrado = filtrado.replace(regex, "****");
             });
             return filtrado;
         }
 
-        // --- AUTENTICACIÓN ---
         function register() {
             const email = document.getElementById('emailInput').value.trim();
             const pass = document.getElementById('passwordInput').value.trim();
@@ -157,7 +146,6 @@
 
             auth.createUserWithEmailAndPassword(email, pass)
                 .then((userCredential) => {
-                    // Guardamos el nick en su perfil
                     return userCredential.user.updateProfile({ displayName: nick });
                 })
                 .catch((error) => { errorLabel.innerText = "Error: " + error.message; });
@@ -176,53 +164,55 @@
             auth.signOut();
         }
 
-        // Detectar si el usuario inicia o cierra sesión
+        // --- DETECTOR DE SESIÓN + LÓGICA DE NICKNAMES ---
         auth.onAuthStateChanged((user) => {
             if (user) {
+                // 1. SI NO TIENE NOMBRE, SE LO PEDIMOS
+                if (!user.displayName || user.displayName.trim() === "") {
+                    let nickElegido = prompt("¡Bienvenido/a! ¿Qué nombre quieres usar en el chat?", "");
+                    if (nickElegido && nickElegido.trim() !== "") {
+                        user.updateProfile({
+                            displayName: nickElegido.trim()
+                        }).then(() => {
+                            alert("Nick guardado: " + nickElegido);
+                            location.reload(); 
+                        });
+                    }
+                }
+
+                // 2. MOSTRAR INTERFAZ
                 document.getElementById('login-screen').style.display = 'none'; 
                 document.getElementById('chatContainer').style.display = 'flex'; 
                 document.getElementById('ad-container-web').style.display = 'block'; 
                 document.getElementById('welcome-msg').innerText = "¡Bienvenid@ " + (user.displayName || "Usuario") + "!";
                 
-                // Activar panel de administradora si es tu correo
                 if(user.email === CORREO_ADMIN) {
                     document.getElementById('admin-panel').style.display = 'block';
-                } else {
-                    document.getElementById('admin-panel').style.display = 'none';
                 }
 
                 escucharMensajes();
             } else {
-                // Si cierra sesión, volvemos a la pantalla principal
-                if(unsubscribeChat) unsubscribeChat(); // Detiene la lectura del chat
+                if(unsubscribeChat) unsubscribeChat();
                 document.getElementById('login-screen').style.display = 'block'; 
                 document.getElementById('chatContainer').style.display = 'none'; 
                 document.getElementById('ad-container-web').style.display = 'none';
-                document.getElementById('emailInput').value = '';
-                document.getElementById('passwordInput').value = '';
-                document.getElementById('messages-area').innerHTML = '<div class="message-bubble" id="welcome-msg" style="background:#d4edda;">Conectando de forma segura...</div>';
             }
         });
 
-        // --- SISTEMA DE CHAT ---
         function sendMessage() {
             const inputField = document.getElementById('messageInput');
             const rawText = inputField.value.trim();
             const user = auth.currentUser;
             
             if (rawText !== '' && user) {
-                // Pasamos el texto por el filtro de censura antes de enviarlo
                 const textoLimpio = censurarMensaje(rawText);
-
                 db.collection("chat_global").add({
                     texto: textoLimpio,
                     usuario: user.displayName || "Anónimo",
-                    uid: user.uid, // Guardamos el UID para que puedas banearlo si es necesario
+                    uid: user.uid,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 }).then(() => {
                     inputField.value = '';
-                }).catch((error) => {
-                    alert("No se pudo enviar el mensaje. Es posible que hayas sido bloqueado.");
                 });
             }
         }
@@ -238,48 +228,32 @@
                   snapshot.docChanges().forEach((change) => {
                       if (change.type === "added") {
                           const msgData = change.doc.data();
-                          if (msgData.usuario && msgData.texto) {
-                              const msgDiv = document.createElement('div');
-                              msgDiv.classList.add('message-bubble');
-                              // Si el mensaje es tuyo, le pone otro color
-                              if(msgData.uid === auth.currentUser.uid) {
-                                  msgDiv.classList.add('me');
-                              }
-                              
-                              // Solo si eres admin, verás el UID de la persona debajo de su mensaje
-                              let uidHTML = "";
-                              if(auth.currentUser.email === CORREO_ADMIN) {
-                                  uidHTML = `<span class="msg-uid">UID: ${msgData.uid}</span>`;
-                              }
+                          const msgDiv = document.createElement('div');
+                          msgDiv.classList.add('message-bubble');
+                          if(msgData.uid === auth.currentUser.uid) msgDiv.classList.add('me');
+                          
+                          let uidHTML = (auth.currentUser.email === CORREO_ADMIN) ? `<span class="msg-uid">UID: ${msgData.uid}</span>` : "";
 
-                              msgDiv.innerHTML = `<strong>${msgData.usuario}:</strong> ${msgData.texto} ${uidHTML}`;
-                              const area = document.getElementById('messages-area');
-                              area.appendChild(msgDiv);
-                              area.scrollTop = area.scrollHeight;
-                          }
+                          msgDiv.innerHTML = `<strong>${msgData.usuario}:</strong> ${msgData.texto} ${uidHTML}`;
+                          const area = document.getElementById('messages-area');
+                          area.appendChild(msgDiv);
+                          area.scrollTop = area.scrollHeight;
                       }
                   });
               });
         }
 
-        // --- SISTEMA DE BANEO (Solo para administradora) ---
         function banUser() {
             const uidABanear = document.getElementById('banUidInput').value.trim();
             if(uidABanear && auth.currentUser.email === CORREO_ADMIN) {
-                // Guardamos el UID en la colección de baneados
                 db.collection("usuarios_baneados").doc(uidABanear).set({
                     fecha_baneo: firebase.firestore.FieldValue.serverTimestamp(),
                     baneado_por: auth.currentUser.email
-                }).then(() => {
-                    alert("Usuario baneado correctamente de la plataforma.");
-                    document.getElementById('banUidInput').value = '';
-                }).catch(error => {
-                    alert("Error al banear: " + error.message);
-                });
+                }).then(() => alert("Usuario bloqueado."));
             }
         }
 
-        // --- CAPAS DE SEGURIDAD AMY SOFTWARE ---
+        // SEGURIDAD
         (function() {
             setInterval(function() {
                 const startTime = performance.now();
