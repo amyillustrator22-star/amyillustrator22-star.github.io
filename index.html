@@ -255,10 +255,16 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
+        // FUNCIONES MODAL
         function abrirJuegos() { document.getElementById('modal-juegos').style.display = 'flex'; }
         function cerrarJuegos() { document.getElementById('modal-juegos').style.display = 'none'; }
+        
+        // Cerrar modal al hacer clic fuera del contenido
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('modal-juegos')) { cerrarJuegos(); }
+        }
 
-        // Seguridad: Log de eventos
+        // SEGURIDAD: LOG DE EVENTOS
         function logSecurityEvent(type) {
             db.collection('security_alerts').add({
                 event_type: type,
@@ -268,7 +274,7 @@
             }).catch(e => console.error(e));
         }
 
-        // ✅ CAPA 2: Anti-Consola (RECUPERADO)
+        // CAPA 2: ANTI-CONSOLA
         (function() {
             setInterval(function() {
                 const startTime = performance.now();
@@ -278,7 +284,7 @@
             }, 1000);
         })();
 
-        // ✅ CAPA 3: VARIABLES CEBO (RECUPERADO)
+        // CAPA 3: VARIABLES CEBO
         let admin_config = {
             db_master_key: "AMY_MASTER_9921",
             is_root: false
@@ -292,20 +298,42 @@
             }
         });
 
-        // ✅ DETECTOR HONEYPOT (RECUPERADO)
+        // DETECTOR HONEYPOT
         document.getElementById('honeypot-link').addEventListener('click', function(e) {
             e.preventDefault();
             logSecurityEvent("honeypot_link_clicked");
             alert("Acceso denegado. Tu actividad ha sido registrada.");
         });
 
-        // Recuperar Contraseña
+        // RECUPERAR CONTRASEÑA
         document.getElementById('btn-recuperar').addEventListener('click', function() {
             const email = document.getElementById('email-recuperar').value.trim();
             if (email === "") { alert("Escribe tu Gmail."); return; }
             auth.sendPasswordResetEmail(email)
-                .then(() => { alert("¡Enlace enviado!"); })
+                .then(() => { alert("¡Enlace enviado! Revisa tu correo."); })
                 .catch(e => alert("Error: " + e.message));
+        });
+
+        // ✅ LÓGICA UNIVERSAL DE NICKNAMES
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                if (!user.displayName || user.displayName.trim() === "") {
+                    let nickElegido = prompt("¡Bienvenido/a a VibezMatch! ¿Qué nombre quieres usar en el chat?", "");
+                    if (nickElegido && nickElegido.trim() !== "") {
+                        user.updateProfile({
+                            displayName: nickElegido.trim()
+                        }).then(() => {
+                            alert("¡Genial! Ahora te conocemos como: " + nickElegido);
+                            location.reload();
+                        }).catch(e => {
+                            console.error("Error al guardar nick:", e);
+                            alert("Hubo un error al guardar tu nombre.");
+                        });
+                    } else {
+                        console.log("El usuario no eligió nick.");
+                    }
+                }
+            }
         });
 
         console.log("%c¡Amy Software Protection Active!", "color: #2ecc71; font-size: 20px; font-weight: bold;");
