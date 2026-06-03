@@ -74,7 +74,6 @@
             
             <div class="relative group flex-shrink-0 ml-4">
                 <div class="absolute -inset-1 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-                <!-- Forzamos la descarga del logo con ?v=2 -->
                 <img src="AmySoftwareLogo.jpg?v=2" alt="Logo Amy Software"
                      class="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover ring-1 ring-white/20 shadow-2xl">
             </div>
@@ -87,7 +86,12 @@
                 <span class="text-green-400 text-xs tracking-[0.2em] uppercase font-righteous">VibezMatch</span>
             </div>
             <p class="text-white/70 text-sm leading-relaxed font-sans">Citas para todo tipo de neurotipo: neurodivergentes, personas con discapacidad y colectivo LGTBI+.</p>
-            <a href="chat.html" class="btn-primary inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-green-500 hover:bg-green-400 text-white text-sm rounded-xl no-underline">Entrar al Chat Social</a>
+            <a href="chat.html" class="btn-primary inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-green-500 hover:bg-green-400 text-white text-sm rounded-xl no-underline shadow-lg shadow-green-900/40">
+                Entrar al Chat Social
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                </svg>
+            </a>
         </div>
 
         <!-- Zona de Juegos -->
@@ -96,15 +100,28 @@
                 <span class="dot-pulse w-2 h-2 rounded-full bg-purple-400 inline-block"></span>
                 <span class="text-purple-400 text-xs tracking-[0.2em] uppercase font-righteous">Zona de Juegos</span>
             </div>
-            <button onclick="abrirJuegos()" class="btn-primary inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm rounded-xl border-0 cursor-pointer">Abrir Expediente de Juegos</button>
+            <button onclick="abrirJuegos()" class="btn-primary inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm rounded-xl border-0 cursor-pointer shadow-lg shadow-purple-900/40">Abrir Expediente de Juegos</button>
+        </div>
+
+        <!-- Acceso Web -->
+        <div class="app-card glass-card rounded-3xl px-6 py-5 border-l-4 border-l-amber-500 hover:bg-white/[0.07]">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="dot-pulse w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
+                <span class="text-amber-400 text-xs tracking-[0.2em] uppercase font-righteous">Acceso Web</span>
+            </div>
+            <p class="text-white/70 text-sm font-sans mb-4">¿Te registraste con Google? Crea tu contraseña web aquí.</p>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <input type="email" id="email-recuperar" placeholder="Tu Gmail de la App" class="flex-1 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:border-amber-400/50">
+                <button id="btn-recuperar" class="btn-primary px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-white text-sm rounded-xl border-0 cursor-pointer whitespace-nowrap">Enviar Enlace</button>
+            </div>
         </div>
     </div>
 
     <!-- MODAL JUEGOS -->
     <div id="modal-juegos" class="modal-backdrop hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-        <div class="glass-card rounded-3xl p-8 w-full max-w-md shadow-2xl border border-purple-500/20" style="background: rgba(15,8,30,0.97);">
+        <div class="glass-card rounded-3xl p-8 w-full max-w-md border border-purple-500/20" style="background: rgba(15,8,30,0.97);">
             <div class="flex items-start justify-between mb-6">
-                <div><h3 class="text-purple-400 text-sm font-righteous">Expediente de Juegos</h3></div>
+                <div><h3 class="text-purple-400 text-sm font-righteous uppercase tracking-widest">Expediente de Juegos</h3></div>
                 <button onclick="cerrarJuegos()" class="text-white/40 hover:text-red-400 bg-transparent border-0 cursor-pointer text-xl">✕</button>
             </div>
             <div class="grid grid-cols-2 gap-3">
@@ -114,9 +131,9 @@
         </div>
     </div>
 
-    <!-- SISTEMA DE SEGURIDAD RECUPERADO -->
     <a href="admin_panel.html" style="display:none;" id="honeypot-link" aria-hidden="true">Acceso Administrador</a>
 
+    <!-- SCRIPTS FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
@@ -135,15 +152,17 @@
         const db = firebase.firestore();
         const auth = firebase.auth();
 
+        // FUNCIONES UI
         function abrirJuegos() { document.getElementById('modal-juegos').classList.replace('hidden', 'flex'); }
         function cerrarJuegos() { document.getElementById('modal-juegos').classList.replace('flex', 'hidden'); }
 
-        // PROTECCIÓN ANTI-DEBUG
+        // SEGURIDAD
         function logSecurityEvent(type) {
             db.collection('security_alerts').add({
                 event_type: type,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                url: window.location.href
+                url: window.location.href,
+                user_agent: navigator.userAgent
             }).catch(e => console.error(e));
         }
 
@@ -156,17 +175,33 @@
             }, 1000);
         })();
 
-        // HONEYPOT
         document.getElementById('honeypot-link').addEventListener('click', function(e) {
             e.preventDefault();
             logSecurityEvent("honeypot_link_clicked");
             alert("Acceso denegado. Tu actividad ha sido registrada.");
         });
 
-        document.getElementById('btn-recuperar')?.addEventListener('click', function() {
-            const email = document.getElementById('email-recuperar').value.trim();
-            if (email) auth.sendPasswordResetEmail(email).then(() => alert("¡Enlace enviado!")).catch(e => alert(e.message));
+        // LÓGICA DE AUTH Y REDIRECCIÓN AL CHAT
+        auth.onAuthStateChanged((user) => {
+            if (user && (!user.displayName || user.displayName.trim() === "")) {
+                let nickElegido = prompt("¡Bienvenido/a a VibezMatch! ¿Qué nombre quieres usar en el chat?", "");
+                if (nickElegido && nickElegido.trim() !== "") {
+                    user.updateProfile({ displayName: nickElegido.trim() }).then(() => {
+                        location.reload();
+                    });
+                }
+            }
         });
+
+        document.getElementById('btn-recuperar').addEventListener('click', function() {
+            const email = document.getElementById('email-recuperar').value.trim();
+            if (email === "") { alert("Escribe tu Gmail."); return; }
+            auth.sendPasswordResetEmail(email)
+                .then(() => { alert("¡Enlace enviado! Revisa tu correo."); })
+                .catch(e => alert("Error: " + e.message));
+        });
+
+        console.log("%c¡Amy Software Protection Active!", "color: #4ade80; font-size: 20px; font-weight: bold;");
     </script>
 </body>
 </html>
