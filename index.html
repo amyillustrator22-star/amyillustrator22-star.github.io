@@ -1,98 +1,132 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5491883632835608" crossorigin="anonymous"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amy Software</title>
+    <!-- Cargamos las tipografías que te gustan -->
     <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Righteous&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root { --neon-green: #4ade80; --neon-purple: #a855f7; }
-        body { 
-            font-family: 'Righteous', cursive; 
-            background: #0f172a; 
-            background-image: 
-                radial-gradient(circle at 20% 30%, rgba(74, 222, 128, 0.15) 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.15) 0%, transparent 40%);
-            color: white;
-            min-height: 100vh;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
+        body { font-family: 'Righteous', cursive; background: #080814; color: white; }
+        
         .brand-title {
             font-family: 'Alfa Slab One', serif;
-            background: linear-gradient(to bottom, #fff 30%, var(--neon-green));
+            background: linear-gradient(160deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 15px rgba(74, 222, 128, 0.5));
+            filter: drop-shadow(0 0 20px rgba(74, 222, 128, 0.4));
         }
+
         .glass-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        .logo-container {
+
+        .app-card { transition: all 0.2s ease; border-left: 4px solid transparent; }
+        .app-card:hover { transform: translateY(-2px); background: rgba(255, 255, 255, 0.07); }
+
+        .logo-box {
             font-family: 'Alfa Slab One', serif;
-            background: #000;
-            border: 2px solid var(--neon-green);
-            box-shadow: 0 0 15px var(--neon-green);
+            border: 2px solid #4ade80;
+            box-shadow: 0 0 15px rgba(74, 222, 128, 0.3);
             text-shadow: 2px 2px 0px #ff007f;
         }
-        .btn-neon { transition: all 0.3s ease; font-weight: bold; border: 1px solid; }
-        .btn-green { border-color: var(--neon-green); color: var(--neon-green); }
-        .btn-green:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); }
-        .btn-purple { border-color: var(--neon-purple); color: var(--neon-purple); }
-        .btn-purple:hover { background: var(--neon-purple); color: #fff; box-shadow: 0 0 20px var(--neon-purple); }
-        .hidden { display: none !important; }
+
+        .dot-pulse { animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .hidden { display: none; }
     </style>
 </head>
-<body class="px-4 py-10">
+<body class="min-h-screen flex flex-col items-center px-4 py-12"
+      style="background: radial-gradient(ellipse at 20% 0%, rgba(99,38,180,0.25) 0%, transparent 60%), #080814;">
 
-    <header class="text-center mb-12">
-        <h1 class="brand-title text-5xl md:text-7xl mb-2">AMY SOFTWARE</h1>
-        <p class="text-green-400/80 tracking-widest text-sm uppercase">Cybernetic Protection Active</p>
-    </header>
+    <!-- Título Principal -->
+    <h1 class="brand-title text-5xl sm:text-6xl md:text-7xl tracking-tighter text-center mb-10 select-none">
+        AMY SOFTWARE
+    </h1>
 
-    <main class="w-full max-w-2xl space-y-6">
-        <div class="glass-card rounded-3xl p-6 flex items-center justify-between border-b-2 border-green-500/50">
+    <div class="w-full max-w-[680px] space-y-3">
+
+        <!-- Cabecera con Logo Alfa Slab -->
+        <div class="glass-card rounded-3xl px-6 py-5 flex items-center justify-between">
             <div>
-                <h2 class="text-xl">System Dashboard</h2>
-                <p class="text-white/40 text-sm">Escudo: <span class="text-green-400">Activado</span></p>
+                <p class="text-white/90 text-lg tracking-wide">Aplicaciones disponibles</p>
+                <p class="text-white/30 text-xs mt-0.5">Selecciona una app para comenzar</p>
             </div>
-            <div class="logo-container w-16 h-16 rounded-xl flex items-center justify-center text-2xl text-green-400 select-none">AΩ</div>
+            <div class="logo-box w-14 h-14 rounded-2xl flex items-center justify-center text-green-400 text-2xl">AΩ</div>
         </div>
 
-        <div class="glass-card rounded-3xl p-6 hover:border-green-500/50 transition-colors">
-            <h3 class="text-green-400 text-lg uppercase mb-2">VibezMatch</h3>
-            <p class="text-white/70 mb-6">Acceso al canal de comunicación seguro.</p>
-            <!-- He añadido un parámetro para forzar que el navegador no use caché al saltar al chat -->
-            <a href="chat.html?v=amy" class="btn-neon btn-green block text-center py-3 rounded-xl no-underline">INICIAR PROTOCOLO</a>
+        <!-- 1. VibezMatch (Chat Funcional) -->
+        <div class="app-card glass-card rounded-3xl px-6 py-5 border-l-green-500">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="dot-pulse w-2 h-2 rounded-full bg-green-400"></span>
+                <span class="text-green-400 text-xs uppercase tracking-widest">VibezMatch</span>
+            </div>
+            <p class="text-white/70 text-sm mb-4">Citas para todo tipo de neurotipo: neurodivergentes, personas con discapacidad y colectivo LGTBI+.</p>
+            <a href="chat.html" class="inline-block px-5 py-2.5 bg-green-500 hover:bg-green-400 text-white text-sm rounded-xl font-bold no-underline transition-all">
+                Entrar al Chat Social
+            </a>
         </div>
 
-        <div class="glass-card rounded-3xl p-6 hover:border-purple-500/50 transition-colors">
-            <h3 class="text-purple-400 text-lg uppercase mb-2">Zona de Juegos</h3>
-            <button onclick="toggleModal('modal-juegos', true)" class="btn-neon btn-purple w-full py-3 rounded-xl cursor-pointer bg-transparent uppercase">ABRIR EXPEDIENTE</button>
+        <!-- 2. Zona de Juegos -->
+        <div class="app-card glass-card rounded-3xl px-6 py-5 border-l-purple-500">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="dot-pulse w-2 h-2 rounded-full bg-purple-400"></span>
+                <span class="text-purple-400 text-xs uppercase tracking-widest">Zona de Juegos</span>
+            </div>
+            <p class="text-white/70 text-sm mb-4">Accede a la colección de minijuegos de Amy Software.</p>
+            <button onclick="abrirJuegos()" class="px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm rounded-xl font-bold cursor-pointer border-0">
+                Abrir Expediente
+            </button>
         </div>
-    </main>
 
-    <!-- MODAL JUEGOS -->
-    <div id="modal-juegos" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
-        <div class="glass-card w-full max-w-md rounded-3xl p-8 relative border-purple-500/50">
-            <button onclick="toggleModal('modal-juegos', false)" class="absolute top-4 right-4 text-white/50 hover:text-white text-2xl cursor-pointer bg-transparent border-0">✕</button>
-            <h3 class="text-purple-400 text-2xl mb-6 font-alfa text-center uppercase">Módulos</h3>
-            <div class="grid grid-cols-1 gap-4">
-                <div class="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-purple-500/20 cursor-pointer" onclick="alert('Iniciando...')">🎯 Cuestionario</div>
-                <div class="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-purple-500/20 cursor-pointer" onclick="alert('Iniciando...')">🐍 Snake Cyberpunk</div>
+        <!-- 3. DietCheck (Tu app de nutrición) -->
+        <div class="app-card glass-card rounded-3xl px-6 py-5 border-l-sky-500/50">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-sky-400/50"></span>
+                    <span class="text-sky-400/80 text-xs uppercase tracking-widest">DietCheck</span>
+                </div>
+                <span class="text-[10px] px-2 py-1 rounded-full bg-white/5 text-white/30 border border-white/10">Próximamente</span>
+            </div>
+            <p class="text-white/50 text-sm">Escanea QR de restaurantes o códigos de barras para dietas personalizadas.</p>
+        </div>
+
+        <!-- 4. Acceso Web -->
+        <div class="app-card glass-card rounded-3xl px-6 py-5 border-l-amber-500">
+            <div class="flex items-center gap-2 mb-3">
+                <span class="dot-pulse w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="text-amber-400 text-xs uppercase tracking-widest">Acceso Web</span>
+            </div>
+            <p class="text-white/70 text-sm mb-4">¿Te registraste con Google? Crea tu contraseña web aquí.</p>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <input type="email" id="email-recuperar" placeholder="Tu Gmail de la App" class="flex-1 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:border-amber-400">
+                <button id="btn-recuperar" class="px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-white text-sm rounded-xl font-bold cursor-pointer border-0">Enviar Enlace</button>
             </div>
         </div>
     </div>
 
-    <a href="admin_panel.html" style="display:none;" id="honeypot-link" aria-hidden="true">Acceso Admin</a>
+    <!-- MODAL JUEGOS (Arreglado para que se vea) -->
+    <div id="modal-juegos" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="glass-card rounded-3xl p-8 w-full max-w-md relative" style="background: rgba(15,8,30,0.95);">
+            <button onclick="cerrarJuegos()" class="absolute top-4 right-4 text-white/50 hover:text-white text-2xl cursor-pointer bg-transparent border-0">✕</button>
+            <h3 class="text-purple-400 text-xl font-righteous mb-6 uppercase tracking-widest">Expediente de Juegos</h3>
+            <div class="grid grid-cols-2 gap-3">
+                <div class="p-4 bg-white/5 border border-purple-500/20 rounded-2xl text-center cursor-pointer hover:bg-purple-500/20 text-sm" onclick="alert('Próximamente')">🎯 Cuestionario</div>
+                <div class="p-4 bg-white/5 border border-purple-500/20 rounded-2xl text-center cursor-pointer hover:bg-purple-500/20 text-sm" onclick="alert('Próximamente')">🐍 Snake</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🛡️ TUS DEFENSAS (Inalteradas) -->
+    <a href="admin_panel.html" style="display:none;" id="honeypot-link" aria-hidden="true">Admin Access</a>
 
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -105,13 +139,13 @@
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const auth = firebase.auth();
 
-        function toggleModal(id, show) {
-            const m = document.getElementById(id);
-            if(show) { m.classList.remove('hidden'); m.style.display = 'flex'; }
-            else { m.classList.add('hidden'); m.style.display = 'none'; }
-        }
+        // Funciones del Modal
+        function abrirJuegos() { document.getElementById('modal-juegos').style.display = 'flex'; }
+        function cerrarJuegos() { document.getElementById('modal-juegos').style.display = 'none'; }
 
+        // 🛡️ SISTEMA DE SEGURIDAD AMY SOFTWARE
         function logSecurityEvent(type) {
             db.collection('security_alerts').add({
                 event_type: type,
@@ -132,6 +166,11 @@
             e.preventDefault();
             logSecurityEvent("honeypot_link_clicked");
             alert("Acceso denegado.");
+        });
+
+        document.getElementById('btn-recuperar').addEventListener('click', () => {
+            const email = document.getElementById('email-recuperar').value.trim();
+            if (email) auth.sendPasswordResetEmail(email).then(() => alert("¡Enlace enviado!")).catch(e => alert(e.message));
         });
     </script>
 </body>
