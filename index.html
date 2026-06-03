@@ -50,11 +50,6 @@
         }
         .btn-primary:hover { transform: translateY(-1px); }
 
-        .game-tile {
-            transition: all 0.18s ease;
-            font-family: 'Righteous', cursive;
-        }
-
         .dot-pulse {
             animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite;
         }
@@ -64,10 +59,7 @@
             50% { opacity: 0.4; }
         }
 
-        .modal-backdrop {
-            backdrop-filter: blur(10px);
-        }
-
+        .modal-backdrop { backdrop-filter: blur(10px); }
         input::placeholder { color: rgba(156,163,175,0.6); }
         input:focus { outline: none; }
     </style>
@@ -89,10 +81,13 @@
                 <p class="text-white/90 text-lg font-righteous tracking-wide">Aplicaciones disponibles</p>
                 <p class="text-white/30 text-xs mt-0.5 font-sans">Selecciona una app para comenzar</p>
             </div>
-            <!-- Logo Amy Software -->
-            <img src="AmySoftwareLogo.jpg" 
-                 alt="Logo Amy Software"
-                 class="w-14 h-14 rounded-2xl object-cover shadow-lg shadow-black/40 ring-1 ring-white/10">
+            
+            <!-- Logo con efecto Glass y Brillo -->
+            <div class="relative group flex-shrink-0 ml-4">
+                <div class="absolute -inset-1 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
+                <img src="AmySoftwareLogo.jpg" alt="Logo Amy Software"
+                     class="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover ring-1 ring-white/20 shadow-2xl">
+            </div>
         </div>
 
         <!-- VibezMatch -->
@@ -172,46 +167,23 @@
 
     </div>
 
-    <!-- Modal Juegos -->
-    <div id="modal-juegos"
-         class="modal-backdrop hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-        <div class="glass-card rounded-3xl p-8 w-full max-w-md shadow-2xl border border-purple-500/20"
-             style="background: rgba(15,8,30,0.97);">
-
+    <!-- Modal Juegos (Igual que antes) -->
+    <div id="modal-juegos" class="modal-backdrop hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+        <div class="glass-card rounded-3xl p-8 w-full max-w-md shadow-2xl border border-purple-500/20" style="background: rgba(15,8,30,0.97);">
             <div class="flex items-start justify-between mb-6">
                 <div>
                     <h3 class="text-purple-400 text-sm tracking-[0.2em] uppercase font-righteous">Expediente de Juegos</h3>
                     <p class="text-white/20 text-xs font-sans mt-1">Amy Software Collection</p>
                 </div>
-                <button onclick="cerrarJuegos()"
-                        class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-red-500/20 text-white/40 hover:text-red-400 transition-all text-base border border-white/5 cursor-pointer">
-                    ✕
-                </button>
+                <button onclick="cerrarJuegos()" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-red-500/20 text-white/40 hover:text-red-400 transition-all text-base border border-white/5 cursor-pointer">✕</button>
             </div>
-
             <div class="grid grid-cols-2 gap-3">
-                <div class="game-tile px-4 py-4 bg-white/[0.04] border border-purple-500/20 rounded-2xl text-center cursor-pointer hover:bg-purple-500/20 hover:border-purple-400/50 text-white/80 hover:text-white text-sm"
-                     onclick="alert('Próximamente')">🎯 Cuestionario Vibez</div>
-                <div class="game-tile px-4 py-4 bg-white/[0.04] border border-purple-500/20 rounded-2xl text-center cursor-pointer hover:bg-purple-500/20 hover:border-purple-400/50 text-white/80 hover:text-white text-sm"
-                     onclick="alert('Próximamente')">🐍 Snake Cyberpunk</div>
-                <div class="game-tile px-4 py-4 bg-white/[0.04] border border-purple-500/20 rounded-2xl text-center cursor-pointer hover:bg-purple-500/20 hover:border-purple-400/50 text-white/80 hover:text-white text-sm"
-                     onclick="alert('Próximamente')">🔢 Sudoku</div>
-                <div class="game-tile px-4 py-4 bg-white/[0.04] border border-purple-500/20 rounded-2xl text-center cursor-pointer hover:bg-purple-500/20 hover:border-purple-400/50 text-white/80 hover:text-white text-sm"
-                     onclick="alert('Próximamente')">🌑 Apagón</div>
-                <div class="game-tile px-4 py-4 bg-white/[0.04] border border-purple-500/20 rounded-2xl text-center cursor-pointer hover:bg-purple-500/20 hover:border-purple-400/50 text-white/80 hover:text-white text-sm"
-                     onclick="alert('Próximamente')">🔐 Codebreaker</div>
-                <div class="game-tile px-4 py-4 bg-white/[0.04] border border-purple-500/20 rounded-2xl text-center cursor-pointer hover:bg-purple-500/20 hover:border-purple-400/50 text-white/80 hover:text-white text-sm"
-                     onclick="alert('Próximamente')">❓ Daily Quiz</div>
+                <div class="game-tile px-4 py-4 bg-white/[0.04] border border-purple-500/20 rounded-2xl text-center cursor-pointer hover:bg-purple-500/20 hover:text-white text-sm" onclick="alert('Próximamente')">🎯 Cuestionario</div>
+                <div class="game-tile px-4 py-4 bg-white/[0.04] border border-purple-500/20 rounded-2xl text-center cursor-pointer hover:bg-purple-500/20 hover:text-white text-sm" onclick="alert('Próximamente')">🐍 Snake</div>
             </div>
-
-            <button onclick="cerrarJuegos()"
-                    class="btn-primary mt-6 w-full py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 hover:text-red-300 text-sm rounded-xl border border-red-500/20 hover:border-red-400/30 cursor-pointer transition-all">
-                Cerrar
-            </button>
+            <button onclick="cerrarJuegos()" class="btn-primary mt-6 w-full py-2.5 bg-red-500/20 hover:bg-red-500/30 text-red-400 text-sm rounded-xl border border-red-500/20 cursor-pointer transition-all">Cerrar</button>
         </div>
     </div>
-
-    <a href="admin_panel.html" style="display:none;" id="honeypot-link" aria-hidden="true">Acceso Administrador</a>
 
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
@@ -227,59 +199,17 @@
             appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a",
             measurementId: "G-JKN6EBRHWZ"
         };
-
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         const auth = firebase.auth();
 
-        function abrirJuegos() {
-            const m = document.getElementById('modal-juegos');
-            m.classList.remove('hidden');
-            m.classList.add('flex');
-        }
-        function cerrarJuegos() {
-            const m = document.getElementById('modal-juegos');
-            m.classList.add('hidden');
-            m.classList.remove('flex');
-        }
-
-        window.onclick = function(event) {
-            if (event.target == document.getElementById('modal-juegos')) { cerrarJuegos(); }
-        }
-
-        function logSecurityEvent(type) {
-            db.collection('security_alerts').add({
-                event_type: type,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                user_agent: navigator.userAgent,
-                url: window.location.href
-            }).catch(e => console.error(e));
-        }
-
-        (function() {
-            setInterval(function() {
-                const startTime = performance.now();
-                debugger;
-                const endTime = performance.now();
-                if (endTime - startTime > 100) { logSecurityEvent("console_debug_detected"); }
-            }, 1000);
-        })();
-
-        document.getElementById('honeypot-link').addEventListener('click', function(e) {
-            e.preventDefault();
-            logSecurityEvent("honeypot_link_clicked");
-            alert("Acceso denegado. Tu actividad ha sido registrada.");
-        });
+        function abrirJuegos() { document.getElementById('modal-juegos').classList.replace('hidden', 'flex'); }
+        function cerrarJuegos() { document.getElementById('modal-juegos').classList.replace('flex', 'hidden'); }
 
         document.getElementById('btn-recuperar').addEventListener('click', function() {
             const email = document.getElementById('email-recuperar').value.trim();
-            if (email === "") { alert("Escribe tu Gmail."); return; }
-            auth.sendPasswordResetEmail(email)
-                .then(() => { alert("¡Enlace enviado! Revisa tu correo."); })
-                .catch(e => alert("Error: " + e.message));
+            if (email) auth.sendPasswordResetEmail(email).then(() => alert("¡Enlace enviado!")).catch(e => alert(e.message));
         });
-
-        console.log("%c¡Amy Software Protection Active!", "color: #4ade80; font-size: 20px; font-weight: bold;");
     </script>
 </body>
 </html>
