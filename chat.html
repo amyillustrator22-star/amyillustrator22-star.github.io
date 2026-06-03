@@ -1,433 +1,505 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VibezMatch - Chat Social</title>
+  <!DOCTYPE html>
+  <html lang="es">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>VibezMatch - Chat Social</title>
 
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5491883632835608"
-     crossorigin="anonymous"></script>
+      <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygo
+  ogle.js?client=ca-pub-5491883632835608"
+       crossorigin="anonymous"></script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        righteous: ['Righteous', 'cursive'],
-                        inter: ['Inter', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        * { box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; overflow: hidden; margin: 0; }
-        input:focus { outline: none; }
-        input::placeholder { color: rgba(156,163,175,0.45); }
+      <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Inte
+  r:wght@400;500;600&display=swap" rel="stylesheet">
+      <script src="https://cdn.tailwindcss.com"></script>
+      <script>
+          tailwind.config = {
+              theme: {
+                  extend: {
+                      fontFamily: {
+                          righteous: ['Righteous', 'cursive'],
+                          inter: ['Inter', 'sans-serif'],
+                      }
+                  }
+              }
+          }
+      </script>
+      <style>
+          * { box-sizing: border-box; }
+          body { font-family: 'Inter', sans-serif; overflow: hidden; margin: 0;
+  }
+          input:focus { outline: none; }
+          input::placeholder { color: rgba(156,163,175,0.45); }
 
-        .glass {
-            background: rgba(255,255,255,0.04);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255,255,255,0.08);
-        }
+          .glass {
+              background: rgba(255,255,255,0.04);
+              backdrop-filter: blur(24px);
+              -webkit-backdrop-filter: blur(24px);
+              border: 1px solid rgba(255,255,255,0.08);
+          }
 
-        /* ── Message bubbles – applied dynamically by JS ── */
-        #messages-area {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
+          #messages-area {
+              display: flex;
+              flex-direction: column;
+              gap: 6px;
+          }
 
-        .message-bubble {
-            position: relative;
-            max-width: 72%;
-            padding: 9px 13px 7px;
-            border-radius: 18px 18px 18px 4px;
-            font-size: 0.875rem;
-            line-height: 1.55;
-            word-break: break-word;
-            background: rgba(255,255,255,0.08);
-            color: rgba(255,255,255,0.88);
-            border: 1px solid rgba(255,255,255,0.06);
-            align-self: flex-start;
-            animation: bubbleIn 0.14s ease-out;
-        }
+          .message-bubble {
+              position: relative;
+              max-width: 72%;
+              padding: 9px 13px 7px;
+              border-radius: 18px 18px 18px 4px;
+              font-size: 0.875rem;
+              line-height: 1.55;
+              word-break: break-word;
+              background: rgba(255,255,255,0.08);
+              color: rgba(255,255,255,0.88);
+              border: 1px solid rgba(255,255,255,0.06);
+              align-self: flex-start;
+              animation: bubbleIn 0.14s ease-out;
+          }
 
-        .message-bubble.me {
-            background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
-            color: #fff;
-            border-radius: 18px 18px 4px 18px;
-            border: none;
-            align-self: flex-end;
-            box-shadow: 0 2px 14px rgba(34,197,94,0.22);
-        }
+          .message-bubble.me {
+              background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);
+              color: #fff;
+              border-radius: 18px 18px 4px 18px;
+              border: none;
+              align-self: flex-end;
+              box-shadow: 0 2px 14px rgba(34,197,94,0.22);
+          }
 
-        .message-bubble strong {
-            display: block;
-            font-weight: 600;
-            font-size: 0.7rem;
-            color: #4ade80;
-            margin-bottom: 3px;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
+          .message-bubble strong {
+              display: block;
+              font-weight: 600;
+              font-size: 0.7rem;
+              color: #4ade80;
+              margin-bottom: 3px;
+              letter-spacing: 0.04em;
+              text-transform: uppercase;
+          }
 
-        .message-bubble.me strong { color: rgba(255,255,255,0.6); }
+          .message-bubble.me strong { color: rgba(255,255,255,0.6); }
 
-        .msg-uid {
-            display: block;
-            font-size: 0.6rem;
-            color: rgba(255,255,255,0.28);
-            margin-top: 4px;
-            font-family: 'Courier New', monospace;
-            word-break: break-all;
-        }
+          .msg-uid {
+              display: block;
+              font-size: 0.6rem;
+              color: rgba(255,255,255,0.28);
+              margin-top: 4px;
+              font-family: 'Courier New', monospace;
+              word-break: break-all;
+          }
 
-        /* System / welcome pill */
-        #welcome-msg {
-            align-self: center !important;
-            background: rgba(255,255,255,0.05) !important;
-            border-radius: 20px !important;
-            color: rgba(255,255,255,0.38) !important;
-            font-size: 0.72rem !important;
-            padding: 5px 16px !important;
-            border: 1px solid rgba(255,255,255,0.05) !important;
-            max-width: 100% !important;
-            text-align: center !important;
-        }
+          #welcome-msg {
+              align-self: center !important;
+              background: rgba(255,255,255,0.05) !important;
+              border-radius: 20px !important;
+              color: rgba(255,255,255,0.38) !important;
+              font-size: 0.72rem !important;
+              padding: 5px 16px !important;
+              border: 1px solid rgba(255,255,255,0.05) !important;
+              max-width: 100% !important;
+              text-align: center !important;
+          }
 
-        /* Scrollbar */
-        #messages-area::-webkit-scrollbar { width: 3px; }
-        #messages-area::-webkit-scrollbar-track { background: transparent; }
-        #messages-area::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 2px; }
+          #messages-area::-webkit-scrollbar { width: 3px; }
+          #messages-area::-webkit-scrollbar-track { background: transparent; }
+          #messages-area::-webkit-scrollbar-thumb { background:
+  rgba(255,255,255,0.08); border-radius: 2px; }
 
-        @keyframes bubbleIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-    </style>
-</head>
-<body class="bg-[#0e1117]">
+          @keyframes bubbleIn {
+              from { opacity: 0; transform: translateY(5px); }
+              to   { opacity: 1; transform: translateY(0); }
+          }
+      </style>
+  </head>
+  <body class="bg-[#0e1117]">
 
-    <!-- ════════════════ LOGIN SCREEN ════════════════ -->
-    <div id="login-screen"
-         class="fixed inset-0 flex items-center justify-center p-4 z-50"
-         style="background: radial-gradient(ellipse at 25% 15%, rgba(99,38,180,0.28) 0%, transparent 55%),
-                            radial-gradient(ellipse at 75% 85%, rgba(30,100,60,0.18) 0%, transparent 55%),
-                            #0e1117;">
+      <!-- LOGIN SCREEN -->
+      <div id="login-screen"
+           class="fixed inset-0 flex items-center justify-center p-4 z-50"
+           style="background: radial-gradient(ellipse at 25% 15%, 
+  rgba(99,38,180,0.28) 0%, transparent 55%),
+                              radial-gradient(ellipse at 75% 85%, 
+  rgba(30,100,60,0.18) 0%, transparent 55%),
+                              #0e1117;">
 
-        <div class="glass rounded-3xl p-8 w-full max-w-sm shadow-2xl">
+          <div class="glass rounded-3xl p-8 w-full max-w-sm shadow-2xl">
 
-            <!-- Logo -->
-            <div class="text-center mb-7">
-                <h1 class="font-righteous text-3xl tracking-widest uppercase"
-                    style="background: linear-gradient(160deg,#4ade80 0%,#22c55e 50%,#16a34a 100%);
-                           -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-                           filter: drop-shadow(0 0 18px rgba(74,222,128,0.4));">
-                    VibezMatch
-                </h1>
-                <p class="text-white/30 text-xs mt-1.5 font-inter">Chat Social · Accede o crea tu cuenta</p>
-            </div>
+              <div class="text-center mb-7">
+                  <h1 class="font-righteous text-3xl tracking-widest uppercase"
+                      style="background: linear-gradient(160deg,#4ade80 
+  0%,#22c55e 50%,#16a34a 100%);
+                             -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent;
+                             filter: drop-shadow(0 0 18px 
+  rgba(74,222,128,0.4));">
+                      VibezMatch
+                  </h1>
+                  <p class="text-white/30 text-xs mt-1.5 font-inter">Chat Social
+  · Accede o crea tu cuenta</p>
+              </div>
 
-            <!-- Inputs -->
-            <div class="space-y-2.5">
-                <input type="text" id="regNameInput"
-                       placeholder="Nickname (solo para registro)"
-                       class="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.08] rounded-xl text-white text-sm transition-all focus:border-green-500/40 focus:bg-white/[0.08]"
-                       autocomplete="off">
-                <input type="email" id="emailInput"
-                       placeholder="Correo electrónico"
-                       class="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.08] rounded-xl text-white text-sm transition-all focus:border-green-500/40 focus:bg-white/[0.08]"
-                       autocomplete="off">
-                <input type="password" id="passwordInput"
-                       placeholder="Contraseña"
-                       class="w-full px-4 py-3 bg-white/[0.05] border border-white/[0.08] rounded-xl text-white text-sm transition-all focus:border-green-500/40 focus:bg-white/[0.08]"
-                       autocomplete="off">
-            </div>
+              <div class="space-y-2.5">
+                  <input type="text" id="regNameInput"
+                         placeholder="Nickname (solo para registro)"
+                         class="w-full px-4 py-3 bg-white/[0.05] border 
+  border-white/[0.08] rounded-xl text-white text-sm transition-all 
+  focus:border-green-500/40 focus:bg-white/[0.08]"
+                         autocomplete="off">
+                  <input type="email" id="emailInput"
+                         placeholder="Correo electrónico"
+                         class="w-full px-4 py-3 bg-white/[0.05] border 
+  border-white/[0.08] rounded-xl text-white text-sm transition-all 
+  focus:border-green-500/40 focus:bg-white/[0.08]"
+                         autocomplete="off">
+                  <input type="password" id="passwordInput"
+                         placeholder="Contraseña"
+                         class="w-full px-4 py-3 bg-white/[0.05] border 
+  border-white/[0.08] rounded-xl text-white text-sm transition-all 
+  focus:border-green-500/40 focus:bg-white/[0.08]"
+                         autocomplete="off">
+              </div>
 
-            <!-- Action buttons -->
-            <div class="flex gap-2 mt-4">
-                <button onclick="login()"
-                        class="flex-1 py-3 bg-green-500 hover:bg-green-400 text-white text-sm font-righteous rounded-xl transition-all hover:-translate-y-0.5 shadow-lg shadow-green-900/30 border-0 cursor-pointer">
-                    Entrar
-                </button>
-                <button onclick="register()"
-                        class="flex-1 py-3 bg-white/[0.05] hover:bg-white/[0.09] text-white/70 text-sm font-righteous rounded-xl border border-white/[0.09] hover:border-white/[0.18] transition-all cursor-pointer">
-                    Registrarse
-                </button>
-            </div>
+              <div class="flex gap-2 mt-4">
+                  <button onclick="login()"
+                          class="flex-1 py-3 bg-green-500 hover:bg-green-400 
+  text-white text-sm font-righteous rounded-xl transition-all 
+  hover:-translate-y-0.5 shadow-lg shadow-green-900/30 border-0 cursor-pointer">
+                      Entrar
+                  </button>
+                  <button onclick="register()"
+                          class="flex-1 py-3 bg-white/[0.05] 
+  hover:bg-white/[0.09] text-white/70 text-sm font-righteous rounded-xl border 
+  border-white/[0.09] hover:border-white/[0.18] transition-all cursor-pointer">
+                      Registrarse
+                  </button>
+              </div>
 
-            <p id="auth-error" class="text-red-400 text-xs text-center mt-3 min-h-[16px]"></p>
+              <p id="auth-error" class="text-red-400 text-xs text-center mt-3 
+  min-h-[16px]"></p>
 
-            <!-- Password recovery -->
-            <div class="mt-3 pt-3 border-t border-white/[0.06]">
-                <button onclick="toggleRecovery()"
-                        class="w-full text-white/30 hover:text-white/55 text-xs transition-colors cursor-pointer bg-transparent border-0 font-inter">
-                    ¿Olvidaste tu contraseña?
-                </button>
-                <div id="recovery-section" style="display:none;" class="mt-3 space-y-2">
-                    <input type="email" id="recovery-email"
-                           placeholder="Tu correo registrado"
-                           class="w-full px-4 py-2.5 bg-white/[0.05] border border-amber-500/25 rounded-xl text-white text-sm transition-all focus:border-amber-400/50 focus:bg-white/[0.08]"
-                           autocomplete="off">
-                    <button onclick="sendRecovery()"
-                            class="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-white text-sm font-righteous rounded-xl transition-all hover:-translate-y-0.5 shadow-lg shadow-amber-900/25 border-0 cursor-pointer">
-                        Enviar enlace de recuperación
-                    </button>
-                </div>
-            </div>
+              <div class="mt-3 pt-3 border-t border-white/[0.06]">
+                  <button onclick="toggleRecovery()"
+                          class="w-full text-white/30 hover:text-white/55 
+  text-xs transition-colors cursor-pointer bg-transparent border-0 font-inter">
+                      ¿Olvidaste tu contraseña?
+                  </button>
+                  <div id="recovery-section" style="display:none;" class="mt-3 
+  space-y-2">
+                      <input type="email" id="recovery-email"
+                             placeholder="Tu correo registrado"
+                             class="w-full px-4 py-2.5 bg-white/[0.05] border 
+  border-amber-500/25 rounded-xl text-white text-sm transition-all 
+  focus:border-amber-400/50 focus:bg-white/[0.08]"
+                             autocomplete="off">
+                      <button onclick="sendRecovery()"
+                              class="w-full py-2.5 bg-amber-500 
+  hover:bg-amber-400 text-white text-sm font-righteous rounded-xl transition-all
+  hover:-translate-y-0.5 shadow-lg shadow-amber-900/25 border-0 
+  cursor-pointer">
+                          Enviar enlace de recuperación
+                      </button>
+                  </div>
+              </div>
 
-        </div>
-    </div><!-- /login-screen -->
+          </div>
+      </div>
 
+      <!-- CHAT SCREEN -->
+      <div id="chatContainer"
+           style="display:none;"
+           class="fixed inset-0 flex-col bg-[#0e1117]">
 
-    <!-- ════════════════ CHAT SCREEN ════════════════ -->
-    <div id="chatContainer"
-         style="display:none;"
-         class="fixed inset-0 flex-col bg-[#0e1117]">
+          <!-- Header -->
+          <div class="flex items-center gap-3 px-4 py-3 flex-shrink-0"
+               style="background: rgba(10,6,20,0.97);
+                      backdrop-filter: blur(20px);
+                      -webkit-backdrop-filter: blur(20px);
+                      border-bottom: 1px solid rgba(255,255,255,0.05);">
+              <a href="index.html"
+                 class="w-8 h-8 flex items-center justify-center rounded-full 
+  bg-white/[0.04] hover:bg-white/[0.09] text-white/50 hover:text-white 
+  transition-all flex-shrink-0">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" 
+  viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 
+  0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 
+  2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+                  </svg>
+              </a>
+              <div class="w-9 h-9 rounded-full bg-green-500/15 border 
+  border-green-500/30 flex items-center justify-center flex-shrink-0">
+                  <span class="text-green-400 text-sm font-bold 
+  font-righteous">V</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                  <p class="text-white/90 text-sm font-semibold font-righteous 
+  truncate leading-tight">VibezMatch Chat</p>
+                  <p class="text-green-400/55 text-[10px] font-inter">● Canal
+  global · últimas 24 h</p>
+              </div>
+              <button onclick="logout()"
+                      class="flex-shrink-0 px-3 py-1.5 text-red-400/70 
+  hover:text-red-400 text-xs font-righteous rounded-lg bg-red-500/[0.06] 
+  hover:bg-red-500/[0.14] border border-red-500/[0.1] hover:border-red-400/25 
+  transition-all cursor-pointer">
+                  Salir
+              </button>
+          </div>
 
-        <!-- Header -->
-        <div class="flex items-center gap-3 px-4 py-3 flex-shrink-0"
-             style="background: rgba(10,6,20,0.97);
-                    backdrop-filter: blur(20px);
-                    -webkit-backdrop-filter: blur(20px);
-                    border-bottom: 1px solid rgba(255,255,255,0.05);">
-            <a href="index.html"
-               class="w-8 h-8 flex items-center justify-center rounded-full bg-white/[0.04] hover:bg-white/[0.09] text-white/50 hover:text-white transition-all flex-shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
-                </svg>
-            </a>
-            <div class="w-9 h-9 rounded-full bg-green-500/15 border border-green-500/30 flex items-center justify-center flex-shrink-0">
-                <span class="text-green-400 text-sm font-bold font-righteous">V</span>
-            </div>
-            <div class="flex-1 min-w-0">
-                <p class="text-white/90 text-sm font-semibold font-righteous truncate leading-tight">VibezMatch Chat</p>
-                <p class="text-green-400/55 text-[10px] font-inter">● Canal global · últimas 24 h</p>
-            </div>
-            <button onclick="logout()"
-                    class="flex-shrink-0 px-3 py-1.5 text-red-400/70 hover:text-red-400 text-xs font-righteous rounded-lg bg-red-500/[0.06] hover:bg-red-500/[0.14] border border-red-500/[0.1] hover:border-red-400/25 transition-all cursor-pointer">
-                Salir
-            </button>
-        </div>
+          <!-- Messages -->
+          <div id="messages-area"
+               class="flex-1 overflow-y-auto px-4 py-5"
+               style="background: radial-gradient(ellipse at 10% 15%, 
+  rgba(99,38,180,0.05) 0%, transparent 45%), #0e1117;">
+              <div class="message-bubble" id="welcome-msg">Conectando de forma
+  segura...</div>
+          </div>
 
-        <!-- Messages -->
-        <div id="messages-area"
-             class="flex-1 overflow-y-auto px-4 py-5"
-             style="background: radial-gradient(ellipse at 10% 15%, rgba(99,38,180,0.05) 0%, transparent 45%), #0e1117;">
-            <div class="message-bubble" id="welcome-msg">Conectando de forma segura...</div>
-        </div>
+          <!-- Admin panel -->
+          <div id="admin-panel"
+               style="display:none; background: rgba(239,68,68,0.04);"
+               class="flex-shrink-0 px-4 py-3 border-t border-red-500/15">
+              <p class="text-red-400/75 text-[11px] font-righteous uppercase 
+  tracking-widest mb-2">Panel Administradora</p>
+              <div class="flex gap-2">
+                  <input type="text" id="banUidInput" placeholder="UID a 
+  bloquear"
+                         class="flex-1 px-3 py-2 bg-white/[0.04] border 
+  border-red-500/20 rounded-xl text-white/80 text-xs transition-all 
+  focus:border-red-400/40 font-inter"
+                         autocomplete="off">
+                  <button onclick="banUser()"
+                          class="px-4 py-2 bg-red-500/15 hover:bg-red-500/25 
+  text-red-400 text-xs font-righteous rounded-xl border border-red-500/20 
+  transition-all cursor-pointer">
+                      Bloquear
+                  </button>
+              </div>
+          </div>
 
-        <!-- Admin panel (only visible to admin) -->
-        <div id="admin-panel"
-             style="display:none; background: rgba(239,68,68,0.04);"
-             class="flex-shrink-0 px-4 py-3 border-t border-red-500/15">
-            <p class="text-red-400/75 text-[11px] font-righteous uppercase tracking-widest mb-2">Panel Administradora</p>
-            <div class="flex gap-2">
-                <input type="text" id="banUidInput" placeholder="UID a bloquear"
-                       class="flex-1 px-3 py-2 bg-white/[0.04] border border-red-500/20 rounded-xl text-white/80 text-xs transition-all focus:border-red-400/40 font-inter"
-                       autocomplete="off">
-                <button onclick="banUser()"
-                        class="px-4 py-2 bg-red-500/15 hover:bg-red-500/25 text-red-400 text-xs font-righteous rounded-xl border border-red-500/20 transition-all cursor-pointer">
-                    Bloquear
-                </button>
-            </div>
-        </div>
+          <!-- Input bar -->
+          <div class="flex-shrink-0 flex items-center gap-2.5 px-4 py-3"
+               style="background: rgba(10,6,20,0.97);
+                      backdrop-filter: blur(20px);
+                      -webkit-backdrop-filter: blur(20px);
+                      border-top: 1px solid rgba(255,255,255,0.05);">
+              <input type="text" id="messageInput"
+                     placeholder="Escribe un mensaje..."
+                     class="flex-1 px-4 py-3 bg-white/[0.05] border 
+  border-white/[0.08] rounded-2xl text-white text-sm transition-all 
+  focus:border-green-500/30 focus:bg-white/[0.08] font-inter"
+                     autocomplete="off">
+              <button onclick="sendMessage()"
+                      class="w-11 h-11 flex items-center justify-center 
+  bg-green-500 hover:bg-green-400 rounded-2xl transition-all hover:scale-105 
+  shadow-lg shadow-green-900/35 flex-shrink-0 border-0 cursor-pointer">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 
+  text-white" viewBox="0 0 24 24" fill="currentColor"
+                       style="transform: rotate(45deg) translateY(-1px);">
+                      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                  </svg>
+              </button>
+          </div>
 
-        <!-- Input bar -->
-        <div class="flex-shrink-0 flex items-center gap-2.5 px-4 py-3"
-             style="background: rgba(10,6,20,0.97);
-                    backdrop-filter: blur(20px);
-                    -webkit-backdrop-filter: blur(20px);
-                    border-top: 1px solid rgba(255,255,255,0.05);">
-            <input type="text" id="messageInput"
-                   placeholder="Escribe un mensaje..."
-                   class="flex-1 px-4 py-3 bg-white/[0.05] border border-white/[0.08] rounded-2xl text-white text-sm transition-all focus:border-green-500/30 focus:bg-white/[0.08] font-inter"
-                   autocomplete="off">
-            <button onclick="sendMessage()"
-                    class="w-11 h-11 flex items-center justify-center bg-green-500 hover:bg-green-400 rounded-2xl transition-all hover:scale-105 shadow-lg shadow-green-900/35 flex-shrink-0 border-0 cursor-pointer">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor"
-                     style="transform: rotate(45deg) translateY(-1px);">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                </svg>
-            </button>
-        </div>
+      </div>
 
-    </div><!-- /chatContainer -->
+      <div id="ad-container-web" style="display:none;"></div>
+      <a href="admin_console_debug.html" style="display:none;" 
+  id="honeypot-link-chat" aria-hidden="true">Debug Console</a>
 
-    <!-- Ad slot (invisible container, kept for AdSense logic) -->
-    <div id="ad-container-web" style="display:none;"></div>
+      <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.
+  js"></script>
+      <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-c
+  ompat.js"></script>
+      <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat
+  .js"></script>
+      <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-check-c
+  ompat.js"></script>
 
-    <!-- Honeypot -->
-    <a href="admin_console_debug.html" style="display:none;" id="honeypot-link-chat" aria-hidden="true">Debug Console</a>
+      <script>
+          const firebaseConfig = {
+              apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
+              authDomain: "vibezmatch-91c6d.firebaseapp.com",
+              projectId: "vibezmatch-91c6d",
+              storageBucket: "vibezmatch-91c6d.firebasestorage.app",
+              messagingSenderId: "645008717503",
+              appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a",
+              measurementId: "G-JKN6EBRHWZ"
+          };
 
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-check-compat.js"></script>
+          firebase.initializeApp(firebaseConfig);
+          const db = firebase.firestore();
+          const auth = firebase.auth();
 
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
-            authDomain: "vibezmatch-91c6d.firebaseapp.com",
-            projectId: "vibezmatch-91c6d",
-            storageBucket: "vibezmatch-91c6d.firebasestorage.app",
-            messagingSenderId: "645008717503",
-            appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a",
-            measurementId: "G-JKN6EBRHWZ"
-        };
+          const CORREO_ADMIN = "amyillustrator22@gmail.com";
+          let unsubscribeChat = null;
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+          function censurarMensaje(texto) {
+              const palabrasProhibidas = ["insulto1", "insulto2", "spam",
+  "odio"];
+              let filtrado = texto;
+              palabrasProhibidas.forEach(palabra => {
+                  const regex = new RegExp(palabra, "gi");
+                  filtrado = filtrado.replace(regex, "****");
+              });
+              return filtrado;
+          }
 
-        const CORREO_ADMIN = "amyillustrator22@gmail.com";
-        let unsubscribeChat = null;
+          function toggleRecovery() {
+              const s = document.getElementById('recovery-section');
+              s.style.display = s.style.display === 'none' ? 'block' : 'none';
+          }
 
-        function censurarMensaje(texto) {
-            const palabrasProhibidas = ["insulto1", "insulto2", "spam", "odio"];
-            let filtrado = texto;
-            palabrasProhibidas.forEach(palabra => {
-                const regex = new RegExp(palabra, "gi");
-                filtrado = filtrado.replace(regex, "****");
-            });
-            return filtrado;
-        }
+          function sendRecovery() {
+              const email =
+  document.getElementById('recovery-email').value.trim();
+              if (!email) { alert("Escribe tu correo."); return; }
+              auth.sendPasswordResetEmail(email)
+                  .then(() => { alert("¡Enlace enviado! Revisa tu correo."); })
+                  .catch(e => alert("Error: " + e.message));
+          }
 
-        function toggleRecovery() {
-            const s = document.getElementById('recovery-section');
-            s.style.display = s.style.display === 'none' ? 'block' : 'none';
-        }
+          function register() {
+              const email = document.getElementById('emailInput').value.trim();
+              const pass  =
+  document.getElementById('passwordInput').value.trim();
+              const nick  =
+  document.getElementById('regNameInput').value.trim();
+              const err   = document.getElementById('auth-error');
+              if (!nick) { err.innerText = "Necesitas un Nickname para 
+  registrarte."; return; }
+              auth.createUserWithEmailAndPassword(email, pass)
+                  .then(cred => cred.user.updateProfile({ displayName: nick }))
+                  .catch(e  => { err.innerText = "Error: " + e.message; });
+          }
 
-        function sendRecovery() {
-            const email = document.getElementById('recovery-email').value.trim();
-            if (!email) { alert("Escribe tu correo."); return; }
-            auth.sendPasswordResetEmail(email)
-                .then(() => { alert("¡Enlace enviado! Revisa tu correo."); })
-                .catch(e => alert("Error: " + e.message));
-        }
+          function login() {
+              const email = document.getElementById('emailInput').value.trim();
+              const pass  =
+  document.getElementById('passwordInput').value.trim();
+              const err   = document.getElementById('auth-error');
+              auth.signInWithEmailAndPassword(email, pass)
+                  .catch(() => { err.innerText = "Error: Correo o contraseña 
+  incorrectos."; });
+          }
 
-        function register() {
-            const email = document.getElementById('emailInput').value.trim();
-            const pass  = document.getElementById('passwordInput').value.trim();
-            const nick  = document.getElementById('regNameInput').value.trim();
-            const err   = document.getElementById('auth-error');
-            if (!nick) { err.innerText = "Necesitas un Nickname para registrarte."; return; }
-            auth.createUserWithEmailAndPassword(email, pass)
-                .then(cred => cred.user.updateProfile({ displayName: nick }))
-                .catch(e  => { err.innerText = "Error: " + e.message; });
-        }
+          function logout() { auth.signOut(); }
 
-        function login() {
-            const email = document.getElementById('emailInput').value.trim();
-            const pass  = document.getElementById('passwordInput').value.trim();
-            const err   = document.getElementById('auth-error');
-            auth.signInWithEmailAndPassword(email, pass)
-                .catch(() => { err.innerText = "Error: Correo o contraseña incorrectos."; });
-        }
+          auth.onAuthStateChanged((user) => {
+              if (user) {
+                  if (!user.displayName || user.displayName.trim() === "") {
+                      let nick = prompt("¡Bienvenido/a! ¿Qué nombre quieres usar
+  en el chat?", "");
+                      if (nick && nick.trim() !== "") {
+                          user.updateProfile({ displayName: nick.trim() })
+                              .then(() => { alert("Nick guardado: " + nick);
+  location.reload(); });
+                      }
+                  }
 
-        function logout() { auth.signOut(); }
+                  document.getElementById('login-screen').style.display  =
+  'none';
+                  document.getElementById('chatContainer').style.display  =
+  'flex';
+                  document.getElementById('ad-container-web').style.display =
+  'block';
+                  document.getElementById('welcome-msg').innerText =
+  "¡Bienvenid@ " + (user.displayName || "Usuario") + "!";
 
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                if (!user.displayName || user.displayName.trim() === "") {
-                    let nick = prompt("¡Bienvenido/a! ¿Qué nombre quieres usar en el chat?", "");
-                    if (nick && nick.trim() !== "") {
-                        user.updateProfile({ displayName: nick.trim() })
-                            .then(() => { alert("Nick guardado: " + nick); location.reload(); });
-                    }
-                }
+                  if (user.email === CORREO_ADMIN) {
+                      document.getElementById('admin-panel').style.display =
+  'block';
+                  }
 
-                document.getElementById('login-screen').style.display  = 'none';
-                document.getElementById('chatContainer').style.display  = 'flex';
-                document.getElementById('ad-container-web').style.display = 'block';
-                document.getElementById('welcome-msg').innerText = "¡Bienvenid@ " + (user.displayName || "Usuario") + "!";
+                  escucharMensajes();
+              } else {
+                  if (unsubscribeChat) unsubscribeChat();
+                  document.getElementById('login-screen').style.display  =
+  'flex';
+                  document.getElementById('chatContainer').style.display  =
+  'none';
+                  document.getElementById('ad-container-web').style.display =
+  'none';
+              }
+          });
 
-                if (user.email === CORREO_ADMIN) {
-                    document.getElementById('admin-panel').style.display = 'block';
-                }
+          function sendMessage() {
+              const input = document.getElementById('messageInput');
+              const raw   = input.value.trim();
+              const user  = auth.currentUser;
+              if (raw !== '' && user) {
+                  db.collection("chat_global").add({
+                      texto:     censurarMensaje(raw),
+                      usuario:   user.displayName || "Anónimo",
+                      uid:       user.uid,
+                      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                  }).then(() => { input.value = ''; });
+              }
+          }
 
-                escucharMensajes();
-            } else {
-                if (unsubscribeChat) unsubscribeChat();
-                document.getElementById('login-screen').style.display  = 'flex';
-                document.getElementById('chatContainer').style.display  = 'none';
-                document.getElementById('ad-container-web').style.display = 'none';
-            }
-        });
+          function escucharMensajes() {
+              const limite = new Date();
+              limite.setDate(limite.getDate() - 1);
 
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const raw   = input.value.trim();
-            const user  = auth.currentUser;
-            if (raw !== '' && user) {
-                db.collection("chat_global").add({
-                    texto:     censurarMensaje(raw),
-                    usuario:   user.displayName || "Anónimo",
-                    uid:       user.uid,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                }).then(() => { input.value = ''; });
-            }
-        }
+              unsubscribeChat = db.collection("chat_global")
+                  .where("timestamp", ">=", limite)
+                  .orderBy("timestamp", "asc")
+                  .onSnapshot((snapshot) => {
+                      snapshot.docChanges().forEach((change) => {
+                          if (change.type === "added") {
+                              const d = change.doc.data();
+                              const div = document.createElement('div');
+                              div.classList.add('message-bubble');
+                              if (d.uid === auth.currentUser.uid)
+  div.classList.add('me');
 
-        function escucharMensajes() {
-            const limite = new Date();
-            limite.setDate(limite.getDate() - 1);
+                              const uidHTML = (auth.currentUser.email ===
+  CORREO_ADMIN)
+                                  ? `<span class="msg-uid">UID: ${d.uid}</span>`
+  : "";
 
-            unsubscribeChat = db.collection("chat_global")
-                .where("timestamp", ">=", limite)
-                .orderBy("timestamp", "asc")
-                .onSnapshot((snapshot) => {
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === "added") {
-                            const d = change.doc.data();
-                            const div = document.createElement('div');
-                            div.classList.add('message-bubble');
-                            if (d.uid === auth.currentUser.uid) div.classList.add('me');
+                              div.innerHTML =
+  `<strong>${d.usuario}</strong>${d.texto}${uidHTML}`;
+                              const area =
+  document.getElementById('messages-area');
+                              area.appendChild(div);
+                              area.scrollTop = area.scrollHeight;
+                          }
+                      });
+                  });
+          }
 
-                            const uidHTML = (auth.currentUser.email === CORREO_ADMIN)
-                                ? `<span class="msg-uid">UID: ${d.uid}</span>` : "";
+          function banUser() {
+              const uid = document.getElementById('banUidInput').value.trim();
+              if (uid && auth.currentUser.email === CORREO_ADMIN) {
+                  db.collection("usuarios_baneados").doc(uid).set({
+                      fecha_baneo:
+  firebase.firestore.FieldValue.serverTimestamp(),
+                      baneado_por: auth.currentUser.email
+                  }).then(() => alert("Usuario bloqueado."));
+              }
+          }
 
-                            div.innerHTML = `<strong>${d.usuario}</strong>${d.texto}${uidHTML}`;
-                            const area = document.getElementById('messages-area');
-                            area.appendChild(div);
-                            area.scrollTop = area.scrollHeight;
-                        }
-                    });
-                });
-        }
+          (function() {
+              setInterval(function() {
+                  const t = performance.now();
+                  debugger;
+                  if (performance.now() - t > 100) {
+                      db.collection('security_alerts').add({
+                          event_type: "chat_debug_attempt",
+                          timestamp:
+  firebase.firestore.FieldValue.serverTimestamp()
+                      });
+                  }
+              }, 1000);
+          })();
 
-        function banUser() {
-            const uid = document.getElementById('banUidInput').value.trim();
-            if (uid && auth.currentUser.email === CORREO_ADMIN) {
-                db.collection("usuarios_baneados").doc(uid).set({
-                    fecha_baneo: firebase.firestore.FieldValue.serverTimestamp(),
-                    baneado_por: auth.currentUser.email
-                }).then(() => alert("Usuario bloqueado."));
-            }
-        }
+          document.getElementById("messageInput").addEventListener("keyup", (e)
+  => {
+              if (e.key === "Enter") sendMessage();
+          });
+      </script>
+  </body>
+  </html>
 
-        // SEGURIDAD: anti-debug
-        (function() {
-            setInterval(function() {
-                const t = performance.now();
-                debugger;
-                if (performance.now() - t > 100) {
-                    db.collection('security_alerts').add({
-                        event_type: "chat_debug_attempt",
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                }
-            }, 1000);
-        })();
-
-        document.getElementById("messageInput").addEventListener("keyup", (e) => {
-            if (e.key === "Enter") sendMessage();
-        });
-    </script>
-</body>
-</html>
