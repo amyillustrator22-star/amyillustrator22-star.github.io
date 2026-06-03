@@ -1,142 +1,98 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5491883632835608"
-     crossorigin="anonymous"></script>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amy Software</title>
-    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Syne:wght@800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Righteous&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        righteous: ['Righteous', 'cursive'],
-                        syne: ['Syne', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
     <style>
-        body { font-family: 'Righteous', cursive; }
+        :root { --neon-green: #4ade80; --neon-purple: #a855f7; }
+        body { 
+            font-family: 'Righteous', cursive; 
+            background: #0f172a; 
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(74, 222, 128, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.15) 0%, transparent 40%);
+            color: white;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         .brand-title {
-            font-family: 'Syne', sans-serif;
-            font-weight: 800;
-            background: linear-gradient(160deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
+            font-family: 'Alfa Slab One', serif;
+            background: linear-gradient(to bottom, #fff 30%, var(--neon-green));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            filter: drop-shadow(0 0 24px rgba(74, 222, 128, 0.4));
+            filter: drop-shadow(0 0 15px rgba(74, 222, 128, 0.5));
         }
         .glass-card {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .app-card {
-            transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        .logo-container {
+            font-family: 'Alfa Slab One', serif;
+            background: #000;
+            border: 2px solid var(--neon-green);
+            box-shadow: 0 0 15px var(--neon-green);
+            text-shadow: 2px 2px 0px #ff007f;
         }
-        .app-card:hover { transform: translateY(-2px); }
-        .btn-primary {
-            font-family: 'Righteous', cursive;
-            transition: all 0.2s ease;
-        }
-        .btn-primary:hover { transform: translateY(-1px); }
-        .dot-pulse {
-            animation: pulse 2s cubic-bezier(0.4,0,0.6,1) infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.4; }
-        }
-        .modal-backdrop { backdrop-filter: blur(10px); }
-        input::placeholder { color: rgba(156,163,175,0.6); }
-        input:focus { outline: none; }
+        .btn-neon { transition: all 0.3s ease; font-weight: bold; border: 1px solid; }
+        .btn-green { border-color: var(--neon-green); color: var(--neon-green); }
+        .btn-green:hover { background: var(--neon-green); color: #000; box-shadow: 0 0 20px var(--neon-green); }
+        .btn-purple { border-color: var(--neon-purple); color: var(--neon-purple); }
+        .btn-purple:hover { background: var(--neon-purple); color: #fff; box-shadow: 0 0 20px var(--neon-purple); }
+        .hidden { display: none !important; }
     </style>
 </head>
-<body class="min-h-screen bg-[#080814] overflow-x-hidden flex flex-col items-center px-4 py-12"
-      style="background: radial-gradient(ellipse at 20% 0%, rgba(99,38,180,0.25) 0%, transparent 60%), radial-gradient(ellipse at 80% 100%, rgba(30,100,60,0.2) 0%, transparent 60%), #080814;">
+<body class="px-4 py-10">
 
-    <h1 class="brand-title text-5xl sm:text-6xl md:text-7xl tracking-[0.2em] uppercase text-center mb-10 select-none">
-        AMY SOFTWARE
-    </h1>
+    <header class="text-center mb-12">
+        <h1 class="brand-title text-5xl md:text-7xl mb-2">AMY SOFTWARE</h1>
+        <p class="text-green-400/80 tracking-widest text-sm uppercase">Cybernetic Protection Active</p>
+    </header>
 
-    <div class="w-full max-w-[680px] space-y-3">
-        <!-- Panel Header -->
-        <div class="glass-card rounded-3xl px-6 py-5 flex items-center justify-between">
+    <main class="w-full max-w-2xl space-y-6">
+        <div class="glass-card rounded-3xl p-6 flex items-center justify-between border-b-2 border-green-500/50">
             <div>
-                <p class="text-white/90 text-lg font-righteous tracking-wide">Aplicaciones disponibles</p>
-                <p class="text-white/30 text-xs mt-0.5 font-sans">Selecciona una app para comenzar</p>
+                <h2 class="text-xl">System Dashboard</h2>
+                <p class="text-white/40 text-sm">Escudo: <span class="text-green-400">Activado</span></p>
             </div>
-            
-            <div class="relative group flex-shrink-0 ml-4">
-                <div class="absolute -inset-1 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-                <img src="AmySoftwareLogo.jpg?v=2" alt="Logo Amy Software"
-                     class="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover ring-1 ring-white/20 shadow-2xl">
-            </div>
+            <div class="logo-container w-16 h-16 rounded-xl flex items-center justify-center text-2xl text-green-400 select-none">AΩ</div>
         </div>
 
-        <!-- VibezMatch -->
-        <div class="app-card glass-card rounded-3xl px-6 py-5 border-l-4 border-l-green-500 hover:bg-white/[0.07] hover:border-l-green-400">
-            <div class="flex items-center gap-2 mb-3">
-                <span class="dot-pulse w-2 h-2 rounded-full bg-green-400 inline-block"></span>
-                <span class="text-green-400 text-xs tracking-[0.2em] uppercase font-righteous">VibezMatch</span>
-            </div>
-            <p class="text-white/70 text-sm leading-relaxed font-sans">Citas para todo tipo de neurotipo: neurodivergentes, personas con discapacidad y colectivo LGTBI+.</p>
-            <a href="chat.html" class="btn-primary inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-green-500 hover:bg-green-400 text-white text-sm rounded-xl no-underline shadow-lg shadow-green-900/40">
-                Entrar al Chat Social
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                </svg>
-            </a>
+        <div class="glass-card rounded-3xl p-6 hover:border-green-500/50 transition-colors">
+            <h3 class="text-green-400 text-lg uppercase mb-2">VibezMatch</h3>
+            <p class="text-white/70 mb-6">Acceso al canal de comunicación seguro.</p>
+            <!-- He añadido un parámetro para forzar que el navegador no use caché al saltar al chat -->
+            <a href="chat.html?v=amy" class="btn-neon btn-green block text-center py-3 rounded-xl no-underline">INICIAR PROTOCOLO</a>
         </div>
 
-        <!-- Zona de Juegos -->
-        <div class="app-card glass-card rounded-3xl px-6 py-5 border-l-4 border-l-purple-500 hover:bg-white/[0.07]">
-            <div class="flex items-center gap-2 mb-3">
-                <span class="dot-pulse w-2 h-2 rounded-full bg-purple-400 inline-block"></span>
-                <span class="text-purple-400 text-xs tracking-[0.2em] uppercase font-righteous">Zona de Juegos</span>
-            </div>
-            <button onclick="abrirJuegos()" class="btn-primary inline-flex items-center gap-2 mt-4 px-5 py-2.5 bg-purple-600 hover:bg-purple-500 text-white text-sm rounded-xl border-0 cursor-pointer shadow-lg shadow-purple-900/40">Abrir Expediente de Juegos</button>
+        <div class="glass-card rounded-3xl p-6 hover:border-purple-500/50 transition-colors">
+            <h3 class="text-purple-400 text-lg uppercase mb-2">Zona de Juegos</h3>
+            <button onclick="toggleModal('modal-juegos', true)" class="btn-neon btn-purple w-full py-3 rounded-xl cursor-pointer bg-transparent uppercase">ABRIR EXPEDIENTE</button>
         </div>
-
-        <!-- Acceso Web -->
-        <div class="app-card glass-card rounded-3xl px-6 py-5 border-l-4 border-l-amber-500 hover:bg-white/[0.07]">
-            <div class="flex items-center gap-2 mb-3">
-                <span class="dot-pulse w-2 h-2 rounded-full bg-amber-400 inline-block"></span>
-                <span class="text-amber-400 text-xs tracking-[0.2em] uppercase font-righteous">Acceso Web</span>
-            </div>
-            <p class="text-white/70 text-sm font-sans mb-4">¿Te registraste con Google? Crea tu contraseña web aquí.</p>
-            <div class="flex flex-col sm:flex-row gap-2">
-                <input type="email" id="email-recuperar" placeholder="Tu Gmail de la App" class="flex-1 px-4 py-2.5 bg-white/5 border border-white/10 rounded-xl text-white text-sm focus:border-amber-400/50">
-                <button id="btn-recuperar" class="btn-primary px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-white text-sm rounded-xl border-0 cursor-pointer whitespace-nowrap">Enviar Enlace</button>
-            </div>
-        </div>
-    </div>
+    </main>
 
     <!-- MODAL JUEGOS -->
-    <div id="modal-juegos" class="modal-backdrop hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-        <div class="glass-card rounded-3xl p-8 w-full max-w-md border border-purple-500/20" style="background: rgba(15,8,30,0.97);">
-            <div class="flex items-start justify-between mb-6">
-                <div><h3 class="text-purple-400 text-sm font-righteous uppercase tracking-widest">Expediente de Juegos</h3></div>
-                <button onclick="cerrarJuegos()" class="text-white/40 hover:text-red-400 bg-transparent border-0 cursor-pointer text-xl">✕</button>
-            </div>
-            <div class="grid grid-cols-2 gap-3">
-                <div class="game-tile px-4 py-4 bg-white/[0.04] border border-purple-500/20 rounded-2xl text-center cursor-pointer hover:bg-purple-500/20 text-white/80 text-sm" onclick="alert('Próximamente')">🎯 Cuestionario</div>
-                <div class="game-tile px-4 py-4 bg-white/[0.04] border border-purple-500/20 rounded-2xl text-center cursor-pointer hover:bg-purple-500/20 text-white/80 text-sm" onclick="alert('Próximamente')">🐍 Snake</div>
+    <div id="modal-juegos" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md">
+        <div class="glass-card w-full max-w-md rounded-3xl p-8 relative border-purple-500/50">
+            <button onclick="toggleModal('modal-juegos', false)" class="absolute top-4 right-4 text-white/50 hover:text-white text-2xl cursor-pointer bg-transparent border-0">✕</button>
+            <h3 class="text-purple-400 text-2xl mb-6 font-alfa text-center uppercase">Módulos</h3>
+            <div class="grid grid-cols-1 gap-4">
+                <div class="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-purple-500/20 cursor-pointer" onclick="alert('Iniciando...')">🎯 Cuestionario</div>
+                <div class="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-purple-500/20 cursor-pointer" onclick="alert('Iniciando...')">🐍 Snake Cyberpunk</div>
             </div>
         </div>
     </div>
 
-    <a href="admin_panel.html" style="display:none;" id="honeypot-link" aria-hidden="true">Acceso Administrador</a>
+    <a href="admin_panel.html" style="display:none;" id="honeypot-link" aria-hidden="true">Acceso Admin</a>
 
-    <!-- SCRIPTS FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
 
     <script>
         const firebaseConfig = {
@@ -145,63 +101,38 @@
             projectId: "vibezmatch-91c6d",
             storageBucket: "vibezmatch-91c6d.firebasestorage.app",
             messagingSenderId: "645008717503",
-            appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a",
-            measurementId: "G-JKN6EBRHWZ"
+            appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a"
         };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth();
 
-        // FUNCIONES UI
-        function abrirJuegos() { document.getElementById('modal-juegos').classList.replace('hidden', 'flex'); }
-        function cerrarJuegos() { document.getElementById('modal-juegos').classList.replace('flex', 'hidden'); }
+        function toggleModal(id, show) {
+            const m = document.getElementById(id);
+            if(show) { m.classList.remove('hidden'); m.style.display = 'flex'; }
+            else { m.classList.add('hidden'); m.style.display = 'none'; }
+        }
 
-        // SEGURIDAD
         function logSecurityEvent(type) {
             db.collection('security_alerts').add({
                 event_type: type,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                url: window.location.href,
-                user_agent: navigator.userAgent
-            }).catch(e => console.error(e));
+                url: window.location.href
+            }).catch(() => {});
         }
 
         (function() {
             setInterval(function() {
-                const startTime = performance.now();
+                const s = performance.now();
                 debugger;
-                const endTime = performance.now();
-                if (endTime - startTime > 100) { logSecurityEvent("console_debug_detected"); }
+                if (performance.now() - s > 100) { logSecurityEvent("console_debug_detected"); }
             }, 1000);
         })();
 
-        document.getElementById('honeypot-link').addEventListener('click', function(e) {
+        document.getElementById('honeypot-link').addEventListener('click', (e) => {
             e.preventDefault();
             logSecurityEvent("honeypot_link_clicked");
-            alert("Acceso denegado. Tu actividad ha sido registrada.");
+            alert("Acceso denegado.");
         });
-
-        // LÓGICA DE AUTH Y REDIRECCIÓN AL CHAT
-        auth.onAuthStateChanged((user) => {
-            if (user && (!user.displayName || user.displayName.trim() === "")) {
-                let nickElegido = prompt("¡Bienvenido/a a VibezMatch! ¿Qué nombre quieres usar en el chat?", "");
-                if (nickElegido && nickElegido.trim() !== "") {
-                    user.updateProfile({ displayName: nickElegido.trim() }).then(() => {
-                        location.reload();
-                    });
-                }
-            }
-        });
-
-        document.getElementById('btn-recuperar').addEventListener('click', function() {
-            const email = document.getElementById('email-recuperar').value.trim();
-            if (email === "") { alert("Escribe tu Gmail."); return; }
-            auth.sendPasswordResetEmail(email)
-                .then(() => { alert("¡Enlace enviado! Revisa tu correo."); })
-                .catch(e => alert("Error: " + e.message));
-        });
-
-        console.log("%c¡Amy Software Protection Active!", "color: #4ade80; font-size: 20px; font-weight: bold;");
     </script>
 </body>
 </html>
