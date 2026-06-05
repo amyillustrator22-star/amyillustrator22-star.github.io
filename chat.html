@@ -46,14 +46,21 @@
             }
         });
 
-        // Autenticación con protección Honeypot
+        // Autenticación con protección Honeypot y chivatos de depuración
         window.handleAuthSubmit = async function(e) {
             e.preventDefault();
+            console.log("¡Botón pulsado! Intentando procesar...");
+
             const hpValue = document.getElementById('validation_code_hp').value;
-            if (hpValue) return; 
+            if (hpValue) {
+                console.log("Honeypot detectado, bloqueando.");
+                return;
+            }
 
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
+            console.log("Procesando Auth para:", email);
+            
             const isLogin = currentMode === 'login';
 
             try {
@@ -63,11 +70,14 @@
                     resetToLoginTab();
                 } else if (isLogin) {
                     await signInWithEmailAndPassword(auth, email, password);
+                    console.log("Inicio de sesión exitoso.");
                 } else {
                     await createUserWithEmailAndPassword(auth, email, password);
+                    console.log("Registro exitoso.");
                 }
             } catch (error) {
-                alert("Error: Verifica tus credenciales.");
+                console.error("Error completo de Firebase:", error);
+                alert("Error: " + error.message);
             }
         };
 
@@ -88,8 +98,6 @@
             const chatMessagesDiv = document.getElementById('chat-messages');
 
             unsubscribeChat = onSnapshot(q, (snapshot) => {
-                const isScrolledToBottom = chatMessagesDiv.scrollHeight - chatMessagesDiv.clientHeight <= chatMessagesDiv.scrollTop + 10;
-
                 chatMessagesDiv.innerHTML = `
                     <div class="flex justify-center my-2">
                         <span class="bg-gray-200 text-gray-600 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm text-center">
@@ -163,7 +171,6 @@
         window.simulatedBan = async function(uidToBan) {
             if(!confirm("¿Confirmas la expulsión definitiva de este usuario?")) return;
             try {
-                // Escribe directamente en tu colección de usuarios_baneados según tus Reglas
                 await setDoc(doc(db, 'usuarios_baneados', uidToBan), {
                     baneadoEn: serverTimestamp(),
                     motivo: "Violación de normas desde plataforma web",
