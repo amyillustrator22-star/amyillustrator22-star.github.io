@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VibezMatch - TEST123</title>
+    <title>VibezMatch - Chat Room Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
         import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Firebase Hosting inyecta las credenciales automáticamente desde esta URL oculta
         const response = await fetch('/__/firebase/init.json');
         const firebaseConfig = await response.json();
         
@@ -21,7 +20,6 @@
         let unsubscribeChat = null;
         let currentUser = null;
 
-        // Escuchar el estado de autenticación y verificar baneos
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 currentUser = user;
@@ -29,7 +27,7 @@
                 const banSnap = await getDoc(banRef);
                 
                 if (banSnap.exists()) {
-                    alert("Tu cuenta ha sido suspendida por incumplir las normas de la comunidad.");
+                    alert("Tu cuenta ha sido suspendida.");
                     await signOut(auth);
                     window.location.reload();
                     return;
@@ -46,15 +44,10 @@
             }
         });
 
-        // Autenticación con protección Honeypot y chivatos de depuración
         window.handleAuthSubmit = async function() {
             console.log("¡Ejecutando lógica de Auth!");
-
             const hpValue = document.getElementById('validation_code_hp').value;
-            if (hpValue) {
-                console.log("Honeypot detectado, bloqueando.");
-                return;
-            }
+            if (hpValue) return;
 
             const email = document.getElementById('auth-email').value;
             const password = document.getElementById('auth-password').value;
@@ -65,32 +58,25 @@
             try {
                 if (currentMode === 'recovery') {
                     await sendPasswordResetEmail(auth, email);
-                    alert("Enlace de recuperación enviado. Revisa tu correo electrónico.");
+                    alert("Enlace de recuperación enviado.");
                     resetToLoginTab();
                 } else if (isLogin) {
                     await signInWithEmailAndPassword(auth, email, password);
-                    console.log("Inicio de sesión exitoso.");
                 } else {
                     await createUserWithEmailAndPassword(auth, email, password);
-                    console.log("Registro exitoso.");
                 }
             } catch (error) {
-                console.error("Error completo de Firebase:", error);
+                console.error("Error Firebase:", error);
                 alert("Error: " + error.message);
             }
         };
 
-        // Nueva función de puente para el clic directo
         window.handleAuthSubmitDirect = function() {
             console.log("¡Clic directo detectado!");
             handleAuthSubmit();
         };
 
-        window.logout = async function() {
-            await signOut(auth);
-        };
-
-        // Lógica de la Sala Global
+        window.logout = async function() { await signOut(auth); };
         window.acceptRulesAndEnter = function() {
             document.getElementById('rules-modal').classList.add('hidden');
             document.getElementById('chat-container').classList.remove('hidden');
@@ -103,234 +89,45 @@
             const chatMessagesDiv = document.getElementById('chat-messages');
 
             unsubscribeChat = onSnapshot(q, (snapshot) => {
-                chatMessagesDiv.innerHTML = `
-                    <div class="flex justify-center my-2">
-                        <span class="bg-gray-200 text-gray-600 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm text-center">
-                            🔒 Los nombres están ocultos y los privados deshabilitados por privacidad.<br>
-                            Todo comportamiento abusivo resultará en baneo permanente.
-                        </span>
-                    </div>
-                `;
-
+                chatMessagesDiv.innerHTML = '';
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
                     const isMine = data.uid === currentUser.uid;
-                    const text = data.text || '';
-                    const timeString = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
-                    
                     const msgDiv = document.createElement('div');
-                    
-                    if (isMine) {
-                        msgDiv.className = "flex items-end gap-2 max-w-lg ml-auto justify-end";
-                        msgDiv.innerHTML = `
-                            <div class="bg-gray-900 text-white rounded-2xl rounded-br-none p-3.5 shadow-md relative">
-                                <p class="text-sm font-medium leading-relaxed break-words">${escapeHTML(text)}</p>
-                                <span class="block text-[10px] text-gray-400 text-right mt-1 font-semibold">${timeString}</span>
-                            </div>
-                        `;
-                    } else {
-                        msgDiv.className = "flex items-end gap-2 max-w-lg";
-                        msgDiv.innerHTML = `
-                            <div class="bg-white text-gray-900 rounded-2xl rounded-bl-none p-3.5 shadow-sm border border-gray-200 relative group">
-                                <p class="text-sm font-medium leading-relaxed break-words">${escapeHTML(text)}</p>
-                                <span class="block text-[10px] text-gray-400 text-right mt-1 font-semibold">${timeString}</span>
-                                <button onclick="simulatedBan('${data.uid}')" class="admin-action hidden absolute -top-3 -right-3 bg-red-600 text-white rounded-full p-1 shadow-lg hover:bg-red-700 transition-all" title="Banear Usuario">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
-                                </button>
-                            </div>
-                        `;
-                    }
+                    msgDiv.innerHTML = `<p>${escapeHTML(data.text)}</p>`;
                     chatMessagesDiv.appendChild(msgDiv);
                 });
-
-                if (isAdminMode) {
-                    document.querySelectorAll('.admin-action').forEach(b => b.classList.remove('hidden'));
-                }
-
                 chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
             });
         }
 
         window.handleSendMessage = async function(e) {
             e.preventDefault();
-            const chatHp = e.target.elements['chat_msg_honeypot'].value;
-            if (chatHp) return;
-
             const input = document.getElementById('chat-message-input');
             const text = input.value.trim();
             if (!text || !currentUser) return;
-
             input.value = ''; 
-
-            try {
-                await addDoc(collection(db, 'chat_global'), {
-                    text: text,
-                    uid: currentUser.uid,
-                    timestamp: serverTimestamp()
-                });
-            } catch (error) {
-                alert("No se pudo enviar el mensaje. Verifica tu conexión o si tu cuenta tiene restricciones.");
-            }
+            await addDoc(collection(db, 'chat_global'), { text, uid: currentUser.uid, timestamp: serverTimestamp() });
         };
 
-        window.simulatedBan = async function(uidToBan) {
-            if(!confirm("¿Confirmas la expulsión definitiva de este usuario?")) return;
-            try {
-                await setDoc(doc(db, 'usuarios_baneados', uidToBan), {
-                    baneadoEn: serverTimestamp(),
-                    motivo: "Violación de normas desde plataforma web",
-                    baneadoPor: currentUser.uid 
-                });
-                alert("Usuario bloqueado y desconectado con éxito.");
-            } catch (error) {
-                alert("Error: Solo la cuenta de Administradora puede ejecutar esta acción.");
-            }
-        }
-        
+        function escapeHTML(str) { return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
     </script>
-
-    <style>
-        body { background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%); min-height: 100vh; }
-        .hp-field { position: absolute; left: -9999px; top: -9999px; width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; }
-        .chat-messages::-webkit-scrollbar { width: 6px; }
-        .chat-messages::-webkit-scrollbar-track { background: transparent; }
-        .chat-messages::-webkit-scrollbar-thumb { background-color: rgba(156, 163, 175, 0.5); border-radius: 20px; }
-    </style>
 </head>
-<body class="font-sans text-gray-800 flex items-center justify-center p-2 sm:p-4">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-    <div id="auth-container" class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-[2.5rem] p-8 shadow-2xl border border-white/50">
-        <div class="text-center mb-8">
-            <h2 class="text-3xl font-extrabold text-gray-950 tracking-tight">VibezMatch Chat</h2>
-            <p class="text-sm text-gray-600 mt-2">Accede o regístrate para conectar con la comunidad</p>
-        </div>
-
-        <div class="flex bg-gray-200/60 p-1 rounded-xl mb-6">
-            <button id="tab-login-btn" onclick="switchAuthTab('login')" class="w-1/2 py-2 text-sm font-bold rounded-lg bg-white shadow text-gray-900 transition-all">Entrar</button>
-            <button id="tab-register-btn" onclick="switchAuthTab('register')" class="w-1/2 py-2 text-sm font-medium rounded-lg text-gray-600 hover:text-gray-900 transition-all">Registrarse</button>
-        </div>
-
-        <!-- Formulario modificado para usar clic directo -->
-        <div id="auth-form" class="space-y-4">
-            <div class="hp-field"><input type="text" id="validation_code_hp" tabindex="-1"></div>
-            <div>
-                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Correo Electrónico</label>
-                <input type="email" id="auth-email" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white/50 focus:ring-2 focus:ring-slate-900 focus:outline-none">
-            </div>
-            <div id="password-field-container">
-                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Contraseña</label>
-                <div class="relative">
-                    <input type="password" id="auth-password" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white/50 focus:ring-2 focus:ring-slate-900 focus:outline-none pr-12">
-                    <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
-                        <svg id="eye-icon-closed" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path></svg>
-                        <svg id="eye-icon-open" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                    </button>
-                </div>
-            </div>
-            <div class="flex justify-between items-center text-xs">
-                <button type="button" onclick="showRecoveryView()" id="forgot-pass-btn" class="text-slate-600 font-medium hover:underline">¿Olvidaste tu contraseña?</button>
-                <button type="button" onclick="resetToLoginTab()" id="back-to-login-btn" class="hidden text-slate-600 font-medium hover:underline">Volver a Entrar</button>
-            </div>
-            <button onclick="handleAuthSubmitDirect()" id="auth-submit-btn" class="w-full py-3 px-4 bg-gray-950 text-white font-bold rounded-xl hover:bg-gray-800 transition-all shadow-md">Iniciar Sesión</button>
-        </div>
+    <div id="auth-container" class="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm">
+        <input type="email" id="auth-email" placeholder="Correo" class="w-full p-2 border mb-4">
+        <input type="password" id="auth-password" placeholder="Contraseña" class="w-full p-2 border mb-4">
+        <input type="text" id="validation_code_hp" class="hidden">
+        <button onclick="handleAuthSubmitDirect()" id="auth-submit-btn" class="w-full bg-black text-white p-2 rounded">Iniciar Sesión</button>
     </div>
 
-    <!-- ... el resto de tu HTML permanece igual ... -->
-    <div id="rules-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-[2.5rem] max-w-md w-full p-8 shadow-2xl">
-            <h3 class="text-2xl font-black text-center mb-6">Normas de Convivencia</h3>
-            <ul class="space-y-3 text-sm text-gray-700 font-medium mb-8 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <li class="flex items-start gap-2"><span class="text-red-500 font-bold">❌</span> <span>Prohibido insultos o lenguaje ofensivo.</span></li>
-                <li class="flex items-start gap-2"><span class="text-red-500 font-bold">❌</span> <span>Cero tolerancia a material explícito o acoso.</span></li>
-                <li class="flex items-start gap-2"><span class="text-green-500 font-bold">✨</span> <span>El respeto es obligatorio. Las faltas terminan en expulsión.</span></li>
-            </ul>
-            <button onclick="acceptRulesAndEnter()" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-md shadow-emerald-200">Acepto las reglas</button>
-        </div>
-    </div>
-
-    <div id="chat-container" class="w-full max-w-4xl h-[85vh] bg-white rounded-[2.5rem] shadow-2xl border border-gray-200 flex flex-col overflow-hidden hidden">
-        <header class="bg-gray-900 text-white px-6 py-4 flex items-center justify-between shadow-md z-10">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center font-bold">VM</div>
-                <div><h3 class="font-extrabold text-lg tracking-tight">Sala General</h3></div>
-            </div>
-            <div class="flex items-center gap-2">
-                <button id="admin-toggle-btn" onclick="toggleAdminMode()" class="px-3 py-1.5 bg-gray-800 border border-gray-700 text-purple-400 rounded-xl text-xs font-bold transition-all hover:bg-gray-700">Modo Admin: OFF</button>
-                <button onclick="logout()" class="px-3 py-1.5 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 shadow-md">Salir</button>
-            </div>
-        </header>
-
-        <div id="chat-messages" class="chat-messages flex-1 p-4 sm:p-6 bg-slate-100 overflow-y-auto space-y-4" style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 16px 16px;">
-        </div>
-
-        <footer class="p-4 bg-white border-t border-gray-200 z-10">
-            <form onsubmit="handleSendMessage(event)" class="flex gap-2 relative items-center">
-                <input type="text" name="chat_msg_honeypot" class="hp-field" tabindex="-1">
-                <input type="text" id="chat-message-input" required placeholder="Escribe un mensaje con respeto..." class="flex-1 bg-gray-100 border-0 focus:ring-2 focus:ring-gray-900 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none transition-all">
-                <button type="submit" class="p-3 bg-gray-950 text-white rounded-xl hover:bg-gray-800 transition-all shadow-md flex items-center justify-center">
-                    <svg class="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                </button>
-            </form>
-        </footer>
-    </div>
+    <div id="rules-modal" class="hidden">...</div>
+    <div id="chat-container" class="hidden">...</div>
 
     <script>
         let currentMode = 'login';
-        let isAdminMode = false;
-        function switchAuthTab(tab) {
-            currentMode = tab;
-            document.getElementById('auth-submit-btn').innerText = tab === 'login' ? "Iniciar Sesión" : "Crear Cuenta";
-            if(tab === 'login') {
-                document.getElementById('tab-login-btn').className = "w-1/2 py-2 text-sm font-bold rounded-lg bg-white shadow text-gray-900 transition-all";
-                document.getElementById('tab-register-btn').className = "w-1/2 py-2 text-sm font-medium rounded-lg text-gray-600 hover:text-gray-900 transition-all";
-            } else {
-                document.getElementById('tab-register-btn').className = "w-1/2 py-2 text-sm font-bold rounded-lg bg-white shadow text-gray-900 transition-all";
-                document.getElementById('tab-login-btn').className = "w-1/2 py-2 text-sm font-medium rounded-lg text-gray-600 hover:text-gray-900 transition-all";
-            }
-        }
-        function showRecoveryView() {
-            currentMode = 'recovery';
-            document.getElementById('password-field-container').classList.add('hidden');
-            document.getElementById('auth-submit-btn').innerText = "Enviar Enlace";
-            document.getElementById('forgot-pass-btn').classList.add('hidden');
-            document.getElementById('back-to-login-btn').classList.remove('hidden');
-        }
-        function resetToLoginTab() {
-            currentMode = 'login';
-            document.getElementById('password-field-container').classList.remove('hidden');
-            document.getElementById('auth-submit-btn').innerText = "Iniciar Sesión";
-            document.getElementById('forgot-pass-btn').classList.remove('hidden');
-            document.getElementById('back-to-login-btn').classList.add('hidden');
-            switchAuthTab('login');
-        }
-        function toggleAdminMode() {
-            isAdminMode = !isAdminMode;
-            const btn = document.getElementById('admin-toggle-btn');
-            if (isAdminMode) {
-                btn.innerText = "Modo Admin: ON";
-                btn.className = "px-3 py-1.5 bg-red-600 border border-red-500 text-white rounded-xl text-xs font-bold transition-all hover:bg-red-500 animate-pulse";
-                document.querySelectorAll('.admin-action').forEach(b => b.classList.remove('hidden'));
-            } else {
-                btn.innerText = "Modo Admin: OFF";
-                btn.className = "px-3 py-1.5 bg-gray-800 border border-gray-700 text-purple-400 rounded-xl text-xs font-bold transition-all hover:bg-gray-700";
-                document.querySelectorAll('.admin-action').forEach(b => b.classList.add('hidden'));
-            }
-        }
-        function togglePasswordVisibility() {
-            const pwdInput = document.getElementById('auth-password');
-            const iconClosed = document.getElementById('eye-icon-closed');
-            const iconOpen = document.getElementById('eye-icon-open');
-            if (pwdInput.type === 'password') {
-                pwdInput.type = 'text';
-                iconClosed.classList.add('hidden');
-                iconOpen.classList.remove('hidden');
-            } else {
-                pwdInput.type = 'password';
-                iconClosed.classList.remove('hidden');
-                iconOpen.classList.add('hidden');
-            }
-        }
-        function escapeHTML(str) { return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)); }
+        console.log("El script ha cargado correctamente");
     </script>
 </body>
 </html>
