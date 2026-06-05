@@ -121,7 +121,8 @@
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
                     const isMine = data.uid === currentUser.uid;
-                    const text = data.text || '';
+                    // Sincronizado con el campo 'message' de la app móvil
+                    const text = data.message || '';
                     const timeString = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
                     
                     const msgDiv = document.createElement('div');
@@ -170,7 +171,7 @@
 
             try {
                 await addDoc(collection(db, 'chat_global'), {
-                    text: text,
+                    message: text, // Sincronizado para que la app de Android lo lea correctamente
                     uid: currentUser.uid,
                     timestamp: serverTimestamp()
                 });
