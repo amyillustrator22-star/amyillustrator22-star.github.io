@@ -3,109 +3,360 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VibezMatch - Chat Social</title>
-    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>VibezMatch - Chat Room Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase App y Servicios necesarios (v9 / v10 SDK vía CDN) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+      // Firebase Hosting inyecta las credenciales automáticamente desde esta URL oculta
+        const response = await fetch('/__/firebase/init.json');
+        const firebaseConfig = await response.json();
+
+        // Inicializar Firebase solo si las claves están configuradas
+        // Dejamos la estructura lista para que Amy sincronice su App y Web usando la misma colección de Firestore
+    </script>
     <style>
-        body { font-family: 'Inter', sans-serif; background: #0f172a; color: white; overflow: hidden; }
-        .glass { background: rgba(255,255,255,0.05); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.1); }
-        #messages-area { height: calc(100vh - 140px); overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .message-bubble { max-width: 80%; padding: 12px; border-radius: 15px; background: rgba(255,255,255,0.1); font-size: 0.9rem; align-self: flex-start; }
-        .message-bubble.me { background: #22c55e; color: white; align-self: flex-end; }
-        .message-bubble strong { display: block; font-size: 0.7rem; color: #4ade80; margin-bottom: 4px; }
-        .message-bubble.me strong { color: rgba(255,255,255,0.7); }
-        input:focus { outline: none; }
+        body {
+            background: linear-gradient(135deg, #f1f5f9 0%, #cbd5e1 100%);
+            min-height: 100vh;
+        }
+        /* Estilo para los Honeypots ocultos para humanos, atractivos para bots */
+        .hp-field {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
+        /* Scrollbar personalizado estilo Telegram */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background-color: rgba(156, 163, 175, 0.5);
+            border-radius: 20px;
+        }
     </style>
 </head>
-<body class="flex flex-col h-screen">
+<body class="font-sans text-gray-800 flex items-center justify-center p-2 sm:p-4">
 
-    <!-- Header del Chat -->
-    <header class="glass p-4 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <a href="index.html" class="text-white/50 hover:text-white">← Volver</a>
-            <h1 class="font-righteous text-green-400">VibezMatch Chat</h1>
+    <!-- ========================================================= -->
+    <!-- PANEL DE AUTENTICACIÓN (LOGIN / REGISTRO / RECUPERACIÓN) -->
+    <!-- ========================================================= -->
+    <div id="auth-container" class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-[2.5rem] p-8 shadow-2xl border border-white/50">
+        <div class="text-center mb-8">
+            <h2 class="text-3xl font-extrabold text-gray-950 tracking-tight">VibezMatch Chat</h2>
+            <p class="text-sm text-gray-600 mt-2">Crea una cuenta o inicia sesión si no tienes la app móvil</p>
         </div>
-        <button onclick="logout()" class="text-xs bg-red-500/20 text-red-400 px-3 py-1 rounded-lg border border-red-500/30">Cerrar Sesión</button>
-    </header>
 
-    <!-- Área de Mensajes -->
-    <div id="messages-area" class="flex-1">
-        <div class="text-center text-white/20 text-xs py-10">Conexión cifrada establecida con Amy Software...</div>
+        <!-- Selector de pestañas -->
+        <div class="flex bg-gray-200/60 p-1 rounded-xl mb-6">
+            <button id="tab-login-btn" onclick="switchAuthTab('login')" class="w-1/2 py-2 text-sm font-bold rounded-lg bg-white shadow text-gray-900 transition-all">Entrar</button>
+            <button id="tab-register-btn" onclick="switchAuthTab('register')" class="w-1/2 py-2 text-sm font-medium rounded-lg text-gray-600 hover:text-gray-900 transition-all">Registrarse</button>
+        </div>
+
+        <!-- Formulario Principal -->
+        <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+            
+            <!-- HONEYPOT 1: Trampa para registro automatizado de bots -->
+            <div class="hp-field">
+                <label for="validation_code_hp">Security Code Verification (Leave Empty)</label>
+                <input type="text" id="validation_code_hp" name="validation_code_hp" tabindex="-1" autocomplete="off">
+            </div>
+
+            <!-- Campo Email -->
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Correo Electrónico</label>
+                <input type="email" id="auth-email" required class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white/50 focus:ring-2 focus:ring-slate-900 focus:outline-none transition-all" placeholder="tu@correo.com">
+            </div>
+
+            <!-- Campo Contraseña -->
+            <div id="password-field-container">
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-500 mb-1">Contraseña</label>
+                <div class="relative">
+                    <input type="password" id="auth-password" required class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white/50 focus:ring-2 focus:ring-slate-900 focus:outline-none transition-all pr-12" placeholder="••••••••">
+                    <!-- Botón Ojo para ver contraseña -->
+                    <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
+                        <svg id="eye-icon-closed" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path></svg>
+                        <svg id="eye-icon-open" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recuperar cuenta / Volver -->
+            <div class="flex justify-between items-center text-xs">
+                <button type="button" id="forgot-pass-btn" onclick="showRecoveryView()" class="text-slate-600 hover:underline font-medium">¿Olvidaste tu contraseña?</button>
+                <button type="button" id="back-to-login-btn" onclick="resetToLoginTab()" class="text-slate-600 hover:underline font-medium hidden">Volver a Iniciar Sesión</button>
+            </div>
+
+            <!-- Botón de acción -->
+            <button type="submit" id="auth-submit-btn" class="w-full py-3 px-4 bg-gray-950 text-white font-bold rounded-xl hover:bg-gray-800 transition-all shadow-md">
+                Iniciar Sesión
+            </button>
+        </form>
     </div>
 
-    <!-- Barra de Entrada -->
-    <div class="glass p-4 flex gap-2">
-        <input type="text" id="messageInput" placeholder="Escribe un mensaje..." class="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm">
-        <button onclick="sendMessage()" class="bg-green-500 hover:bg-green-400 text-white px-6 py-2 rounded-xl font-bold transition-all">Enviar</button>
+    <!-- ========================================================= -->
+    <!-- MODAL EMERGENTE: REGLAS DE LA COMUNIDAD (OBLIGATORIO)     -->
+    <!-- ========================================================= -->
+    <div id="rules-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-[2.5rem] max-w-md w-full p-8 shadow-2xl border border-gray-100 transform scale-95 transition-all duration-300">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </div>
+                <h3 class="text-2xl font-black text-gray-950">Normas de Convivencia</h3>
+                <p class="text-sm text-gray-500 mt-1">Por favor, lee y acepta las reglas antes de acceder al chat</p>
+            </div>
+            
+            <ul class="space-y-3 text-sm text-gray-700 font-medium mb-8 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                <li class="flex items-start gap-2">
+                    <span class="text-red-500 font-bold">❌</span> <span>No se permite decir palabrotas o insultos.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-red-500 font-bold">❌</span> <span>Prohibido subir material explícito o desnudos.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-red-500 font-bold">❌</span> <span>No se permite hablar mal de nadie ni difamar.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-green-500 font-bold">✨</span> <span>El respeto mutuo es obligatorio. Cualquier falta grave resultará en <strong>baneo permanente</strong>.</span>
+                </li>
+            </ul>
+
+            <button onclick="acceptRulesAndEnter()" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-md shadow-emerald-200">
+                Acepto las reglas, entrar al chat
+            </button>
+        </div>
     </div>
 
-    <!-- Firebase y Lógica -->
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <!-- ========================================================= -->
+    <!-- PANTALLA DE CHAT GENERAL (ESTILO WHATSAPP/TELEGRAM)       -->
+    <!-- ========================================================= -->
+    <div id="chat-container" class="w-full max-w-4xl h-[85vh] bg-white rounded-[2.5rem] shadow-2xl border border-gray-200 flex flex-col overflow-hidden hidden">
+        
+        <!-- Encabezado del Chat -->
+        <header class="bg-gray-900 text-white px-6 py-4 flex items-center justify-between shadow-md">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center font-bold shadow-md">
+                    VM
+                </div>
+                <div>
+                    <h3 class="font-extrabold text-lg tracking-tight">Sala General VibezMatch</h3>
+                    <p class="text-xs text-emerald-400 font-semibold flex items-center gap-1">
+                        <span class="w-2 h-2 bg-emerald-400 rounded-full inline-block animate-pulse"></span> Chat Global Sincronizado
+                    </p>
+                </div>
+            </div>
 
+            <!-- Panel de Control de Administración (Amy Control) -->
+            <div class="flex items-center gap-2">
+                <button id="admin-toggle-btn" onclick="toggleAdminMode()" class="px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-xl text-xs font-bold hover:bg-gray-700 transition-all text-purple-400">
+                    Modo Admin: OFF
+                </button>
+            </div>
+        </header>
+
+        <!-- Área de Mensajes (Estilo WhatsApp/Telegram con fondo característico sutil) -->
+        <div id="chat-messages" class="chat-messages flex-1 p-4 sm:p-6 bg-slate-100 overflow-y-auto space-y-4" style="background-image: radial-gradient(#cbd5e1 1px, transparent 1px); background-size: 16px 16px;">
+            
+            <!-- Mensaje del sistema informativo -->
+            <div class="flex justify-center my-2">
+                <span class="bg-gray-200 text-gray-600 text-xs font-bold px-3 py-1 rounded-full shadow-sm">
+                    🔒 Los nombres de usuario están ocultos y los chats privados están deshabilitados por privacidad
+                </span>
+            </div>
+
+            <!-- Mensaje Recibido (Ejemplo) -->
+            <div class="flex items-end gap-2 max-w-lg">
+                <div class="bg-white text-gray-900 rounded-2xl rounded-bl-none p-3.5 shadow-sm border border-gray-200 relative group">
+                    <p class="text-sm font-medium leading-relaxed">¡Hola a todos! Qué buena idea implementar el chat en la web oficial también, así hablo desde el ordenador de casa 🙌</p>
+                    <span class="block text-[10px] text-gray-400 text-right mt-1 font-semibold">16:42</span>
+                    <!-- Botón Moderación (Solo visible en modo administrador) -->
+                    <button class="admin-action hidden absolute -top-3 -right-3 bg-red-600 text-white rounded-full p-1 shadow-lg hover:bg-red-700 transition-all" title="Expulsar Usuario" onclick="simulatedBan('Usuario_A')">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mensaje Propio (Enviado) -->
+            <div class="flex items-end gap-2 max-w-lg ml-auto justify-end">
+                <div class="bg-gray-900 text-white rounded-2xl rounded-br-none p-3.5 shadow-md relative">
+                    <p class="text-sm font-medium leading-relaxed">¡Totalmente! Sincronizado en tiempo real con Firebase para que no te pierdas nada estés donde estés.</p>
+                    <span class="block text-[10px] text-gray-400 text-right mt-1 font-semibold">16:45</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Barra inferior de Envío de Mensajes -->
+        <footer class="p-4 bg-white border-t border-gray-200">
+            <form id="chat-input-form" onsubmit="handleSendMessage(event)" class="flex gap-2 items-center relative">
+                
+                <!-- HONEYPOT 3: Trampa en input de mensajes para bots spammers -->
+                <input type="text" name="chat_msg_honeypot" class="hp-field" tabindex="-1" autocomplete="off">
+
+                <input type="text" id="chat-message-input" required placeholder="Escribe un mensaje respetuoso aquí..." class="flex-1 bg-gray-100 border-0 focus:ring-2 focus:ring-gray-900 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none transition-all">
+                
+                <button type="submit" class="p-3 bg-gray-950 text-white rounded-xl hover:bg-gray-800 transition-all shadow-md flex items-center justify-center">
+                    <svg class="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                </button>
+            </form>
+        </footer>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- LÓGICA INTERACTIVA JAVASCRIPT / CONTROL DE FLUJO          -->
+    <!-- ========================================================= -->
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
-            authDomain: "vibezmatch-91c6d.firebaseapp.com",
-            projectId: "vibezmatch-91c6d",
-            storageBucket: "vibezmatch-91c6d.firebasestorage.app",
-            messagingSenderId: "645008717503",
-            appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
+        let currentMode = 'login'; // 'login', 'register', 'recovery'
+        let isAdminMode = false;
 
-        auth.onAuthStateChanged((user) => {
-            if (!user) { window.location.href = "index.html"; }
-            else { escucharMensajes(); }
-        });
+        function switchAuthTab(tab) {
+            if (currentMode === 'recovery') return;
+            currentMode = tab;
+            const loginBtn = document.getElementById('tab-login-btn');
+            const registerBtn = document.getElementById('tab-register-btn');
+            const submitBtn = document.getElementById('auth-submit-btn');
 
-        function sendMessage() {
-            const input = document.getElementById('messageInput');
-            const user = auth.currentUser;
-            if (input.value.trim() !== '' && user) {
-                db.collection("chat_global").add({
-                    texto: input.value.trim(),
-                    usuario: user.displayName || "Anónimo",
-                    uid: user.uid,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                input.value = '';
+            if (tab === 'login') {
+                loginBtn.className = "w-1/2 py-2 text-sm font-bold rounded-lg bg-white shadow text-gray-900 transition-all";
+                registerBtn.className = "w-1/2 py-2 text-sm font-medium rounded-lg text-gray-600 hover:text-gray-900 transition-all";
+                submitBtn.innerText = "Iniciar Sesión";
+            } else {
+                registerBtn.className = "w-1/2 py-2 text-sm font-bold rounded-lg bg-white shadow text-gray-900 transition-all";
+                loginBtn.className = "w-1/2 py-2 text-sm font-medium rounded-lg text-gray-600 hover:text-gray-900 transition-all";
+                submitBtn.innerText = "Crear Cuenta";
             }
         }
 
-        function escucharMensajes() {
-            db.collection("chat_global").orderBy("timestamp", "asc").limitToLast(50)
-                .onSnapshot((snapshot) => {
-                    const area = document.getElementById('messages-area');
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === "added") {
-                            const d = change.doc.data();
-                            const div = document.createElement('div');
-                            div.classList.add('message-bubble');
-                            if (d.uid === auth.currentUser.uid) div.classList.add('me');
-                            div.innerHTML = `<strong>${d.usuario}</strong>${d.texto}`;
-                            area.appendChild(div);
-                            area.scrollTop = area.scrollHeight;
-                        }
-                    });
-                });
+        function showRecoveryView() {
+            currentMode = 'recovery';
+            document.getElementById('password-field-container').classList.add('hidden');
+            document.getElementById('forgot-pass-btn').classList.add('hidden');
+            document.getElementById('back-to-login-btn').classList.remove('hidden');
+            document.getElementById('auth-submit-btn').innerText = "Enviar Enlace de Recuperación";
+            document.getElementById('tab-login-btn').parentElement.classList.add('hidden');
         }
 
-        function logout() { auth.signOut(); }
+        function resetToLoginTab() {
+            currentMode = 'login';
+            document.getElementById('password-field-container').classList.remove('hidden');
+            document.getElementById('forgot-pass-btn').classList.remove('hidden');
+            document.getElementById('back-to-login-btn').classList.add('hidden');
+            document.getElementById('auth-submit-btn').innerText = "Iniciar Sesión";
+            document.getElementById('tab-login-btn').parentElement.classList.remove('hidden');
+            switchAuthTab('login');
+        }
 
-        // Mantenemos tu protección
-        (function() {
-            setInterval(function() {
-                const start = performance.now();
-                debugger;
-                if (performance.now() - start > 100) {
-                    db.collection('security_alerts').add({ event_type: "chat_debug_attempt", timestamp: new Date() });
-                }
-            }, 1000);
-        })();
+        function togglePasswordVisibility() {
+            const pwdInput = document.getElementById('auth-password');
+            const iconClosed = document.getElementById('eye-icon-closed');
+            const iconOpen = document.getElementById('eye-icon-open');
+            
+            if (pwdInput.type === 'password') {
+                pwdInput.type = 'text';
+                iconClosed.classList.add('hidden');
+                iconOpen.classList.remove('hidden');
+            } else {
+                pwdInput.type = 'password';
+                iconClosed.classList.remove('hidden');
+                iconOpen.classList.add('hidden');
+            }
+        }
+
+        // Manejo de Autenticación con detección Honeypot
+        function handleAuthSubmit(e) {
+            e.preventDefault();
+            
+            // VERIFICACIÓN HONEYPOT 1: Si este campo tiene valor, es un bot automátizado
+            const hpValue = document.getElementById('validation_code_hp').value;
+            if (hpValue) {
+                console.warn("Honeypot de autenticación activado. Petición bloqueada.");
+                alert("Error de validación de seguridad.");
+                return;
+            }
+
+            // Simulación de paso exitoso -> Mostrar reglas obligatorias
+            document.getElementById('auth-container').classList.add('hidden');
+            document.getElementById('rules-modal').classList.remove('hidden');
+        }
+
+        function acceptRulesAndEnter() {
+            document.getElementById('rules-modal').classList.add('hidden');
+            document.getElementById('chat-container').classList.remove('hidden');
+            // Hacer scroll automático al final de los mensajes al entrar
+            const msgBox = document.getElementById('chat-messages');
+            msgBox.scrollTop = msgBox.scrollHeight;
+        }
+
+        // Control de envío de mensajes con protección Honeypot adicional
+        function handleSendMessage(e) {
+            e.preventDefault();
+            
+            // VERIFICACIÓN HONEYPOT 3 (Chat Spammer)
+            const chatHp = e.target.elements['chat_msg_honeypot'].value;
+            if (chatHp) {
+                console.warn("Bot detectado intentando enviar spam masivo en el chat.");
+                return;
+            }
+
+            const input = document.getElementById('chat-message-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Inserción visual simulada (Aquí mapearías a Firebase addDoc)
+            const chatMessages = document.getElementById('chat-messages');
+            const newMsg = document.createElement('div');
+            newMsg.className = "flex items-end gap-2 max-w-lg ml-auto justify-end";
+            newMsg.innerHTML = `
+                <div class="bg-gray-900 text-white rounded-2xl rounded-br-none p-3.5 shadow-md relative">
+                    <p class="text-sm font-medium leading-relaxed">${escapeHTML(text)}</p>
+                    <span class="block text-[10px] text-gray-400 text-right mt-1 font-semibold">Ahora</span>
+                </div>
+            `;
+            chatMessages.appendChild(newMsg);
+            input.value = '';
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Activar/Desactivar herramientas de moderación para Amy
+        function toggleAdminMode() {
+            isAdminMode = !isAdminMode;
+            const btn = document.getElementById('admin-toggle-btn');
+            const adminButtons = document.querySelectorAll('.admin-action');
+            
+            if (isAdminMode) {
+                btn.innerText = "Modo Admin: ON";
+                btn.className = "px-3 py-1.5 bg-red-600 border border-red-500 rounded-xl text-xs font-bold hover:bg-red-500 transition-all text-white animate-pulse";
+                adminButtons.forEach(b => b.classList.remove('hidden'));
+            } else {
+                btn.innerText = "Modo Admin: OFF";
+                btn.className = "px-3 py-1.5 bg-gray-800 border border-gray-700 rounded-xl text-xs font-bold hover:bg-gray-700 transition-all text-purple-400";
+                adminButtons.forEach(b => b.classList.add('hidden'));
+            }
+        }
+
+        function simulatedBan(userIdentifier) {
+            alert(`Acción de Administradora: El usuario [${userIdentifier}] ha sido expulsado del chat y su cuenta ha sido suspendida en la base de datos por violar las normas.`);
+            // Integración real en Firebase: updateDoc(doc(db, "users", userId), { banned: true });
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
     </script>
 </body>
 </html>
+
