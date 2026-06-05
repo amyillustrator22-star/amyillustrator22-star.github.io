@@ -5,21 +5,30 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VibezMatch - Chat Room Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-        import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getFirestore, collection, addDoc, query, orderBy, limit, onSnapshot, serverTimestamp, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const response = await fetch('/__/firebase/init.json');
-        const firebaseConfig = await response.json();
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+    // --- AQUÍ ESTÁ EL CAMBIO ---
+    const firebaseConfig = {
+        apiKey: "AIzaSyBcStr-2HfqatHiZIOxJNmmvE74sA",
+        authDomain: "vibezmatch-91c6d.firebaseapp.com",
+        projectId: "vibezmatch-91c6d",
+        storageBucket: "vibezmatch-91c6d.appspot.com",
+        messagingSenderId: "645008717503",
+        appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a",
+        measurementId: "G-JKN6EBRHWZ"
+    };
 
-        let unsubscribeChat = null;
-        let currentUser = null;
-        let currentMode = 'login';
-        let isAdminMode = false;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    // ----------------------------
+
+    let unsubscribeChat = null;
+    let currentUser = null;
+ 
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
