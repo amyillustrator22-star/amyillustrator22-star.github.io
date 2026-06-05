@@ -10,15 +10,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
     <style>
         body {
-            /* Gris claro plateado */
             background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
             min-height: 100vh;
         }
         .title-nabla {
             font-family: 'Nabla', cursive;
             font-size: 3.5rem;
-            /* Si Nabla no obedece color por ser una fuente de color, le forzamos sombras y stroke para asegurar el amarillo y negro o usamos una fuente estándar alternativa si falla */
-            color: #facc15; /* Amarillo */
+            color: #facc15; 
             -webkit-text-stroke: 2px black;
             text-shadow: 3px 3px 0px black;
             line-height: 1.2;
@@ -29,14 +27,28 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
+        
+        /* Honeypot Styles - Ocultos para humanos, visibles para bots */
+        .hp-trap {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+        }
     </style>
 </head>
 <body class="flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8 font-sans text-gray-800">
 
+    <!-- HONEYPOT 1: Enlace trampa para crawlers y bots maliciosos -->
+    <a href="/wp-admin-login-trap" class="hp-trap" rel="nofollow">Admin Access</a>
+
     <!-- Header Section -->
     <header class="flex flex-col md:flex-row items-center gap-6 mb-16 mt-8">
         <div class="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-white rounded-2xl shadow-lg p-2 border-2 border-gray-200">
-            <!-- Usa el logo subido. Se asume que está en el mismo directorio -->
             <img src="AmySoftwareLogo.jpg" alt="Logo de Amy Software" class="w-full h-full object-cover rounded-xl">
         </div>
         <h1 class="title-nabla text-center md:text-left drop-shadow-xl">
@@ -47,50 +59,64 @@
     <!-- Main Content: App Grid -->
     <main class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-10 mb-16">
         
-        <!-- App 1: VibezMatch -->
-        <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center transition-transform hover:scale-105 duration-300">
-            <div class="bg-gradient-to-br from-pink-500 to-purple-600 text-white p-4 rounded-3xl mb-6 shadow-md">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-            </div>
-            <h2 class="text-3xl font-extrabold text-gray-900 mb-4 tracking-tight">VibezMatch</h2>
-            <p class="text-lg text-gray-700 leading-relaxed font-medium">
-                Tu app de citas inclusiva. Un espacio seguro y diseñado para la comunidad <strong>LGTBI</strong>, <strong>personas con discapacidad</strong> y cualquier <strong>neurotipo</strong>. ¡Conecta con personas increíbles y encuentra tu match perfecto!
-            </p>
-        </article>
+        <!-- App 1: VibezMatch (Link Play Store) -->
+        <a href="https://play.google.com/store/apps/details?id=com.afy.vibezmatch&hl=es" target="_blank" rel="noopener noreferrer" class="block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-purple-500 rounded-[2.5rem]">
+            <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full">
+                <div class="bg-gradient-to-br from-pink-500 to-purple-600 text-white p-4 rounded-3xl mb-6 shadow-md relative">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                </div>
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-4 tracking-tight">VibezMatch</h2>
+                <p class="text-lg text-gray-700 leading-relaxed font-medium">
+                    Tu app de citas inclusiva. Un espacio seguro y diseñado para la comunidad <strong>LGTBI</strong>, <strong>personas con discapacidad</strong> y cualquier <strong>neurotipo</strong>.
+                </p>
+                <p class="mt-4 text-sm text-purple-600 font-bold uppercase tracking-wider">Instalar en Google Play</p>
+            </article>
+        </a>
 
-        <!-- App 2: DietCheck -->
-        <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center transition-transform hover:scale-105 duration-300">
-            <div class="bg-gradient-to-br from-green-400 to-emerald-600 text-white p-4 rounded-3xl mb-6 shadow-md">
-                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-            </div>
-            <h2 class="text-3xl font-extrabold text-gray-900 mb-4 tracking-tight">DietCheck</h2>
-            <p class="text-lg text-gray-700 leading-relaxed font-medium">
-                Escanea códigos de barras o códigos QR al instante. Cuenta con una <strong>IA nutricionista integrada</strong> que te asesora de forma personalizada dependiendo de tus <strong>intolerancias, diabetes o alergias</strong>.
-            </p>
-        </article>
+        <!-- App 2: DietCheck (Link Play Store) -->
+        <a href="https://play.google.com/store/apps/details?id=com.afy.dietcheck&hl=es" target="_blank" rel="noopener noreferrer" class="block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-green-500 rounded-[2.5rem]">
+            <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full">
+                <div class="bg-gradient-to-br from-green-400 to-emerald-600 text-white p-4 rounded-3xl mb-6 shadow-md relative">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+                </div>
+                <h2 class="text-3xl font-extrabold text-gray-900 mb-4 tracking-tight">DietCheck</h2>
+                <p class="text-lg text-gray-700 leading-relaxed font-medium">
+                    Escanea códigos de barras o códigos QR al instante. Cuenta con una <strong>IA nutricionista integrada</strong> para intolerancias, diabetes o alergias.
+                </p>
+                <p class="mt-4 text-sm text-emerald-600 font-bold uppercase tracking-wider">Instalar en Google Play</p>
+            </article>
+        </a>
 
     </main>
 
-    <!-- Social Chat Section -->
-    <section class="w-full max-w-3xl glass-card rounded-[2.5rem] p-8 md:p-10 text-center flex flex-col items-center">
+    <!-- Social Chat Section & HONEYPOT FORM -->
+    <section class="w-full max-w-3xl glass-card rounded-[2.5rem] p-8 md:p-10 text-center flex flex-col items-center relative">
         <h3 class="text-2xl font-bold text-gray-800 mb-4">Comunidad Amy Software</h3>
         <p class="text-gray-600 mb-8 max-w-xl text-lg">
             ¡Únete a nuestro Chat General y conoce a otros usuarios! Un espacio para compartir experiencias, resolver dudas y crear comunidad.
         </p>
-        <a href="#" target="_blank" rel="noopener noreferrer" class="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-gray-900 rounded-2xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:bg-gray-800 hover:shadow-lg hover:-translate-y-1">
-            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
+        
+        <a href="chat.html" target="_blank" rel="noopener noreferrer" class="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-gray-900 rounded-2xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 hover:bg-gray-800 hover:shadow-lg hover:-translate-y-1 z-10">
+            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path></svg>
             Entrar al Chat General
-            <!-- Indicador visual de abrir en nueva ventana -->
-            <svg class="w-4 h-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            <svg class="w-4 h-4 ml-2 opacity-70 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
         </a>
-        <p class="mt-4 text-sm text-gray-500 italic">*(Se abrirá en una nueva ventana)*</p>
+        <p class="mt-4 text-sm text-gray-500 italic z-10">*(Se abrirá en una nueva ventana)*</p>
+
+        <!-- HONEYPOT 2: Formulario invisible de registro falso -->
+        <form action="/fake-trap-endpoint" method="POST" class="hp-trap" autocomplete="off">
+            <label for="trap_username">Username</label>
+            <input type="text" id="trap_username" name="trap_username" tabindex="-1" autocomplete="new-password">
+            <label for="trap_email">Email</label>
+            <input type="email" id="trap_email" name="trap_email" tabindex="-1" autocomplete="new-password">
+            <button type="submit" tabindex="-1">Submit</button>
+        </form>
     </section>
 
     <!-- Footer -->
-    <footer class="mt-16 text-center text-gray-500 text-sm">
+    <footer class="mt-16 text-center text-gray-500 text-sm pb-8">
         <p>&copy; 2026 Amy Software. Todos los derechos reservados.</p>
     </footer>
 
 </body>
 </html>
-
