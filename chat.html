@@ -120,9 +120,11 @@
 
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
-                    const isMine = data.uid === currentUser.uid;
-                    // Sincronizado con el campo 'message' de la app móvil
-                    const text = data.message || '';
+                    
+                    // Sincronizado al 100% con los campos de la app en Kotlin (usuario y texto)
+                    const userIdentifier = data.usuario || ''; 
+                    const isMine = userIdentifier === currentUser.email; // Compara con el email de login en la web
+                    const text = data.texto || '';
                     const timeString = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
                     
                     const msgDiv = document.createElement('div');
@@ -131,6 +133,7 @@
                         msgDiv.className = "flex items-end gap-2 max-w-lg ml-auto justify-end";
                         msgDiv.innerHTML = `
                             <div class="bg-gray-900 text-white rounded-2xl rounded-br-none p-3.5 shadow-md relative">
+                                <span class="block text-[9px] text-gray-400 font-bold mb-0.5">${escapeHTML(userIdentifier)}</span>
                                 <p class="text-sm font-medium leading-relaxed break-words">${escapeHTML(text)}</p>
                                 <span class="block text-[10px] text-gray-400 text-right mt-1 font-semibold">${timeString}</span>
                             </div>
@@ -139,9 +142,10 @@
                         msgDiv.className = "flex items-end gap-2 max-w-lg";
                         msgDiv.innerHTML = `
                             <div class="bg-white text-gray-900 rounded-2xl rounded-bl-none p-3.5 shadow-sm border border-gray-200 relative group">
+                                <span class="block text-[9px] text-gray-500 font-bold mb-0.5">${escapeHTML(userIdentifier)}</span>
                                 <p class="text-sm font-medium leading-relaxed break-words">${escapeHTML(text)}</p>
                                 <span class="block text-[10px] text-gray-400 text-right mt-1 font-semibold">${timeString}</span>
-                                <button onclick="simulatedBan('${data.uid}')" class="admin-action hidden absolute -top-3 -right-3 bg-red-600 text-white rounded-full p-1 shadow-lg hover:bg-red-700 transition-all" title="Banear Usuario">
+                                <button onclick="simulatedBan('${data.uid || userIdentifier}')" class="admin-action hidden absolute -top-3 -right-3 bg-red-600 text-white rounded-full p-1 shadow-lg hover:bg-red-700 transition-all" title="Banear Usuario">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
                                 </button>
                             </div>
@@ -170,9 +174,10 @@
             input.value = ''; 
 
             try {
+                // Estructura de guardado idéntica al Map de la app móvil en Kotlin
                 await addDoc(collection(db, 'chat_global'), {
-                    message: text, // Sincronizado para que la app de Android lo lea correctamente
-                    uid: currentUser.uid,
+                    texto: text,
+                    usuario: currentUser.email, // Guarda el correo para que Android lo pinte como identificador
                     timestamp: serverTimestamp()
                 });
             } catch (error) {
@@ -229,7 +234,7 @@
                     <input type="password" id="auth-password" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white/50 focus:ring-2 focus:ring-slate-900 focus:outline-none pr-12">
                     <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
                         <svg id="eye-icon-closed" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"></path></svg>
-                        <svg id="eye-icon-open" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                        <svg id="eye-icon-open" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                     </button>
                 </div>
             </div>
