@@ -162,29 +162,30 @@
             });
         }
 
-        window.handleSendMessage = async function(e) {
-            e.preventDefault();
-            const chatHp = e.target.elements['chat_msg_honeypot'].value;
-            if (chatHp) return;
+   window.handleSendMessage = async function(e) {
+    e.preventDefault();
+    const chatHp = e.target.elements['chat_msg_honeypot'].value;
+    if (chatHp) return;
 
-            const input = document.getElementById('chat-message-input');
-            const text = input.value.trim();
-            if (!text || !currentUser) return;
+    const input = document.getElementById('chat-message-input');
+    const text = input.value.trim();
+    if (!text || !currentUser) return;
 
-            input.value = ''; 
+    input.value = ''; 
 
-            try {
-                // Estructura de guardado idéntica al Map de la app móvil en Kotlin
-                await addDoc(collection(db, 'chat_global'), {
-                    texto: text,
-                    usuario: currentUser.email, // Guarda el correo para que Android lo pinte como identificador
-                    timestamp: serverTimestamp()
-                });
-            } catch (error) {
-                alert("No se pudo enviar el mensaje. Verifica tu conexión o si tu cuenta tiene restricciones.");
-            }
-        };
+    try {
+        // Si el usuario tiene displayName lo usa, si no, te pone un alias limpio de pruebas
+        const aliasUsuario = currentUser.displayName || "Amy (Web)";
 
+        await addDoc(collection(db, 'chat_global'), {
+            texto: text,
+            usuario: aliasUsuario, // 
+            timestamp: serverTimestamp()
+        });
+    } catch (error) {
+        alert("No se pudo enviar el mensaje. Verifica tu conexión o si tu cuenta tiene restricciones.");
+    }
+};
         window.simulatedBan = async function(uidToBan) {
             if(!confirm("¿Confirmas la expulsión definitiva de este usuario?")) return;
             try {
