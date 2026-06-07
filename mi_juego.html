@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Human Algorithm - Módulo Burbujas</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #05101A;
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        #cyber-hud {
+            width: 100%;
+            max-width: 600px;
+            padding: 15px;
+            border: 1px solid rgba(0, 255, 213, 0.2);
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(0, 255, 213, 0.05);
+        }
+
+        .hud-label {
+            font-size: 11px;
+            color: rgba(0, 255, 213, 0.6);
+            margin-bottom: 4px;
+        }
+
+        .hud-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #00FFD5;
+            text-shadow: 0 0 8px rgba(0, 255, 213, 0.5);
+        }
+
+        #game-container {
+            width: 90vw;
+            max-width: 600px;
+            height: 55vh; /* Ajustado sutilmente para adaptarse a la ventana arcade */
+            max-height: 500px;
+            background-color: #000000;
+            border: 2px solid #00FFD5;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 0 0 25px rgba(0, 255, 213, 0.1);
+            overflow: hidden;
+        }
+
+        .bubble {
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 2px solid #00FFD5;
+            background: rgba(0, 255, 213, 0.1);
+            color: #00FFD5;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 255, 213, 0.3);
+            transition: transform 0.1s ease, background-color 0.2s;
+            animation: floatBobbing 4s ease-in-out infinite alternate;
+        }
+
+        .bubble:hover {
+            background: rgba(0, 255, 213, 0.25);
+            transform: scale(1.05);
+        }
+
+        .bubble:active {
+            transform: scale(0.95);
+        }
+
+        #instruction {
+            margin-top: 15px;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
+        @keyframes floatBobbing {
+            0% { margin-top: 0px; }
+            100% { margin-top: 8px; }
+        }
+
+        .glitch-error {
+            animation: flashRed 0.2s ease-in-out 2;
+        }
+
+        @keyframes flashRed {
+            0% { border-color: #00FFD5; background-color: transparent; }
+            50% { border-color: #ff0055; background-color: rgba(255, 0, 85, 0.2); }
+            100% { border-color: #00FFD5; background-color: transparent; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="cyber-hud">
+        <div>
+            <div class="hud-label">SECUENCIA ACTIVA</div>
+            <div id="level-display" class="hud-value">FASE 01</div>
+        </div>
+        <div style="text-align: right;">
+            <div class="hud-label">EDAD MENTAL ESTIMADA</div>
+            <div id="age-display" class="hud-value">35 AÑOS</div>
+        </div>
+    </div>
+
+    <div id="game-container"></div>
+
+    <div id="instruction">ORDENA LOS PATRONES NUMÉRICOS: PULSA DE MENOR A MAYOR ⬆</div>
+
+    <script>
+        const container = document.getElementById('game-container');
+        const ageDisplay = document.getElementById('age-display');
+        const levelDisplay = document.getElementById('level-display');
+
+        let mentalAge = 35;
+        let currentLevel = 1;
+        let numbersInRound = [];
+        let bubblesCount = 4; 
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playSound(freq, type, duration) {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = type;
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duration);
+            } catch(e) { }
+        }
+
+        function initRound() {
+            container.innerHTML = '';
+            numbersInRound = [];
+            
+            bubblesCount = Math.min(3 + currentLevel, 8);
+            levelDisplay.innerText = `FASE ${String(currentLevel).padStart(2, '0')}`;
+
+            while(numbersInRound.length < bubblesCount) {
+                let num = Math.floor(Math.random() * 99) + 1;
+                if(!numbersInRound.includes(num)) {
+                    numbersInRound.push(num);
+                }
+            }
+
+            numbersInRound.forEach(num => {
+                const bubble = document.createElement('div');
+                bubble.className = 'bubble';
+                bubble.innerText = num;
+                bubble.dataset.value = num;
+
+                const posX = Math.random() * (container.clientWidth - 80);
+                const posY = Math.random() * (container.clientHeight - 80);
+                
+                bubble.style.left = `${posX}px`;
+                bubble.style.top = `${posY}px`;
+                
+                bubble.style.animationDelay = `${Math.random() * 2}s`;
+
+                bubble.addEventListener('click', () => checkSelection(bubble, num));
+                container.appendChild(bubble);
+            });
+        }
+
+        function checkSelection(element, value) {
+            const minRemaining = Math.min(...numbersInRound);
+
+            if (value === minRemaining) {
+                numbersInRound = numbersInRound.filter(n => n !== value);
+                element.style.transform = 'scale(0)';
+                element.style.opacity = '0';
+                
+                playSound(600 + (value * 5), 'sine', 0.1);
+
+                setTimeout(() => element.remove(), 100);
+
+                if (numbersInRound.length === 0) {
+                    playSound(880, 'sine', 0.15);
+                    setTimeout(() => playSound(1200, 'sine', 0.2), 100);
+                    
+                    currentLevel++;
+                    mentalAge = Math.max(15, mentalAge - 1);
+                    ageDisplay.innerText = `${mentalAge} AÑOS`;
+                    
+                    setTimeout(initRound, 600);
+                }
+            } else {
+                playSound(120, 'sawtooth', 0.3);
+                container.classList.add('glitch-error');
+                setTimeout(() => container.classList.remove('glitch-error'), 400);
+
+                mentalAge = Math.min(80, mentalAge + 2);
+                ageDisplay.innerText = `${mentalAge} AÑOS`;
+                
+                setTimeout(initRound, 500);
+            }
+        }
+
+        initRound();
+    </script>
+</body>
+</html>
