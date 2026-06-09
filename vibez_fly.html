@@ -16,6 +16,7 @@
             background-size: cover;
             min-height: 100vh;
             user-select: none;
+            touch-action: manipulation;
         }
         .title-nabla {
             font-family: 'Nabla', cursive;
@@ -26,12 +27,14 @@
             position: relative;
             width: 100%;
             max-width: 430px;
-            height: 75vh;
-            max-height: 750px;
+            /* Usamos vh para que en móvil nunca sobresalga */
+            height: 70vh;
+            max-height: 700px;
             background-image: url('fondocorazon.jpg');
             background-size: cover;
             background-position: center;
             overflow: hidden;
+            display: flex;
         }
         canvas {
             display: block;
@@ -40,26 +43,17 @@
         }
         #ui-capa {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             display: flex;
             flex-direction: column;
             align-items: center;
             padding: 24px;
             pointer-events: none;
         }
-        /* Tu firma de seguridad: Honeypot totalmente invisible para humanos */
         .hp-field { 
-            position: absolute; 
-            left: -9999px; 
-            top: -9999px; 
-            width: 1px; 
-            height: 1px; 
-            overflow: hidden; 
-            opacity: 0; 
-            pointer-events: none; 
+            position: absolute; left: -9999px; top: -9999px; 
+            width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; 
         }
     </style>
 </head>
@@ -67,8 +61,8 @@
 
     <input type="text" id="arcade_security_hp" class="hp-field" tabindex="-1" autocomplete="off">
 
-    <header class="flex items-center gap-4 mb-6">
-        <h1 class="title-nabla text-4xl drop-shadow-xl text-center">
+    <header class="flex items-center gap-4 mb-4">
+        <h1 class="title-nabla text-4xl drop-shadow-xl text-center text-white">
             VIBEZ FLY
         </h1>
     </header>
@@ -98,7 +92,6 @@
 
     <footer class="mt-6">
         <a href="juegos.html" class="inline-flex items-center justify-center px-6 py-3 font-bold text-white transition-all duration-200 bg-gray-900 rounded-xl hover:bg-gray-800 hover:-translate-y-0.5 shadow-md">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             Volver a Selección
         </a>
     </footer>
@@ -106,7 +99,6 @@
 <script>
     const canvas = document.getElementById("canvasJuego");
     const ctx = canvas.getContext("2d");
-
     const txtPuntuacion = document.getElementById("puntuacion");
     const pantallaInicio = document.getElementById("pantalla-inicio");
     const pantallaGameOver = document.getElementById("pantalla-gameover");
@@ -121,178 +113,71 @@
     window.addEventListener("resize", redimensionar);
     redimensionar();
 
-    const GRAVEDAD = 0.5;
-    const IMPULSO = -9;
-    const VELOCIDAD_OBSTACULOS = 4;
-    const DISTANCIA_OBSTACULOS = 400;
-    const HUECO_PASO = 340;
-    const RADIO_MASCOTA = 32;
+    // Valores adaptativos: reducimos un poco las distancias para móviles
+    const GRAVEDAD = 0.4;
+    const IMPULSO = -8;
+    const VELOCIDAD_OBSTACULOS = 3;
+    const HUECO_PASO = 250; // Hueco un poco más grande para facilitar en móvil
+    const RADIO_MASCOTA = 25;
 
-    let juegoIniciado = false;
-    let gameOver = false;
-    let puntuacion = 0;
-
-    let mascotaY = 350;
-    let velocidadY = 0;
-    let obstaculos = [];
+    let juegoIniciado = false, gameOver = false, puntuacion = 0;
+    let mascotaY = 200, velocidadY = 0, obstaculos = [];
 
     function dibujarCorazon(centroX, centroY, roto) {
         ctx.fillStyle = "#ff0000";
-        if (!roto) {
-            ctx.beginPath();
-            ctx.moveTo(centroX, centroY + 15);
-            ctx.bezierCurveTo(centroX - 35, centroY - 25, centroX - 60, centroY + 15, centroX, centroY + 45);
-            ctx.bezierCurveTo(centroX + 60, centroY + 15, centroX + 35, centroY - 25, centroX, centroY + 15);
-            ctx.fill();
-        } else {
-            ctx.beginPath();
-            ctx.moveTo(centroX - 5, centroY + 15);
-            ctx.bezierCurveTo(centroX - 40, centroY - 25, centroX - 65, centroY + 15, centroX - 5, centroY + 45);
-            ctx.lineTo(centroX - 15, centroY + 30);
-            ctx.lineTo(centroX - 2, centroY + 22);
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.moveTo(centroX + 5, centroY + 15);
-            ctx.bezierCurveTo(centroX + 40, centroY - 25, centroX + 65, centroY + 15, centroX + 5, centroY + 45);
-            ctx.lineTo(centroX - 5, centroY + 30);
-            ctx.lineTo(centroX + 8, centroY + 22);
-            ctx.fill();
-        }
+        ctx.beginPath();
+        // Dibujo simplificado para que escale bien
+        ctx.arc(centroX-15, centroY, 20, 0, Math.PI * 2);
+        ctx.arc(centroX+15, centroY, 20, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(centroX-32, centroY+5);
+        ctx.lineTo(centroX+32, centroY+5);
+        ctx.lineTo(centroX, centroY+40);
+        ctx.fill();
     }
 
     function crearObstaculo() {
-        if (botTrap.value) return { x: canvas.width, altoSuperior: 0, pasado: true };
-        const margenMinimo = 140;
-        const altoMaximo = canvas.height - HUECO_PASO - margenMinimo;
-        const altoSuperiorAlea = Math.random() * (altoMaximo - margenMinimo) + margenMinimo;
-        return { x: canvas.width, altoSuperior: altoSuperiorAlea, pasado: false };
+        const margen = 80;
+        const altoMax = canvas.height - HUECO_PASO - margen;
+        const altoSuperior = Math.random() * (altoMax - margen) + margen;
+        return { x: canvas.width, altoSuperior: altoSuperior, pasado: false };
     }
 
     function actualizarJuego() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        if (botTrap.value) {
-            handleBotDetection();
-            return;
-        }
-
         if (juegoIniciado && !gameOver) {
             velocidadY += GRAVEDAD;
             mascotaY += velocidadY;
-
-            if (mascotaY + RADIO_MASCOTA >= canvas.height || mascotaY - RADIO_MASCOTA <= 0) {
-                gameOver = true;
-                pantallaGameOver.classList.remove("hidden");
-            }
-
-            if (obstaculos.length === 0) obstaculos.push(crearObstaculo());
-            if (obstaculos[obstaculos.length - 1].x < canvas.width - DISTANCIA_OBSTACULOS) {
-                obstaculos.push(crearObstaculo());
-            }
-            if (obstaculos[0].x < -150) obstaculos.shift();
-
+            if (mascotaY > canvas.height || mascotaY < 0) { gameOver = true; pantallaGameOver.classList.remove("hidden"); }
+            if (obstaculos.length === 0 || obstaculos[obstaculos.length-1].x < canvas.width - 250) obstaculos.push(crearObstaculo());
             obstaculos.forEach(obs => {
                 obs.x -= VELOCIDAD_OBSTACULOS;
-
-                if (!obs.pasado && obs.x < canvas.width / 2) {
-                    obs.pasado = true;
-                    puntuacion++;
-                    txtPuntuacion.innerText = puntuacion;
-                }
-
-                const hitBoxIzquierda = (canvas.width / 2) - RADIO_MASCOTA;
-                const hitBoxDerecha = (canvas.width / 2) + RADIO_MASCOTA;
-
-                if (obs.x < hitBoxDerecha && obs.x + 40 > hitBoxIzquierda) {
-                    if (mascotaY - RADIO_MASCOTA < obs.altoSuperior || mascotaY + RADIO_MASCOTA > obs.altoSuperior + HUECO_PASO) {
-                        gameOver = true;
-                        pantallaGameOver.classList.remove("hidden");
-                    }
+                if (!obs.pasado && obs.x < canvas.width/2) { obs.pasado = true; puntuacion++; txtPuntuacion.innerText = puntuacion; }
+                if (Math.abs(canvas.width/2 - (obs.x + 20)) < 40 && (mascotaY < obs.altoSuperior || mascotaY > obs.altoSuperior + HUECO_PASO)) {
+                    gameOver = true; pantallaGameOver.classList.remove("hidden");
                 }
             });
+            obstaculos = obstaculos.filter(o => o.x > -50);
         }
-
+        // Dibujar obstáculos
+        ctx.fillStyle = "#78909C";
         obstaculos.forEach(obs => {
-            const anchoCuchillo = 40;
-            const largoMango = 60;
-
-            ctx.fillStyle = "#78909C";
-            ctx.fillRect(obs.x, 0, anchoCuchillo, obs.altoSuperior - largoMango);
-            ctx.fillStyle = "#B0BEC5";
-            ctx.beginPath();
-            ctx.moveTo(obs.x, obs.altoSuperior - largoMango);
-            ctx.lineTo(obs.x + anchoCuchillo, obs.altoSuperior - largoMango);
-            ctx.lineTo(obs.x + (anchoCuchillo / 2), obs.altoSuperior);
-            ctx.fill();
-            ctx.fillStyle = "#5D4037";
-            ctx.fillRect(obs.x + 10, 0, anchoCuchillo - 20, largoMango);
-
-            const inicioYInferior = obs.altoSuperior + HUECO_PASO;
-            ctx.fillStyle = "#78909C";
-            ctx.fillRect(obs.x, inicioYInferior + largoMango, anchoCuchillo, canvas.height - (inicioYInferior + largoMango));
-            ctx.fillStyle = "#B0BEC5";
-            ctx.beginPath();
-            ctx.moveTo(obs.x, inicioYInferior + largoMango);
-            ctx.lineTo(obs.x + anchoCuchillo, inicioYInferior + largoMango);
-            ctx.lineTo(obs.x + (anchoCuchillo / 2), inicioYInferior);
-            ctx.fill();
-            ctx.fillStyle = "#5D4037";
-            ctx.fillRect(obs.x + 10, canvas.height - largoMango, anchoCuchillo - 20, largoMango);
+            ctx.fillRect(obs.x, 0, 40, obs.altoSuperior);
+            ctx.fillRect(obs.x, obs.altoSuperior + HUECO_PASO, 40, canvas.height);
         });
-
-        if (!botTrap.value) {
-            dibujarCorazon(canvas.width / 2, mascotaY, gameOver);
-        }
+        dibujarCorazon(canvas.width / 2, mascotaY, gameOver);
         requestAnimationFrame(actualizarJuego);
     }
 
-    function realizarSalto() {
-        if (botTrap.value) return;
-        if (!gameOver) {
-            if (!juegoIniciado) {
-                juegoIniciado = true;
-                pantallaInicio.classList.add("hidden");
-            }
-            velocidadY = IMPULSO;
-        }
-    }
-
-    // Lógica antibot de Amy Software Co.
-    function handleBotDetection() {
-        juegoIniciado = false;
-        gameOver = true;
-        pantallaInicio.classList.add("hidden");
-        pantallaGameOver.classList.remove("hidden");
-        document.getElementById("texto-gameover").innerText = "⚠️ BOT DETECTED ⚠️";
-        document.getElementById("texto-gameover").classList.add("text-purple-600");
-        btnReintentar.style.display = "none";
-        txtPuntuacion.innerText = "99";
-        txtPuntuacion.style.color = "#ff0055";
-    }
-
-    contenedor.addEventListener("mousedown", (e) => {
-        if(e.target.tagName !== 'BUTTON') realizarSalto();
-    });
-    contenedor.addEventListener("touchstart", (e) => {
-        if(e.target.tagName !== 'BUTTON') {
-            e.preventDefault();
-            realizarSalto();
-        }
-    }, { passive: false });
+    contenedor.addEventListener("touchstart", (e) => { e.preventDefault(); realizarSalto(); }, { passive: false });
+    contenedor.addEventListener("mousedown", realizarSalto);
+    function realizarSalto() { if (!gameOver) { juegoIniciado = true; pantallaInicio.classList.add("hidden"); velocidadY = IMPULSO; } }
 
     btnReintentar.addEventListener("click", (e) => {
-        e.stopPropagation();
-        if (botTrap.value) return;
-        mascotaY = canvas.height / 2;
-        velocidadY = 0;
-        obstaculos = [];
-        puntuacion = 0;
-        txtPuntuacion.innerText = "0";
-        gameOver = false;
-        juegoIniciado = false;
-        pantallaGameOver.classList.add("hidden");
-        pantallaInicio.classList.remove("hidden");
+        mascotaY = 200; velocidadY = 0; obstaculos = []; puntuacion = 0;
+        txtPuntuacion.innerText = "0"; gameOver = false; juegoIniciado = false;
+        pantallaGameOver.classList.add("hidden"); pantallaInicio.classList.remove("hidden");
     });
 
     requestAnimationFrame(actualizarJuego);
