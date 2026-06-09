@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Human Algorithm - Módulo Burbujas</title>
+    <title> Juego de Brain Training de Burbujas</title>
     <style>
         * {
             box-sizing: border-box;
@@ -22,6 +22,18 @@
             justify-content: center;
             min-height: 100vh;
             overflow: hidden;
+        }
+
+        /* Tu firma de seguridad: Honeypot totalmente invisible para humanos */
+        .hp-field { 
+            position: absolute; 
+            left: -9999px; 
+            top: -9999px; 
+            width: 1px; 
+            height: 1px; 
+            overflow: hidden; 
+            opacity: 0; 
+            pointer-events: none; 
         }
 
         #cyber-hud {
@@ -54,7 +66,7 @@
         #game-container {
             width: 90vw;
             max-width: 600px;
-            height: 55vh; /* Ajustado sutilmente para adaptarse a la ventana arcade */
+            height: 55vh;
             max-height: 500px;
             background-color: #000000;
             border: 2px solid #00FFD5;
@@ -118,6 +130,8 @@
 </head>
 <body>
 
+    <input type="text" id="arcade_security_hp" class="hp-field" tabindex="-1" autocomplete="off">
+
     <div id="cyber-hud">
         <div>
             <div class="hud-label">SECUENCIA ACTIVA</div>
@@ -137,6 +151,7 @@
         const container = document.getElementById('game-container');
         const ageDisplay = document.getElementById('age-display');
         const levelDisplay = document.getElementById('level-display');
+        const botTrap = document.getElementById('arcade_security_hp');
 
         let mentalAge = 35;
         let currentLevel = 1;
@@ -161,6 +176,12 @@
         }
 
         function initRound() {
+            // Verificación del Honeypot: si el input invisible tiene texto, bloquea el juego por bot detection
+            if (botTrap.value) {
+                handleBotDetection();
+                return;
+            }
+
             container.innerHTML = '';
             numbersInRound = [];
             
@@ -194,6 +215,12 @@
         }
 
         function checkSelection(element, value) {
+            // Re-verificar Honeypot en cada clic por si el bot inyecta el valor en caliente
+            if (botTrap.value) {
+                handleBotDetection();
+                return;
+            }
+
             const minRemaining = Math.min(...numbersInRound);
 
             if (value === minRemaining) {
@@ -225,6 +252,25 @@
                 
                 setTimeout(initRound, 500);
             }
+        }
+
+        // Lógica de defensa cibernética de Amy Software
+        function handleBotDetection() {
+            playSound(80, 'sawtooth', 1.0);
+            container.innerHTML = `
+                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#ff0055; font-weight:bold; letter-spacing:2px; text-align:center; padding:20px;">
+                    <div>⚠️ ERROR CRÍTICO DE SISTEMA ⚠️</div>
+                    <div style="font-size:11px; color:rgba(255,0,85,0.6); margin-top:15px; font-family:monospace;">ALGORITMO NO HUMANO DETECTADO.<br>ACCESO TERMINAL SUSPENDIDO.</div>
+                </div>
+            `;
+            container.style.borderColor = '#ff0055';
+            container.style.boxShadow = '0 0 25px rgba(255, 0, 85, 0.3)';
+            levelDisplay.innerText = "BLOQUEADO";
+            levelDisplay.style.color = "#ff0055";
+            ageDisplay.innerText = "99 AÑOS";
+            ageDisplay.style.color = "#ff0055";
+            document.getElementById('instruction').innerText = "PROTECCIÓN ANTIMALWARE ACTIVA - AMY SOFTWARE CO.";
+            document.getElementById('instruction').style.color = "#ff0055";
         }
 
         initRound();

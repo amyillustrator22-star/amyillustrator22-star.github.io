@@ -6,9 +6,9 @@
     <title>Amy Software - Web Oficial</title>
 
     <script data-goatcounter="https://amysoftware.goatcounter.com/count"
-            async src="//gc.zgo.at/count.js"></sript>
+            async src="//gc.zgo.at/count.js"></script>
         
-   <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
@@ -57,10 +57,8 @@
 </head>
 <body class="flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8 font-sans text-gray-800">
 
-    <!-- HONEYPOT 1: Enlace trampa para crawlers y bots maliciosos -->
     <a href="/wp-admin-login-trap" class="hp-trap" rel="nofollow">Admin Access</a>
 
-    <!-- Header Section -->
     <header class="flex flex-col md:flex-row items-center gap-6 mb-16 mt-8">
         <div class="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-white rounded-2xl shadow-lg p-2 border-2 border-gray-200">
             <img src="AmySoftwareLogo.jpg" alt="Logo de Amy Software" class="w-full h-full object-cover rounded-xl">
@@ -115,7 +113,6 @@
 
     </main>
 
-    <!-- Social Chat Section & HONEYPOT FORM -->
     <section class="w-full max-w-3xl glass-card rounded-[2.5rem] p-8 md:p-10 text-center flex flex-col items-center relative">
         <h3 class="text-2xl font-bold text-gray-800 mb-4">Chat De VibezMatch</h3>
         <p class="text-gray-600 mb-8 max-w-xl text-lg">
@@ -129,7 +126,6 @@
         </a>
         <p class="mt-4 text-sm text-gray-500 italic z-10">*(Se abrirá en una nueva ventana)*</p>
 
-        <!-- HONEYPOT 2: Formulario invisible de registro falso -->
         <form action="/fake-trap-endpoint" method="POST" class="hp-trap" autocomplete="off">
             <label for="trap_username">Username</label>
             <input type="text" id="trap_username" name="trap_username" tabindex="-1" autocomplete="new-password">
@@ -139,7 +135,6 @@
         </form>
     </section>
 
-    <!-- Footer -->
     <footer class="mt-16 text-center text-gray-500 text-sm pb-8">
         <p>&copy; 2026 Amy Software. Todos los derechos reservados.</p>
     </footer>
