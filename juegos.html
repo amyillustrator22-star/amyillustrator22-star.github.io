@@ -3,97 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amy Software - Sección de Juegos</title>
+    <title>Amy Software - Arcade Central</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
     <style>
         body {
-            /* Fondo oficial de Amy Software con capa de legibilidad */
             background: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)), url('encabezaoAmySoftware.jpg') no-repeat center center fixed;
             background-size: cover;
             min-height: 100vh;
         }
-        /* Tu firma de seguridad: Honeypot invisible para humanos */
-        .hp-field { 
-            position: absolute; 
-            left: -9999px; 
-            top: -9999px; 
-            width: 1px; 
-            height: 1px; 
-            overflow: hidden; 
-            opacity: 0; 
-            pointer-events: none; 
+        .title-nabla {
+            font-family: 'Nabla', cursive;
+            font-size: 3rem;
+            -webkit-text-stroke: 1px black;
+            text-shadow: 2px 2px 0px black;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
     </style>
 </head>
-<body class="font-sans text-gray-800 flex flex-col items-center justify-center p-2 sm:p-4">
+<body class="flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8 font-sans text-gray-800">
 
-    <input type="text" id="juegos_frame_hp" class="hp-field" tabindex="-1" autocomplete="off">
+    <header class="flex flex-col items-center gap-4 mb-16 mt-8">
+        <h1 class="title-nabla text-center drop-shadow-xl">
+            ARCADE CENTER
+        </h1>
+        <p class="text-white text-lg font-medium bg-black/40 px-4 py-1 rounded-full backdrop-blur-sm">Elige tu entrenamiento mental</p>
+    </header>
 
-    <div id="arcade-main-container" class="w-full max-w-5xl h-[85vh] bg-white/90 backdrop-blur-md rounded-[2.5rem] shadow-2xl border border-white/50 flex flex-col overflow-hidden">
+    <main class="w-full max-w-5xl grid grid-cols-1 md:grid-cols-2 gap-12 mb-16 px-4">
         
-        <header class="bg-gray-900 text-white px-6 py-4 flex items-center justify-between shadow-md">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-tr from-purple-500 to-indigo-600 rounded-xl flex items-center justify-center font-bold text-xl">AS</div>
-                <div>
-                    <h3 class="font-extrabold text-lg tracking-tight uppercase">Zona Arcade</h3>
-                </div>
-            </div>
-            <a href="index.html" class="px-4 py-2 bg-gray-800 border border-gray-700 text-white rounded-xl text-xs font-bold transition-all hover:bg-gray-700 flex items-center gap-1.5">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
-                Volver al Inicio
-            </a>
-        </header>
-
-        <div id="arcade-viewport" class="flex-1 bg-slate-950 p-2 sm:p-4 flex items-center justify-center relative">
-            
-            <iframe src="mi_juego.html" class="w-full h-full rounded-2xl border-0 shadow-inner bg-black" allowfullscreen></iframe>
-
-        </div>
-        
-        <footer class="px-6 py-3 bg-gray-900 text-gray-400 text-xs text-center font-semibold tracking-wide border-t border-gray-800">
-            © 2026 Amy Software - Powered by HTML5 & Jetpack Mindset
-        </footer>
-    </div>
-
-    <script>
-        // Sistema de verificación automática del Honeypot perimetral
-        const frameTrap = document.getElementById('juegos_frame_hp');
-        const container = document.getElementById('arcade-main-container');
-
-        function checkFrameSecurity() {
-            if (frameTrap.value) {
-                // Alerta acústica defensiva nativa
-                try {
-                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.type = 'sawtooth';
-                    osc.frequency.value = 90;
-                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.start();
-                    osc.stop(audioCtx.currentTime + 0.5);
-                } catch(e) {}
-
-                // Bloqueo total de la interfaz del contenedor
-                container.innerHTML = `
-                    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; bg-color:#0f172a; color:#ff0055; font-family:monospace; font-weight:bold; text-align:center; padding:40px;">
-                        <h1 style="font-size:24px; margin-bottom:10px;">⚠️ PERÍMETRO COMPROMETIDO ⚠️</h1>
-                        <p style="font-size:12px; color:rgba(255,0,85,0.7);">DETECCIÓN DE AGENTE AUTOMATIZADO EXTERNO.<br>LA RECREATIVA HA SIDO APAGADA POR SEGURIDAD.</p>
-                        <a href="index.html" style="margin-top:25px; padding:10px 20px; background-color:#ff0055; color:white; font-size:11px; border-radius:8px; text-decoration:none; text-transform:uppercase;">Salir del terminal</a>
+        <a href="vibez_fly.html" class="block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-pink-500 rounded-[2.5rem]">
+            <article class="glass-card rounded-[2.5rem] p-10 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
+                <div class="flex flex-col items-center">
+                    <div class="bg-gradient-to-br from-pink-500 to-red-600 text-white p-5 rounded-3xl mb-8 shadow-md">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                     </div>
-                `;
-                container.style.backgroundColor = '#020617';
-                container.style.borderColor = '#ff0055';
-            }
-        }
+                    <h2 class="text-3xl font-extrabold text-gray-900 mb-5 tracking-tight">Vibez Fly</h2>
+                    <p class="text-xl text-gray-700 leading-relaxed font-medium">
+                        Mantén el vuelo del corazón a base de toques y esquiva los letales cuchillos en este reto de reflejos.
+                    </p>
+                </div>
+                <p class="mt-8 text-base text-pink-600 font-bold uppercase tracking-wider">Jugar Ahora</p>
+            </article>
+        </a>
 
-        // Escuchar si un bot lo rellena en tiempo real
-        frameTrap.addEventListener('input', checkFrameSecurity);
-        // Comprobación inicial rápida
-        setInterval(checkFrameSecurity, 1000);
-    </script>
+        <a href="mi_juego.html" class="block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-cyan-500 rounded-[2.5rem]">
+            <article class="glass-card rounded-[2.5rem] p-10 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
+                <div class="flex flex-col items-center">
+                    <div class="bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-5 rounded-3xl mb-8 shadow-md">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                    </div>
+                    <h2 class="text-3xl font-extrabold text-gray-900 mb-5 tracking-tight">Brain Training</h2>
+                    <p class="text-xl text-gray-700 leading-relaxed font-medium">
+                        Pon a prueba tu velocidad mental ordenando secuencias de burbujas numéricas de menor a mayor.
+                    </p>
+                </div>
+                <p class="mt-8 text-base text-cyan-600 font-bold uppercase tracking-wider">Jugar Ahora</p>
+            </article>
+        </a>
+
+    </main>
+
+    <footer class="mt-6">
+        <a href="index.html" class="inline-flex items-center justify-center px-6 py-3 font-bold text-white transition-all duration-200 bg-gray-900 rounded-xl hover:bg-gray-800 hover:-translate-y-0.5 shadow-md">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Volver al Inicio
+        </a>
+    </footer>
 
 </body>
 </html>
