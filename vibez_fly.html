@@ -142,6 +142,7 @@
     const VELOCIDAD_OBSTACULOS = 3;
     const HUECO_PASO = 250; // Hueco un poco más grande para facilitar en móvil
     const RADIO_MASCOTA = 25;
+    const ANCHO_BARRERA = 80; // CORRECCIÓN: Barreras más largas y consistentes (Base de 80px)
 
     let juegoIniciado = false, gameOver = false, puntuacion = 0;
     let mascotaY = 200, velocidadY = 0, obstaculos = [];
@@ -175,30 +176,37 @@
             if (mascotaY > canvas.height || mascotaY < 0) { 
                 gameOver = true; 
                 pantallaGameOver.classList.remove("hidden"); 
-                playSound(220, 'sawtooth', 0.4, 60); // Sonido de derrota descendente
+                playSound(220, 'sawtooth', 0.4, 60); 
             }
-            if (obstaculos.length === 0 || obstaculos[obstaculos.length-1].x < canvas.width - 250) obstaculos.push(crearObstaculo());
+            if (obstaculos.length === 0 || obstaculos[obstaculos.length-1].x < canvas.width - 280) obstaculos.push(crearObstaculo());
             obstaculos.forEach(obs => {
                 obs.x -= VELOCIDAD_OBSTACULOS;
-                if (!obs.pasado && obs.x < canvas.width/2) { 
+                
+                // CORRECCIÓN: Ajuste de paso basado en el nuevo ancho de barrera
+                if (!obs.pasado && obs.x + ANCHO_BARRERA < canvas.width/2) { 
                     obs.pasado = true; 
                     puntuacion++; 
                     txtPuntuacion.innerText = puntuacion; 
-                    playSound(750, 'sine', 0.12); // Sonido al puntuar
+                    playSound(750, 'sine', 0.12); 
                 }
-                if (Math.abs(canvas.width/2 - (obs.x + 20)) < 40 && (mascotaY < obs.altoSuperior || mascotaY > obs.altoSuperior + HUECO_PASO)) {
-                    gameOver = true; 
-                    pantallaGameOver.classList.remove("hidden");
-                    playSound(220, 'sawtooth', 0.4, 60); // Sonido de impacto descendente
+                
+                // CORRECCIÓN: Caja de colisión adaptada al nuevo grosor de 80px de forma milimétrica
+                if (canvas.width/2 + 32 > obs.x && canvas.width/2 - 32 < obs.x + ANCHO_BARRERA) {
+                    if (mascotaY - 20 < obs.altoSuperior || mascotaY + 40 > obs.altoSuperior + HUECO_PASO) {
+                        gameOver = true; 
+                        pantallaGameOver.classList.remove("hidden");
+                        playSound(220, 'sawtooth', 0.4, 60); 
+                    }
                 }
             });
-            obstaculos = obstaculos.filter(o => o.x > -50);
+            obstaculos = obstaculos.filter(o => o.x > -100);
         }
-        // Dibujar obstáculos
+        
+        // Dibujar obstáculos con el nuevo grosor robusto
         ctx.fillStyle = "#78909C";
         obstaculos.forEach(obs => {
-            ctx.fillRect(obs.x, 0, 40, obs.altoSuperior);
-            ctx.fillRect(obs.x, obs.altoSuperior + HUECO_PASO, 40, canvas.height);
+            ctx.fillRect(obs.x, 0, ANCHO_BARRERA, obs.altoSuperior);
+            ctx.fillRect(obs.x, obs.altoSuperior + HUECO_PASO, ANCHO_BARRERA, canvas.height);
         });
         dibujarCorazon(canvas.width / 2, mascotaY, gameOver);
         requestAnimationFrame(actualizarJuego);
@@ -216,27 +224,27 @@
     });
     
     function realizarSalto() { 
-        if (botTrap.value) return; // Protección contra bots intacta
+        if (botTrap.value) return; 
         if (!gameOver) { 
             juegoIniciado = true; 
             pantallaInicio.classList.add("hidden"); 
             velocidadY = IMPULSO; 
-            playSound(400, 'sine', 0.08, 600); // Sonido de salto ascendente corto
+            playSound(400, 'sine', 0.08, 600); 
         } 
     }
 
     btnReintentar.addEventListener("click", (e) => {
         e.preventDefault();
-        e.stopPropagation(); // Evita que el toque se propague al contenedor del juego en móviles
+        e.stopPropagation(); 
         mascotaY = 200; velocidadY = 0; obstaculos = []; puntuacion = 0;
         txtPuntuacion.innerText = "0"; gameOver = false; juegoIniciado = false;
-        pantallaGameOver.add ? pantallaGameOver.add("hidden") : pantallaGameOver.classList.add("hidden"); 
+        pantallaGameOver.classList.add("hidden"); 
         pantallaInicio.classList.remove("hidden");
     });
 
     btnReintentar.addEventListener("touchstart", (e) => {
         e.preventDefault();
-        e.stopPropagation(); // Manejo nativo táctil para evitar rebotes de eventos de click fantasmas
+        e.stopPropagation(); 
         mascotaY = 200; velocidadY = 0; obstaculos = []; puntuacion = 0;
         txtPuntuacion.innerText = "0"; gameOver = false; juegoIniciado = false;
         pantallaGameOver.classList.add("hidden"); 

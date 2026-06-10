@@ -25,32 +25,35 @@
             overflow: hidden; 
         }
         
-        /* Contenedor translúcido */
+        /* Contenedor translúcido optimizado para PC y Móvil */
         #game-wrapper {
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(8px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
-            padding: 15px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
             width: 95vw;
-            max-width: 320px;
+            /* Escalado adaptativo: en móvil usa el ancho de pantalla, en PC crece */
+            max-width: 420px; 
         }
 
-        /* OPCIÓN B: Tablero con cuadrícula de Neón Cian independiente */
+        /* Tablero con cuadrícula de Neón Cian - Escalado dinámico */
         canvas { 
             border: 2px solid rgba(78, 205, 196, 0.6); 
             background-color: rgba(10, 10, 25, 0.88); 
             background-image: 
                 linear-gradient(rgba(0, 255, 255, 0.12) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(0, 255, 255, 0.12) 1px, transparent 1px);
-            background-size: 20px 20px; /* Cuadrícula adaptada a las celdas del juego */
-            height: 50vh; 
-            max-height: 400px; 
-            width: auto; 
+            background-size: 20px 20px; 
+            /* Ahora el canvas escala según el contenedor y la altura de la pantalla */
+            height: 55vh; 
+            max-height: 520px; 
+            width: 100%;
+            max-width: 260px;
             aspect-ratio: 10 / 20; 
             border-radius: 6px;
             box-shadow: 0 0 20px rgba(0, 255, 255, 0.25);
@@ -58,23 +61,23 @@
 
         .ui { 
             text-align: center; 
-            margin-bottom: 10px; 
+            margin-bottom: 15px; 
             width: 100%;
             display: flex;
             justify-content: space-around;
             align-items: center;
         }
-        h2 { margin: 0; font-size: 1.6rem; letter-spacing: 3px; color: #0ff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+        h2 { margin: 0; font-size: 1.8rem; letter-spacing: 3px; color: #0ff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
         .stats { font-size: 0.9rem; font-weight: bold; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 5px;}
         
-        /* Controles móviles */
+        /* Controles móviles ajustados al nuevo tamaño */
         .controls {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 8px;
             margin-top: 15px;
             width: 100%;
-            max-width: 250px;
+            max-width: 260px;
         }
         .btn {
             background: rgba(255, 255, 255, 0.1);
@@ -357,7 +360,10 @@
     function update(time = 0) {
         checkIntegrity();
         if (securityTriggered) { triggerTrap(); return; }
-        let currentDropInterval = Math.max(100, 1000 - (_level * 80));
+        
+        // CORRECCIÓN: El intervalo se calcula dinámicamente en tiempo real
+        let currentDropInterval = Math.max(100, 1000 - (_level * 100)); 
+        
         if (time - lastTime > currentDropInterval) {
             playerDrop();
             lastTime = time;
