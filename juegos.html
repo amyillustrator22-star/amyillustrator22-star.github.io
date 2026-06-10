@@ -130,9 +130,84 @@
         </a>
     </footer>
 
-    <script>
-        function switchLeaderboard(gameId) {
-            // 1. Quitar estilos activos de todos los botones
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // Credenciales extraídas de tu panel de control
+        const firebaseConfig = {
+            apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
+            authDomain: "vibezmatch-91c6d.firebaseapp.com",
+            databaseURL: "https://vibezmatch-91c6d-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "vibezmatch-91c6d",
+            storageBucket: "vibezmatch-91c6d.appspot.com",
+            messagingSenderId: "645008717503",
+            appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a"
+        };
+
+        // Inicializar
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Cargar puntuaciones filtradas
+        async function loadLeaderboard(gameId) {
+            const rowsContainer = document.getElementById('leaderboard-rows');
+            rowsContainer.innerHTML = `
+                <div class="grid grid-cols-3 px-4 py-4 items-center text-center text-gray-500 col-span-3">
+                    Cargando puntuaciones online...
+                </div>
+            `;
+
+            try {
+                const q = query(
+                    collection(db, "scores_arcade"),
+                    where("game", "==", gameId),
+                    orderBy("score", "desc"),
+                    limit(10)
+                );
+
+                const querySnapshot = await getDocs(q);
+                rowsContainer.innerHTML = "";
+
+                if (querySnapshot.empty) {
+                    rowsContainer.innerHTML = `
+                        <div class="grid grid-cols-3 px-4 py-4 items-center text-center text-gray-400 italic col-span-3">
+                            ¡Nadie ha registrado récords aún! Sé el primero.
+                        </div>
+                    `;
+                    return;
+                }
+
+                let position = 1;
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    let medal = `${position}º`;
+                    if (position === 1) medal = "🥇 1º";
+                    if (position === 2) medal = "🥈 2º";
+                    if (position === 3) medal = "🥉 3º";
+
+                    rowsContainer.innerHTML += `
+                        <div class="grid grid-cols-3 px-4 py-3 items-center hover:bg-black/5 transition-colors duration-150">
+                            <div class="font-bold ${position <= 3 ? 'text-amber-500' : 'text-gray-500'}">${medal}</div>
+                            <div class="font-semibold text-gray-900">${data.player}</div>
+                            <div class="text-right font-extrabold text-gray-900 tracking-wider">${data.score}</div>
+                        </div>
+                    `;
+                    position++;
+                });
+
+            } catch (error) {
+                console.error("Error cargando Firestore:", error);
+                rowsContainer.innerHTML = `
+                    <div class="grid grid-cols-3 px-4 py-4 items-center text-center text-red-500 font-semibold col-span-3">
+                        Error al conectar con los récords mundiales.
+                    </div>
+                `;
+            }
+        }
+
+        // Control visual de pestañas acoplado globalmente
+        window.switchLeaderboard = function(gameId) {
             const btnVibez = document.getElementById('btn-vibez');
             const btnBrain = document.getElementById('btn-brain');
             const btnBlock = document.getElementById('btn-block');
@@ -141,7 +216,6 @@
                 btn.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40";
             });
 
-            // 2. Darle el estilo activo de su color correspondiente al botón pulsado
             if (gameId === 'vibez_fly') {
                 btnVibez.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-pink-600 text-white shadow-md";
             } else if (gameId === 'brain_training') {
@@ -150,24 +224,11 @@
                 btnBlock.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-purple-600 text-white shadow-md";
             }
 
-            // 3. Simulación de filas cargando (en el Paso 3 se conectará con Firebase real)
-            const rowsContainer = document.getElementById('leaderboard-rows');
-            rowsContainer.innerHTML = `
-                <div class="grid grid-cols-3 px-4 py-4 items-center">
-                    <div class="flex items-center gap-2 font-bold text-amber-500">🥇 1º</div>
-                    <div class="font-bold">Amy</div>
-                    <div class="text-right font-extrabold text-gray-900">100</div>
-                </div>
-                <div class="grid grid-cols-3 px-4 py-4 items-center text-gray-400 text-sm italic col-span-3 justify-center text-center">
-                    Conectando con la colección scores_arcade...
-                </div>
-            `;
+            loadLeaderboard(gameId);
         }
         
-        // Arrancar mostrando el primer juego por defecto al cargar la página
-        window.onload = function() {
-            switchLeaderboard('vibez_fly');
-        };
+        // Carga inicial
+        window.switchLeaderboard('vibez_fly');
     </script>
 
 </body>
