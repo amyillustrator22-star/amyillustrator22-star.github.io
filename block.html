@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BLOCK - Arcade Edition</title>
     <style>
-        /* Fondo estilo Tetris Arcade (Grid + Viñeta) */
+        /* Fondo Neón Arcade Brillante y Cuadrícula */
         body { 
-            background-color: #0f172a; 
+            background-color: #2b1055; 
             background-image: 
-                radial-gradient(circle at center, transparent 20%, #000 120%),
-                linear-gradient(rgba(78, 205, 196, 0.15) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(78, 205, 196, 0.15) 1px, transparent 1px);
-            background-size: 100% 100%, 20px 20px, 20px 20px;
+                radial-gradient(circle at top, transparent 20%, #000 150%),
+                linear-gradient(rgba(0, 255, 255, 0.4) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(0, 255, 255, 0.4) 2px, transparent 2px);
+            background-size: 100% 100%, 30px 30px, 30px 30px;
             background-position: center center;
             display: flex; 
             flex-direction: column; 
@@ -25,54 +25,57 @@
             overflow: hidden; 
         }
         
-        /* Contenedor tipo cristal (Glassmorphism) para resaltar el juego */
+        /* Contenedor tipo cristal para resaltar el juego */
         #game-wrapper {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 20px;
+            padding: 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            width: 95vw;
+            max-width: 320px;
         }
 
-        /* Canvas ajustado a la proporción clásica 10x20 */
+        /* Canvas ajustado para que SIEMPRE quepa en el móvil junto a los botones */
         canvas { 
             border: 2px solid rgba(255,255,255,0.2); 
             background: rgba(0, 0, 0, 0.85); 
-            width: 90vw; 
-            max-width: 250px; 
-            height: auto; 
+            height: 50vh; /* La clave para móviles */
+            max-height: 400px; 
+            width: auto; 
             aspect-ratio: 10 / 20; 
             border-radius: 4px;
         }
 
         .ui { 
             text-align: center; 
-            margin-bottom: 15px; 
+            margin-bottom: 10px; 
             width: 100%;
             display: flex;
             justify-content: space-around;
             align-items: center;
         }
-        h2 { margin: 0; font-size: 1.8rem; letter-spacing: 3px; color: #4ECDC4; text-shadow: 0 0 10px rgba(78, 205, 196, 0.5); }
-        .stats { font-size: 1rem; font-weight: bold; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 5px;}
+        h2 { margin: 0; font-size: 1.6rem; letter-spacing: 3px; color: #0ff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
+        .stats { font-size: 0.9rem; font-weight: bold; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 5px;}
         
+        /* Controles adaptados a móviles para no salirse de la pantalla */
         .controls {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 20px;
-            width: 90vw;
+            gap: 8px;
+            margin-top: 15px;
+            width: 100%;
             max-width: 250px;
         }
         .btn {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
-            padding: 15px 0;
+            padding: 12px 0;
             border-radius: 8px;
             font-size: 1.5rem;
             cursor: pointer;
@@ -86,7 +89,7 @@
         #btn-down { grid-column: 2; }
         #btn-right { grid-column: 3; }
 
-        /* HONEYPOT VISUAL: Invisible para ti, trampa para bots */
+        /* HONEYPOT VISUAL: Trampa invisible para bots */
         .system-validate-field { position: absolute; left: -9999px; opacity: 0; }
     </style>
 </head>
@@ -122,19 +125,19 @@
 
     const colors = [
         null,
-        '#FF6B6B', // T
-        '#4ECDC4', // O
-        '#45B7D1', // L
-        '#FFA07A', // J
-        '#98D8C8', // I
-        '#F7DC6F', // S
-        '#BB8FCE'  // Z
+        '#FF6B6B', // 1: T
+        '#4ECDC4', // 2: O
+        '#45B7D1', // 3: L
+        '#FFA07A', // 4: J
+        '#98D8C8', // 5: I
+        '#F7DC6F', // 6: S
+        '#BB8FCE'  // 7: Z
     ];
 
     // --- SISTEMA DE SEGURIDAD Y HONEYPOTS ---
     let securityTriggered = false;
     
-    // TRAMPA DE SEGURIDAD 2 (Señuelo en la consola global para scripters)
+    // TRAMPA DE SEGURIDAD 2 (Variable cebo global)
     window.block_points = 0; 
     
     let _realInternalPointsCounter = 0; 
@@ -271,7 +274,7 @@
         document.getElementById('display-level').innerText = _level;
     }
 
-    // Puntuación histórica de 1986
+    // Lógica retro: puntuación de 1986
     function addScore(lines) {
         checkIntegrity();
         if (securityTriggered) return;
@@ -320,7 +323,7 @@
         return false;
     }
 
-    // Controles teclado 
+    // Teclado
     document.addEventListener('keydown', event => {
         if (securityTriggered) return;
         if (event.keyCode === 37) playerMove(-1);
@@ -329,7 +332,7 @@
         else if (event.keyCode === 38) playerRotate(1);
     });
 
-    // Controles táctiles
+    // Táctil móvil
     document.getElementById('btn-left').addEventListener('click', () => { if (!securityTriggered) playerMove(-1); });
     document.getElementById('btn-right').addEventListener('click', () => { if (!securityTriggered) playerMove(1); });
     document.getElementById('btn-down').addEventListener('click', () => { if (!securityTriggered) playerDrop(); });
