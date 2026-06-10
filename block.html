@@ -5,11 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BLOCK - Arcade Edition</title>
     <style>
-        /* Fondo premium animado y suave */
+        /* Fondo estilo Tetris Arcade (Grid + Viñeta) */
         body { 
-            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #0f0c29);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background-color: #0f172a; 
+            background-image: 
+                radial-gradient(circle at center, transparent 20%, #000 120%),
+                linear-gradient(rgba(78, 205, 196, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(78, 205, 196, 0.15) 1px, transparent 1px);
+            background-size: 100% 100%, 20px 20px, 20px 20px;
+            background-position: center center;
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
@@ -20,14 +24,8 @@
             font-family: 'Courier New', Courier, monospace; 
             overflow: hidden; 
         }
-
-        @keyframes gradientBG {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
         
-        /* Contenedor tipo cristal (Glassmorphism) */
+        /* Contenedor tipo cristal (Glassmorphism) para resaltar el juego */
         #game-wrapper {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
@@ -37,13 +35,13 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
 
         /* Canvas ajustado a la proporción clásica 10x20 */
         canvas { 
             border: 2px solid rgba(255,255,255,0.2); 
-            background: rgba(0, 0, 0, 0.8); 
+            background: rgba(0, 0, 0, 0.85); 
             width: 90vw; 
             max-width: 250px; 
             height: auto; 
@@ -60,7 +58,7 @@
             align-items: center;
         }
         h2 { margin: 0; font-size: 1.8rem; letter-spacing: 3px; color: #4ECDC4; text-shadow: 0 0 10px rgba(78, 205, 196, 0.5); }
-        .stats { font-size: 1rem; font-weight: bold; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 5px;}
+        .stats { font-size: 1rem; font-weight: bold; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 5px;}
         
         .controls {
             display: grid;
@@ -88,6 +86,7 @@
         #btn-down { grid-column: 2; }
         #btn-right { grid-column: 3; }
 
+        /* HONEYPOT VISUAL: Invisible para ti, trampa para bots */
         .system-validate-field { position: absolute; left: -9999px; opacity: 0; }
     </style>
 </head>
@@ -132,9 +131,12 @@
         '#BB8FCE'  // Z
     ];
 
-    // --- SEGURIDAD Y HONEYPOTS ---
+    // --- SISTEMA DE SEGURIDAD Y HONEYPOTS ---
     let securityTriggered = false;
-    window.block_points = 0; // HONEYPOT 2
+    
+    // TRAMPA DE SEGURIDAD 2 (Señuelo en la consola global para scripters)
+    window.block_points = 0; 
+    
     let _realInternalPointsCounter = 0; 
     let _linesCleared = 0;
     let _level = 0;
@@ -154,7 +156,7 @@
         ctx.fillText("S1ST3M4 L0CK", 0.5, 5);
         ctx.fillText("ANOMALY DETECTED", 0, 7);
     }
-    // -----------------------------
+    // ----------------------------------------
 
     function createPiece(type) {
         if (type === 'T') return [[0,1,0], [1,1,1], [0,0,0]];
@@ -178,7 +180,6 @@
         return createPiece(pieceBag.pop());
     }
 
-    // Matriz original de 10x20
     const arena = createMatrix(10, 20);
     const player = { pos: {x: 0, y: 0}, matrix: null };
 
@@ -270,7 +271,7 @@
         document.getElementById('display-level').innerText = _level;
     }
 
-    // Sistema de puntuación clásico de 1986
+    // Puntuación histórica de 1986
     function addScore(lines) {
         checkIntegrity();
         if (securityTriggered) return;
@@ -283,7 +284,7 @@
 
         _realInternalPointsCounter += basePoints * (_level + 1);
         _linesCleared += lines;
-        _level = Math.floor(_linesCleared / 10); // Sube nivel cada 10 líneas
+        _level = Math.floor(_linesCleared / 10); 
         updateUI();
     }
 
@@ -319,6 +320,7 @@
         return false;
     }
 
+    // Controles teclado 
     document.addEventListener('keydown', event => {
         if (securityTriggered) return;
         if (event.keyCode === 37) playerMove(-1);
@@ -327,6 +329,7 @@
         else if (event.keyCode === 38) playerRotate(1);
     });
 
+    // Controles táctiles
     document.getElementById('btn-left').addEventListener('click', () => { if (!securityTriggered) playerMove(-1); });
     document.getElementById('btn-right').addEventListener('click', () => { if (!securityTriggered) playerMove(1); });
     document.getElementById('btn-down').addEventListener('click', () => { if (!securityTriggered) playerDrop(); });
@@ -339,7 +342,6 @@
         checkIntegrity();
         if (securityTriggered) { triggerTrap(); return; }
 
-        // Fórmula de velocidad: Más nivel = más rápido (mínimo 100ms)
         let currentDropInterval = Math.max(100, 1000 - (_level * 80));
 
         const deltaTime = time - lastTime;
