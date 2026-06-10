@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>BLOCK</title>
+    <style>
+        body { background: #111; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; color: #fff; font-family: monospace; }
+        canvas { border: 2px solid #555; background: #000; }
+        .ui { margin-left: 20px; }
+        
+        /* Honeypot visual: Invisible para humanos, trampa para bots automatizados */
+        .system-validate-field {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="system-validate-field" aria-hidden="true">
+    <input type="text" id="auth_token_verification" tabindex="-1" autocomplete="off">
+</div>
+
+<canvas id="game" width="240" height="400"></canvas>
+<div class="ui">
+    <h2>BLOCK</h2>
+    <p>Puntos: <span id="display-score">0</span></p>
+    <p>Usa las flechas para mover.</p>
+</div>
+
+<script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    ctx.scale(20, 20);
+
+    // --- SISTEMA DE SEGURIDAD Y HONEYPOTS ---
+    let securityTriggered = false;
+
+    // Honeypot 2: El señuelo en la consola global para pillar tramposos
+    window.block_points = 0; 
+    
+    // Puntuación real e interna del juego (oculta y segura)
+    let _realInternalPointsCounter = 0; 
+
+    function checkIntegrity() {
+        const botInput = document.getElementById('auth_token_verification').value;
+        // Si rellenan el input fantasma o manipulan la variable global... ¡Cazados!
+        if (botInput !== "" || window.block_points !== 0) {
+            securityTriggered = true;
+        }
+    }
+
+    function triggerTrap() {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ff0000';
+        ctx.font = '1px monospace';
+        ctx.fillText("S1ST3M4 L0CK", 1, 5);
+        ctx.fillText("ANOMALY DETECTED", 0.5, 7);
+    }
+    // ----------------------------------------
+
+    function createPiece(type) {
+        if (type === 'I') return [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]];
+        if (type === 'L') return [[0,1,0],[0,1,0],[0,1,1]];
+        if (type === 'O') return [[1,1],[1,1]];
+    }
+
+    const arena = createMatrix(12, 20);
+    const player = { pos: {x: 5, y: 0}, matrix: createPiece('I') };
+
+    function createMatrix(w, h) {
+        const matrix = [];
+        while (h--) matrix.push(new Array(w).fill(0));
+        return matrix;
+    }
+
+    function draw() {
+        ctx.fillStyle = '#000';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        drawMatrix(arena, {x: 0, y: 0});
+        drawMatrix(player.matrix, player.pos);
+    }
+
+    function drawMatrix(matrix, offset) {
+        matrix.forEach((row, y) => {
+            row.forEach((value, x) => {
+                if (value !== 0) {
+                    ctx.fillStyle = '#fff'; // Bloques en blanco puro (monocromático)
+                    ctx.fillRect(x + offset.x, y + offset.y, 1, 1);
+                }
+            });
+        });
+    }
+
+    function playerDrop() {
+        player.pos.y++;
+        if (collide(arena, player)) {
+            player.pos.y--;
+            merge(arena, player);
+            lineClear();
+            player.pos.y = 0;
+            player.pos.x = 5;
+        }
+    }
+
+    function addPoints(amount) {
+        checkIntegrity();
+        if (securityTriggered) return;
+
+        _realInternalPointsCounter += amount;
+        document.getElementById('display-score').innerText = _realInternalPointsCounter;
+    }
+
+    function lineClear() {
+        outer: for (let y = arena.length - 1; y > 0; --y) {
+            for (let x = 0; x < arena[y].length; ++x) {
+                if (arena[y][x] === 0) {
+                    continue outer;
+                }
+            }
+            const row = arena.splice(y, 1)[0].fill(0);
+            arena.unshift(row);
+            ++y;
+            
+            addPoints(10); 
+        }
+    }
+
+    function merge(arena, player) {
+        player.matrix.forEach((row, y) => {
+            row.forEach((value, x) => {
+                if (value !== 0) arena[y + player.pos.y][x + player.pos.x] = value;
+            });
+        });
+    }
+
+    function collide(arena, player) {
+        const [m, o] = [player.matrix, player.pos];
+        for (let y = 0; y < m.length; ++y) {
+            for (let x = 0; x < m[y].length; ++x) {
+                if (m[y][x] !== 0 && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) return true;
+            }
+        }
+        return false;
+    }
+
+    document.addEventListener('keydown', event => {
+        if (securityTriggered) return;
+        if (event.keyCode === 37) player.pos.x--;
+        else if (event.keyCode === 39) player.pos.x++;
+        else if (event.keyCode === 40) playerDrop();
+    });
+
+    function update() {
+        checkIntegrity();
+        
+        if (securityTriggered) {
+            triggerTrap();
+            return; 
+        }
+
+        playerDrop();
+        draw();
+        setTimeout(update, 1000); // Caída cada 1 segundo
+    }
+
+    update();
+</script>
+</body>
+</html>
