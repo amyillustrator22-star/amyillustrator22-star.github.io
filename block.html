@@ -37,19 +37,13 @@
             align-items: center;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
             width: 95vw;
-            /* Escalado adaptativo: en móvil usa el ancho de pantalla, en PC crece */
             max-width: 420px; 
         }
 
-        /* Tablero con cuadrícula de Neón Cian - Escalado dinámico */
+        /* Tablero con Neón Cian - Rejilla eliminada de CSS para calcularla nativamente */
         canvas { 
             border: 2px solid rgba(78, 205, 196, 0.6); 
             background-color: rgba(10, 10, 25, 0.88); 
-            background-image: 
-                linear-gradient(rgba(0, 255, 255, 0.12) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.12) 1px, transparent 1px);
-            background-size: 20px 20px; 
-            /* Ahora el canvas escala según el contenedor y la altura de la pantalla */
             height: 55vh; 
             max-height: 520px; 
             width: 100%;
@@ -204,8 +198,28 @@
         return matrix;
     }
 
+    // VARIABLES DE CONTROL DE CAÍDA CONTINUA (SOFT DROP)
+    let dropFast = false;
+
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // CORRECCIÓN DE REJILLA: Dibujamos las líneas de fondo alineadas milimétricamente con la matriz
+        ctx.strokeStyle = 'rgba(0, 255, 255, 0.09)';
+        ctx.lineWidth = 0.04;
+        for (let x = 0; x <= 10; x++) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, 20);
+            ctx.stroke();
+        }
+        for (let y = 0; y <= 20; y++) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(10, y);
+            ctx.stroke();
+        }
+
         drawMatrix(arena, {x: 0, y: 0});
         if (player.matrix) drawMatrix(player.matrix, player.pos);
     }
@@ -248,7 +262,7 @@
                 return;
             }
         }
-        playAudioTone(330, 'sine', 0.05, 0.04); // Sonido de rotación sutil
+        playAudioTone(330, 'sine', 0.05, 0.04); 
     }
 
     function playerMove(dir) {
@@ -257,7 +271,7 @@
         if (collide(arena, player)) {
             player.pos.x -= dir;
         } else {
-            playAudioTone(220, 'sine', 0.04, 0.03); // Sonido de movimiento lateral ligero
+            playAudioTone(220, 'sine', 0.04, 0.03); 
         }
     }
 
@@ -267,7 +281,7 @@
         if (collide(arena, player)) {
             player.pos.y--;
             merge(arena, player);
-            playAudioTone(120, 'triangle', 0.1, 0.08); // Golpe al tocar fondo estático
+            playAudioTone(120, 'triangle', 0.1, 0.08); 
             lineClear();
             playerReset();
         }
@@ -278,7 +292,6 @@
         player.pos.y = 0;
         player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
         if (collide(arena, player)) {
-            // Game over sound
             playAudioTone(180, 'sawtooth', 0.3, 0.08);
             setTimeout(() => playAudioTone(130, 'sawtooth', 0.4, 0.08), 120);
             
@@ -319,10 +332,9 @@
         }
         if (linesCount > 0) {
             addScore(linesCount);
-            // Efecto armónico ascendente al limpiar líneas
-            playAudioTone(523.25, 'sine', 0.08, 0.06); // Nota Do (C5)
-            setTimeout(() => playAudioTone(659.25, 'sine', 0.08, 0.06), 60); // Nota Mi (E5)
-            setTimeout(() => playAudioTone(783.99, 'sine', 0.15, 0.06), 120); // Nota Sol (G5)
+            playAudioTone(523.25, 'sine', 0.08, 0.06); 
+            setTimeout(() => playAudioTone(659.25, 'sine', 0.08, 0.06), 60); 
+            setTimeout(() => playAudioTone(783.99, 'sine', 0.15, 0.06), 120); 
         }
     }
 
@@ -344,25 +356,45 @@
         return false;
     }
 
+    // MANEJO DE TECLADO MEJORADO CON SOPORTE DE CAÍDA RÁPIDA MANTENIDA
     document.addEventListener('keydown', event => {
         if (securityTriggered) return;
         if (event.keyCode === 37) playerMove(-1);
         else if (event.keyCode === 39) playerMove(1);
-        else if (event.keyCode === 40) playerDrop();
+        else if (event.keyCode === 40) dropFast = true; // Activa caída rápida al pulsar
         else if (event.keyCode === 38) playerRotate(1);
     });
 
+    document.addEventListener('keyup', event => {
+        if (event.keyCode === 40) dropFast = false; // Desactiva caída rápida al soltar
+    });
+
+    // EVENTOS TÁCTILES MÓVILES MEJORADOS (MANTENER PULSADO / SOLTAR)
+    const btnDown = document.getElementById('btn-down');
+    
+    btnDown.addEventListener('mousedown', () => { if (!securityTriggered) dropFast = true; });
+    btnDown.addEventListener('mouseup', () => { dropFast = false; });
+    btnDown.addEventListener('mouseleave', () => { dropFast = false; });
+    
+    btnDown.addEventListener('touchstart', (e) => { 
+        e.preventDefault(); 
+        if (!securityTriggered) dropFast = true; 
+    }, { passive: false });
+    btnDown.addEventListener('touchend', (e) => { 
+        e.preventDefault(); 
+        dropFast = false; 
+    }, { passive: false });
+
     document.getElementById('btn-left').addEventListener('click', () => { if (!securityTriggered) playerMove(-1); });
     document.getElementById('btn-right').addEventListener('click', () => { if (!securityTriggered) playerMove(1); });
-    document.getElementById('btn-down').addEventListener('click', () => { if (!securityTriggered) playerDrop(); });
     document.getElementById('btn-up').addEventListener('click', () => { if (!securityTriggered) playerRotate(1); });
 
     function update(time = 0) {
         checkIntegrity();
         if (securityTriggered) { triggerTrap(); return; }
         
-        // CORRECCIÓN: El intervalo se calcula dinámicamente en tiempo real
-        let currentDropInterval = Math.max(100, 1000 - (_level * 100)); 
+        // Si dropFast está activo, la velocidad de caída es extrema (cada 40ms)
+        let currentDropInterval = dropFast ? 40 : Math.max(100, 1000 - (_level * 100)); 
         
         if (time - lastTime > currentDropInterval) {
             playerDrop();
