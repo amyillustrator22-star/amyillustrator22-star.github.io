@@ -3,66 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BLOCK</title>
+    <title>BLOCK - Arcade Edition</title>
     <style>
+        /* Fondo premium animado y suave */
         body { 
-            background: #111; 
+            background: linear-gradient(-45deg, #0f0c29, #302b63, #24243e, #0f0c29);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
-            height: 100vh; 
+            min-height: 100vh; 
             margin: 0; 
             color: #fff; 
-            font-family: monospace; 
+            font-family: 'Courier New', Courier, monospace; 
             overflow: hidden; 
         }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
         
-        #game-container {
+        /* Contenedor tipo cristal (Glassmorphism) */
+        #game-wrapper {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100%;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
-        /* Canvas adaptativo */
+        /* Canvas ajustado a la proporción clásica 10x20 */
         canvas { 
-            border: 2px solid #555; 
-            background: #000; 
-            width: 90vw; /* Se expande en el móvil */
-            max-width: 320px; /* Tope de tamaño para el ordenador */
+            border: 2px solid rgba(255,255,255,0.2); 
+            background: rgba(0, 0, 0, 0.8); 
+            width: 90vw; 
+            max-width: 250px; 
             height: auto; 
-            aspect-ratio: 12 / 20; 
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            aspect-ratio: 10 / 20; 
             border-radius: 4px;
         }
 
-        .ui { text-align: center; margin-bottom: 10px; }
-        h2 { margin: 0; font-size: 1.8rem; letter-spacing: 2px; }
-        p { margin: 5px 0; font-size: 1.2rem; }
+        .ui { 
+            text-align: center; 
+            margin-bottom: 15px; 
+            width: 100%;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+        h2 { margin: 0; font-size: 1.8rem; letter-spacing: 3px; color: #4ECDC4; text-shadow: 0 0 10px rgba(78, 205, 196, 0.5); }
+        .stats { font-size: 1rem; font-weight: bold; background: rgba(0,0,0,0.4); padding: 5px 10px; border-radius: 5px;}
         
-        /* Botones táctiles para el móvil */
         .controls {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 10px;
-            margin-top: 15px;
+            margin-top: 20px;
             width: 90vw;
-            max-width: 320px;
+            max-width: 250px;
         }
         .btn {
-            background: #333;
-            border: 2px solid #555;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             color: white;
             padding: 15px 0;
             border-radius: 8px;
             font-size: 1.5rem;
-            font-weight: bold;
             cursor: pointer;
             user-select: none;
-            touch-action: manipulation; /* Evita que el móvil haga zoom al pulsar rápido */
+            touch-action: manipulation;
+            transition: background 0.2s;
         }
-        .btn:active { background: #666; }
+        .btn:active { background: rgba(255, 255, 255, 0.3); }
         #btn-up { grid-column: 2; }
         #btn-left { grid-column: 1; }
         #btn-down { grid-column: 2; }
@@ -77,13 +97,14 @@
     <input type="text" id="auth_token_verification" tabindex="-1" autocomplete="off">
 </div>
 
-<div id="game-container">
+<div id="game-wrapper">
     <div class="ui">
+        <div class="stats">NIVEL<br><span id="display-level">0</span></div>
         <h2>BLOCK</h2>
-        <p>Puntos: <span id="display-score">0</span></p>
+        <div class="stats">PTS<br><span id="display-score">0</span></div>
     </div>
 
-    <canvas id="game" width="240" height="400"></canvas>
+    <canvas id="game" width="200" height="400"></canvas>
 
     <div class="controls">
         <div></div>
@@ -100,21 +121,23 @@
     const ctx = canvas.getContext('2d');
     ctx.scale(20, 20);
 
-    // Paleta de colores agradables para cada pieza
     const colors = [
         null,
-        '#FF6B6B', // 1: Rojo suave (T)
-        '#4ECDC4', // 2: Turquesa (Cuadrado)
-        '#45B7D1', // 3: Azul (L)
-        '#FFA07A', // 4: Salmón (L invertida)
-        '#98D8C8', // 5: Menta (Palo)
-        '#F7DC6F', // 6: Amarillo (S)
-        '#BB8FCE'  // 7: Morado (Z)
+        '#FF6B6B', // T
+        '#4ECDC4', // O
+        '#45B7D1', // L
+        '#FFA07A', // J
+        '#98D8C8', // I
+        '#F7DC6F', // S
+        '#BB8FCE'  // Z
     ];
 
+    // --- SEGURIDAD Y HONEYPOTS ---
     let securityTriggered = false;
-    window.block_points = 0; 
+    window.block_points = 0; // HONEYPOT 2
     let _realInternalPointsCounter = 0; 
+    let _linesCleared = 0;
+    let _level = 0;
 
     function checkIntegrity() {
         const botInput = document.getElementById('auth_token_verification').value;
@@ -124,17 +147,17 @@
     }
 
     function triggerTrap() {
-        ctx.fillStyle = '#000';
+        ctx.fillStyle = 'rgba(0,0,0,0.9)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#ff0000';
         ctx.font = '1px monospace';
-        ctx.fillText("S1ST3M4 L0CK", 1, 5);
-        ctx.fillText("ANOMALY DETECTED", 0.5, 7);
+        ctx.fillText("S1ST3M4 L0CK", 0.5, 5);
+        ctx.fillText("ANOMALY DETECTED", 0, 7);
     }
+    // -----------------------------
 
-    // Definición de las 7 matrices base
     function createPiece(type) {
-        if (type === 'T') return [[0,0,0], [1,1,1], [0,1,0]];
+        if (type === 'T') return [[0,1,0], [1,1,1], [0,0,0]];
         if (type === 'O') return [[2,2], [2,2]];
         if (type === 'L') return [[0,3,0], [0,3,0], [0,3,3]];
         if (type === 'J') return [[0,4,0], [0,4,0], [4,4,0]];
@@ -143,13 +166,20 @@
         if (type === 'Z') return [[7,7,0], [0,7,7], [0,0,0]];
     }
 
-    // Selector aleatorio de piezas
+    let pieceBag = [];
     function getRandomPiece() {
-        const pieces = 'TOLJISZ';
-        return createPiece(pieces[pieces.length * Math.random() | 0]);
+        if (pieceBag.length === 0) {
+            pieceBag = ['T', 'O', 'L', 'J', 'I', 'S', 'Z'];
+            for (let i = pieceBag.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [pieceBag[i], pieceBag[j]] = [pieceBag[j], pieceBag[i]];
+            }
+        }
+        return createPiece(pieceBag.pop());
     }
 
-    const arena = createMatrix(12, 20);
+    // Matriz original de 10x20
+    const arena = createMatrix(10, 20);
     const player = { pos: {x: 0, y: 0}, matrix: null };
 
     function createMatrix(w, h) {
@@ -159,10 +189,9 @@
     }
 
     function draw() {
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         drawMatrix(arena, {x: 0, y: 0});
-        drawMatrix(player.matrix, player.pos);
+        if (player.matrix) drawMatrix(player.matrix, player.pos);
     }
 
     function drawMatrix(matrix, offset) {
@@ -171,16 +200,14 @@
                 if (value !== 0) {
                     ctx.fillStyle = colors[value]; 
                     ctx.fillRect(x + offset.x, y + offset.y, 1, 1);
-                    // Borde sutil para separar los cuadraditos de la pieza
-                    ctx.fillStyle = 'rgba(0,0,0,0.2)';
-                    ctx.fillRect(x + offset.x, y + offset.y, 1, 0.05); 
-                    ctx.fillRect(x + offset.x, y + offset.y, 0.05, 1); 
+                    ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                    ctx.fillRect(x + offset.x, y + offset.y, 1, 0.1); 
+                    ctx.fillRect(x + offset.x, y + offset.y, 0.1, 1); 
                 }
             });
         });
     }
 
-    // --- SISTEMA DE ROTACIÓN ---
     function rotate(matrix, dir) {
         for (let y = 0; y < matrix.length; ++y) {
             for (let x = 0; x < y; ++x) {
@@ -192,6 +219,7 @@
     }
 
     function playerRotate(dir) {
+        if (!player.matrix) return;
         const pos = player.pos.x;
         let offset = 1;
         rotate(player.matrix, dir);
@@ -199,20 +227,21 @@
             player.pos.x += offset;
             offset = -(offset + (offset > 0 ? 1 : -1));
             if (offset > player.matrix[0].length) {
-                rotate(player.matrix, -dir); // Cancela si no cabe
+                rotate(player.matrix, -dir);
                 player.pos.x = pos;
                 return;
             }
         }
     }
-    // ---------------------------
 
     function playerMove(dir) {
+        if (!player.matrix) return;
         player.pos.x += dir;
         if (collide(arena, player)) player.pos.x -= dir;
     }
 
     function playerDrop() {
+        if (!player.matrix) return;
         player.pos.y++;
         if (collide(arena, player)) {
             player.pos.y--;
@@ -226,22 +255,40 @@
         player.matrix = getRandomPiece();
         player.pos.y = 0;
         player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
-        // Game Over
         if (collide(arena, player)) {
             arena.forEach(row => row.fill(0));
             _realInternalPointsCounter = 0;
-            document.getElementById('display-score').innerText = 0;
+            _linesCleared = 0;
+            _level = 0;
+            updateUI();
+            pieceBag = [];
         }
     }
 
-    function addPoints(amount) {
+    function updateUI() {
+        document.getElementById('display-score').innerText = _realInternalPointsCounter;
+        document.getElementById('display-level').innerText = _level;
+    }
+
+    // Sistema de puntuación clásico de 1986
+    function addScore(lines) {
         checkIntegrity();
         if (securityTriggered) return;
-        _realInternalPointsCounter += amount;
-        document.getElementById('display-score').innerText = _realInternalPointsCounter;
+        
+        let basePoints = 0;
+        if (lines === 1) basePoints = 40;
+        else if (lines === 2) basePoints = 100;
+        else if (lines === 3) basePoints = 300;
+        else if (lines === 4) basePoints = 1200;
+
+        _realInternalPointsCounter += basePoints * (_level + 1);
+        _linesCleared += lines;
+        _level = Math.floor(_linesCleared / 10); // Sube nivel cada 10 líneas
+        updateUI();
     }
 
     function lineClear() {
+        let linesCount = 0;
         outer: for (let y = arena.length - 1; y > 0; --y) {
             for (let x = 0; x < arena[y].length; ++x) {
                 if (arena[y][x] === 0) continue outer;
@@ -249,8 +296,9 @@
             const row = arena.splice(y, 1)[0].fill(0);
             arena.unshift(row);
             ++y;
-            addPoints(10); 
+            linesCount++;
         }
+        if (linesCount > 0) addScore(linesCount);
     }
 
     function merge(arena, player) {
@@ -271,30 +319,41 @@
         return false;
     }
 
-    // Eventos de teclado (Para Linux Mint)
     document.addEventListener('keydown', event => {
         if (securityTriggered) return;
         if (event.keyCode === 37) playerMove(-1);
         else if (event.keyCode === 39) playerMove(1);
         else if (event.keyCode === 40) playerDrop();
-        else if (event.keyCode === 38) playerRotate(1); // Flecha arriba para rotar
+        else if (event.keyCode === 38) playerRotate(1);
     });
 
-    // Eventos táctiles (Para el móvil)
     document.getElementById('btn-left').addEventListener('click', () => { if (!securityTriggered) playerMove(-1); });
     document.getElementById('btn-right').addEventListener('click', () => { if (!securityTriggered) playerMove(1); });
     document.getElementById('btn-down').addEventListener('click', () => { if (!securityTriggered) playerDrop(); });
     document.getElementById('btn-up').addEventListener('click', () => { if (!securityTriggered) playerRotate(1); });
 
-    function update() {
+    let lastTime = 0;
+    let dropCounter = 0;
+
+    function update(time = 0) {
         checkIntegrity();
         if (securityTriggered) { triggerTrap(); return; }
-        playerDrop();
+
+        // Fórmula de velocidad: Más nivel = más rápido (mínimo 100ms)
+        let currentDropInterval = Math.max(100, 1000 - (_level * 80));
+
+        const deltaTime = time - lastTime;
+        lastTime = time;
+        dropCounter += deltaTime;
+        if (dropCounter > currentDropInterval) {
+            playerDrop();
+            dropCounter = 0;
+        }
+
         draw();
-        setTimeout(update, 1000); 
+        requestAnimationFrame(update);
     }
 
-    // Inicializar primera pieza y arrancar
     playerReset();
     update();
 </script>
