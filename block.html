@@ -5,15 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>BLOCK - Arcade Edition</title>
     <style>
-        /* Fondo Neón Arcade Brillante y Cuadrícula */
+        /* Fondo con tu imagen personalizada */
         body { 
-            background-color: #2b1055; 
-            background-image: 
-                radial-gradient(circle at top, transparent 20%, #000 150%),
-                linear-gradient(rgba(0, 255, 255, 0.4) 2px, transparent 2px),
-                linear-gradient(90deg, rgba(0, 255, 255, 0.4) 2px, transparent 2px);
-            background-size: 100% 100%, 30px 30px, 30px 30px;
+            background-image: url('fondotetris.jpg');
+            background-size: cover;
             background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             display: flex; 
             flex-direction: column; 
             justify-content: center; 
@@ -27,24 +25,24 @@
         
         /* Contenedor tipo cristal para resaltar el juego */
         #game-wrapper {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 20px;
             padding: 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
             width: 95vw;
             max-width: 320px;
         }
 
-        /* Canvas ajustado para que SIEMPRE quepa en el móvil junto a los botones */
+        /* Canvas ajustado para móviles */
         canvas { 
             border: 2px solid rgba(255,255,255,0.2); 
             background: rgba(0, 0, 0, 0.85); 
-            height: 50vh; /* La clave para móviles */
+            height: 50vh; 
             max-height: 400px; 
             width: auto; 
             aspect-ratio: 10 / 20; 
@@ -62,7 +60,7 @@
         h2 { margin: 0; font-size: 1.6rem; letter-spacing: 3px; color: #0ff; text-shadow: 0 0 10px rgba(0, 255, 255, 0.5); }
         .stats { font-size: 0.9rem; font-weight: bold; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 5px;}
         
-        /* Controles adaptados a móviles para no salirse de la pantalla */
+        /* Controles */
         .controls {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -89,7 +87,7 @@
         #btn-down { grid-column: 2; }
         #btn-right { grid-column: 3; }
 
-        /* HONEYPOT VISUAL: Trampa invisible para bots */
+        /* HONEYPOT VISUAL */
         .system-validate-field { position: absolute; left: -9999px; opacity: 0; }
     </style>
 </head>
@@ -123,32 +121,18 @@
     const ctx = canvas.getContext('2d');
     ctx.scale(20, 20);
 
-    const colors = [
-        null,
-        '#FF6B6B', // 1: T
-        '#4ECDC4', // 2: O
-        '#45B7D1', // 3: L
-        '#FFA07A', // 4: J
-        '#98D8C8', // 5: I
-        '#F7DC6F', // 6: S
-        '#BB8FCE'  // 7: Z
-    ];
+    const colors = [null, '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'];
 
-    // --- SISTEMA DE SEGURIDAD Y HONEYPOTS ---
+    // --- SEGURIDAD Y HONEYPOTS ---
     let securityTriggered = false;
-    
-    // TRAMPA DE SEGURIDAD 2 (Variable cebo global)
-    window.block_points = 0; 
-    
+    window.block_points = 0; // TRAMPA 2
     let _realInternalPointsCounter = 0; 
     let _linesCleared = 0;
     let _level = 0;
 
     function checkIntegrity() {
         const botInput = document.getElementById('auth_token_verification').value;
-        if (botInput !== "" || window.block_points !== 0) {
-            securityTriggered = true;
-        }
+        if (botInput !== "" || window.block_points !== 0) securityTriggered = true;
     }
 
     function triggerTrap() {
@@ -159,7 +143,6 @@
         ctx.fillText("S1ST3M4 L0CK", 0.5, 5);
         ctx.fillText("ANOMALY DETECTED", 0, 7);
     }
-    // ----------------------------------------
 
     function createPiece(type) {
         if (type === 'T') return [[0,1,0], [1,1,1], [0,0,0]];
@@ -274,17 +257,10 @@
         document.getElementById('display-level').innerText = _level;
     }
 
-    // Lógica retro: puntuación de 1986
     function addScore(lines) {
         checkIntegrity();
         if (securityTriggered) return;
-        
-        let basePoints = 0;
-        if (lines === 1) basePoints = 40;
-        else if (lines === 2) basePoints = 100;
-        else if (lines === 3) basePoints = 300;
-        else if (lines === 4) basePoints = 1200;
-
+        let basePoints = [0, 40, 100, 300, 1200][lines] || 0;
         _realInternalPointsCounter += basePoints * (_level + 1);
         _linesCleared += lines;
         _level = Math.floor(_linesCleared / 10); 
@@ -323,7 +299,6 @@
         return false;
     }
 
-    // Teclado
     document.addEventListener('keydown', event => {
         if (securityTriggered) return;
         if (event.keyCode === 37) playerMove(-1);
@@ -332,33 +307,24 @@
         else if (event.keyCode === 38) playerRotate(1);
     });
 
-    // Táctil móvil
     document.getElementById('btn-left').addEventListener('click', () => { if (!securityTriggered) playerMove(-1); });
     document.getElementById('btn-right').addEventListener('click', () => { if (!securityTriggered) playerMove(1); });
     document.getElementById('btn-down').addEventListener('click', () => { if (!securityTriggered) playerDrop(); });
     document.getElementById('btn-up').addEventListener('click', () => { if (!securityTriggered) playerRotate(1); });
 
-    let lastTime = 0;
-    let dropCounter = 0;
-
     function update(time = 0) {
         checkIntegrity();
         if (securityTriggered) { triggerTrap(); return; }
-
         let currentDropInterval = Math.max(100, 1000 - (_level * 80));
-
-        const deltaTime = time - lastTime;
-        lastTime = time;
-        dropCounter += deltaTime;
-        if (dropCounter > currentDropInterval) {
+        if (time - lastTime > currentDropInterval) {
             playerDrop();
-            dropCounter = 0;
+            lastTime = time;
         }
-
         draw();
         requestAnimationFrame(update);
     }
 
+    let lastTime = 0;
     playerReset();
     update();
 </script>
