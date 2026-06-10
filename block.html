@@ -130,6 +130,24 @@
 
     const colors = [null, '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'];
 
+    // --- SISTEMA DE AUDIO NATIVO ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playAudioTone(freq, type, duration, volume = 0.05) {
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(volume, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
+    }
+
     // --- SISTEMA DE SEGURIDAD Y HONEYPOTS INTACTOS ---
     let securityTriggered = false;
     window.block_points = 0; // TRAMPA DE SEGURIDAD 2 (Variable cebo global)
@@ -227,12 +245,17 @@
                 return;
             }
         }
+        playAudioTone(330, 'sine', 0.05, 0.04); // Sonido de rotación sutil
     }
 
     function playerMove(dir) {
         if (!player.matrix) return;
         player.pos.x += dir;
-        if (collide(arena, player)) player.pos.x -= dir;
+        if (collide(arena, player)) {
+            player.pos.x -= dir;
+        } else {
+            playAudioTone(220, 'sine', 0.04, 0.03); // Sonido de movimiento lateral ligero
+        }
     }
 
     function playerDrop() {
@@ -241,6 +264,7 @@
         if (collide(arena, player)) {
             player.pos.y--;
             merge(arena, player);
+            playAudioTone(120, 'triangle', 0.1, 0.08); // Golpe al tocar fondo estático
             lineClear();
             playerReset();
         }
@@ -251,6 +275,10 @@
         player.pos.y = 0;
         player.pos.x = (arena[0].length / 2 | 0) - (player.matrix[0].length / 2 | 0);
         if (collide(arena, player)) {
+            // Game over sound
+            playAudioTone(180, 'sawtooth', 0.3, 0.08);
+            setTimeout(() => playAudioTone(130, 'sawtooth', 0.4, 0.08), 120);
+            
             arena.forEach(row => row.fill(0));
             _realInternalPointsCounter = 0;
             _linesCleared = 0;
@@ -286,7 +314,13 @@
             ++y;
             linesCount++;
         }
-        if (linesCount > 0) addScore(linesCount);
+        if (linesCount > 0) {
+            addScore(linesCount);
+            // Efecto armónico ascendente al limpiar líneas
+            playAudioTone(523.25, 'sine', 0.08, 0.06); // Nota Do (C5)
+            setTimeout(() => playAudioTone(659.25, 'sine', 0.08, 0.06), 60); // Nota Mi (E5)
+            setTimeout(() => playAudioTone(783.99, 'sine', 0.15, 0.06), 120); // Nota Sol (G5)
+        }
     }
 
     function merge(arena, player) {

@@ -108,6 +108,27 @@
     const contenedor = document.getElementById("contenedor-juego");
     const botTrap = document.getElementById('arcade_security_hp');
 
+    // Inicialización del motor de audio nativo
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(freq, type, duration, endFreq = null) {
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            if (endFreq) {
+                osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + duration);
+            }
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
+    }
+
     function redimensionar() {
         canvas.width = contenedor.clientWidth;
         canvas.height = contenedor.clientHeight;
@@ -151,13 +172,24 @@
         if (juegoIniciado && !gameOver) {
             velocidadY += GRAVEDAD;
             mascotaY += velocidadY;
-            if (mascotaY > canvas.height || mascotaY < 0) { gameOver = true; pantallaGameOver.classList.remove("hidden"); }
+            if (mascotaY > canvas.height || mascotaY < 0) { 
+                gameOver = true; 
+                pantallaGameOver.classList.remove("hidden"); 
+                playSound(220, 'sawtooth', 0.4, 60); // Sonido de derrota descendente
+            }
             if (obstaculos.length === 0 || obstaculos[obstaculos.length-1].x < canvas.width - 250) obstaculos.push(crearObstaculo());
             obstaculos.forEach(obs => {
                 obs.x -= VELOCIDAD_OBSTACULOS;
-                if (!obs.pasado && obs.x < canvas.width/2) { obs.pasado = true; puntuacion++; txtPuntuacion.innerText = puntuacion; }
+                if (!obs.pasado && obs.x < canvas.width/2) { 
+                    obs.pasado = true; 
+                    puntuacion++; 
+                    txtPuntuacion.innerText = puntuacion; 
+                    playSound(750, 'sine', 0.12); // Sonido al puntuar
+                }
                 if (Math.abs(canvas.width/2 - (obs.x + 20)) < 40 && (mascotaY < obs.altoSuperior || mascotaY > obs.altoSuperior + HUECO_PASO)) {
-                    gameOver = true; pantallaGameOver.classList.remove("hidden");
+                    gameOver = true; 
+                    pantallaGameOver.classList.remove("hidden");
+                    playSound(220, 'sawtooth', 0.4, 60); // Sonido de impacto descendente
                 }
             });
             obstaculos = obstaculos.filter(o => o.x > -50);
@@ -172,15 +204,44 @@
         requestAnimationFrame(actualizarJuego);
     }
 
-    contenedor.addEventListener("touchstart", (e) => { e.preventDefault(); realizarSalto(); }, { passive: false });
-    contenedor.addEventListener("mousedown", realizarSalto);
-    function realizarSalto() { if (!gameOver) { juegoIniciado = true; pantallaInicio.classList.add("hidden"); velocidadY = IMPULSO; } }
+    contenedor.addEventListener("touchstart", (e) => { 
+        if (gameOver) return;
+        e.preventDefault(); 
+        realizarSalto(); 
+    }, { passive: false });
+    
+    contenedor.addEventListener("mousedown", () => {
+        if (gameOver) return;
+        realizarSalto();
+    });
+    
+    function realizarSalto() { 
+        if (botTrap.value) return; // Protección contra bots intacta
+        if (!gameOver) { 
+            juegoIniciado = true; 
+            pantallaInicio.classList.add("hidden"); 
+            velocidadY = IMPULSO; 
+            playSound(400, 'sine', 0.08, 600); // Sonido de salto ascendente corto
+        } 
+    }
 
     btnReintentar.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation(); // Evita que el toque se propague al contenedor del juego en móviles
         mascotaY = 200; velocidadY = 0; obstaculos = []; puntuacion = 0;
         txtPuntuacion.innerText = "0"; gameOver = false; juegoIniciado = false;
-        pantallaGameOver.classList.add("hidden"); pantallaInicio.classList.remove("hidden");
+        pantallaGameOver.add ? pantallaGameOver.add("hidden") : pantallaGameOver.classList.add("hidden"); 
+        pantallaInicio.classList.remove("hidden");
     });
+
+    btnReintentar.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        e.stopPropagation(); // Manejo nativo táctil para evitar rebotes de eventos de click fantasmas
+        mascotaY = 200; velocidadY = 0; obstaculos = []; puntuacion = 0;
+        txtPuntuacion.innerText = "0"; gameOver = false; juegoIniciado = false;
+        pantallaGameOver.classList.add("hidden"); 
+        pantallaInicio.classList.remove("hidden");
+    }, { passive: false });
 
     requestAnimationFrame(actualizarJuego);
 </script>
