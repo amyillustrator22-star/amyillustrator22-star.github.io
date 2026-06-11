@@ -341,6 +341,11 @@
             return;
         }
 
+        // DESBLOQUEO DEL CONTEXTO DE AUDIO SUSPENDIDO TRAS EL PRIMER GESTO DE PULSACIÓN EN BURBUJA
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
         const minRemaining = Math.min(...numbersInRound);
 
         if (value === minRemaining) {
@@ -363,7 +368,6 @@
                 setTimeout(initRound, 600);
             }
         } else {
-            // El usuario ha cometido un error en la secuencia
             playerLifes--;
             playSound(120, 'sawtooth', 0.3);
             container.classList.add('glitch-error');
@@ -373,7 +377,6 @@
             ageDisplay.innerText = `${mentalAge} AÑOS`;
             
             if (playerLifes <= 0) {
-                // Al tercer fallo salta el fin de juego controlado y frena el reinicio
                 evaluateLeaderboardEntrance();
             } else {
                 setTimeout(initRound, 500);
@@ -400,7 +403,6 @@
         document.getElementById('instruction').style.color = "#ff0055";
     }
 
-    // Iniciar el juego atado a la carga del módulo
     initRound();
 </script>
 </body>
