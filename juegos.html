@@ -74,6 +74,21 @@
             </article>
         </a>
 
+        <a href="memo.html" class="block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-pink-500 rounded-[2.5rem]">
+            <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
+                <div class="flex flex-col items-center">
+                    <div class="bg-gradient-to-br from-pink-400 to-pink-600 text-white p-5 rounded-3xl mb-6 shadow-md">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">MEMO</h2>
+                    <p class="text-lg text-gray-700 leading-relaxed font-medium">
+                        Potencia tu memoria fotográfica emparejando elementos ocultos. El tablero se expande cada 3 niveles superados.
+                    </p>
+                </div>
+                <p class="mt-6 text-base text-pink-600 font-bold uppercase tracking-wider">Jugar Ahora</p>
+            </article>
+        </a>
+
         <a href="block.html" class="block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-purple-500 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
@@ -96,12 +111,15 @@
             🏆 RÉCORDS MUNDIALES 🏆
         </h2>
 
-        <div class="flex justify-center gap-2 mb-6 bg-black/10 p-1.5 rounded-2xl backdrop-blur-sm">
+        <div class="flex justify-center gap-2 mb-6 bg-black/10 p-1.5 rounded-2xl backdrop-blur-sm flex-wrap">
             <button id="btn-vibez" onclick="switchLeaderboard('vibez_fly')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-pink-600 text-white shadow-md">
                 Vibez Fly
             </button>
             <button id="btn-brain" onclick="switchLeaderboard('brain_training')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">
                 Brain Training
+            </button>
+            <button id="btn-memo" onclick="switchLeaderboard('memo')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">
+                MEMO
             </button>
             <button id="btn-block" onclick="switchLeaderboard('block')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">
                 BLOCK
@@ -134,7 +152,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // Credenciales extraídas de tu panel de control
+        // Credenciales extraídas de tu panel de control (Intactas)
         const firebaseConfig = {
             apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
             authDomain: "vibezmatch-91c6d.firebaseapp.com",
@@ -186,7 +204,6 @@
                     if (position === 2) medal = "🥈 2º";
                     if (position === 3) medal = "🥉 3º";
 
-                    // Extrae el valor del país si existe en la base de datos
                     let flag = data.country ? data.country : "";
 
                     rowsContainer.innerHTML += `
@@ -212,20 +229,23 @@
             }
         }
 
-        // Control visual de pestañas acoplado globalmente
+        // Control visual de pestañas acoplado globalmente (Actualizado para incluir MEMO)
         window.switchLeaderboard = function(gameId) {
             const btnVibez = document.getElementById('btn-vibez');
             const btnBrain = document.getElementById('btn-brain');
+            const btnMemo = document.getElementById('btn-memo');
             const btnBlock = document.getElementById('btn-block');
             
-            [btnVibez, btnBrain, btnBlock].forEach(btn => {
-                btn.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40";
+            [btnVibez, btnBrain, btnMemo, btnBlock].forEach(btn => {
+                if (btn) btn.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40";
             });
 
             if (gameId === 'vibez_fly') {
                 btnVibez.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-pink-600 text-white shadow-md";
             } else if (gameId === 'brain_training') {
                 btnBrain.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-cyan-600 text-white shadow-md";
+            } else if (gameId === 'memo') {
+                btnMemo.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-pink-600 text-white shadow-md";
             } else if (gameId === 'block') {
                 btnBlock.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-purple-600 text-white shadow-md";
             }
@@ -233,7 +253,7 @@
             loadLeaderboard(gameId);
         }
         
-        // Carga inicial
+        // Carga inicial por defecto
         window.switchLeaderboard('vibez_fly');
     </script>
 

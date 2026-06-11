@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5491883632835608" crossorigin="anonymous"></script>
+
+    <script data-goatcounter="https://amysoftware.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Amy Software - MEMO</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            background: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)), url('encabezaoAmySoftware.jpg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        .title-nabla {
+            font-family: 'Nabla', cursive;
+            -webkit-text-stroke: 1px black;
+            text-shadow: 2px 2px 0px black;
+        }
+        #contenedor-juego {
+            position: relative;
+            width: 100%;
+            max-width: 430px;
+            min-height: 550px;
+            background-image: url('fondocorazon.jpg');
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+        }
+        .hp-field { 
+            position: absolute; left: -9999px; top: -9999px; 
+            width: 1px; height: 1px; overflow: hidden; opacity: 0; pointer-events: none; 
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-4 font-sans text-gray-800">
+
+    <input type="text" id="arcade_security_hp" class="hp-field" tabindex="-1" autocomplete="off">
+
+    <div class="w-full max-w-md flex justify-start mb-2">
+        <a href="juegos.html" class="bg-white/80 backdrop-blur-sm p-3 rounded-full border border-white/50 shadow-md transition-transform active:scale-95 text-gray-900 hover:bg-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+        </a>
+    </div>
+
+    <header class="flex items-center gap-4 mb-4">
+        <h1 class="title-nabla text-4xl drop-shadow-xl text-center text-white">
+            MEMO
+        </h1>
+    </header>
+
+    <div id="contenedor-juego" class="rounded-[2.5rem] border-4 border-pink-500 shadow-2xl p-5 flex flex-col items-center justify-between backdrop-blur-sm bg-slate-950/40">
+        
+        <div class="grid grid-cols-3 gap-2 w-full text-center font-black bg-white/90 backdrop-blur-sm py-2 px-3 rounded-2xl border border-white/50 shadow-md mb-4 text-slate-900 text-sm">
+            <div>Nivel: <span id="memo-nivel" class="text-pink-600 block text-lg">1</span></div>
+            <div>Puntos: <span id="memo-puntos" class="text-purple-600 block text-lg">0</span></div>
+            <div>Vidas: <span id="memo-vidas" class="text-red-500 block text-lg">❤️❤️❤️</span></div>
+        </div>
+
+        <div id="pantalla-inicio" class="my-auto text-center z-10">
+            <button id="btn-comenzar" class="bg-pink-600 hover:bg-pink-700 text-white font-black px-8 py-4 rounded-2xl shadow-lg border-2 border-white/50 text-xl tracking-wider transition-all active:scale-95">
+                INICIAR ENTRENAMIENTO
+            </button>
+        </div>
+
+        <div id="tablero-cartas" class="hidden grid grid-cols-2 gap-3 w-full my-auto transition-all duration-300 items-center justify-center">
+            </div>
+
+        <div id="pantalla-nivel-superado" class="hidden text-center my-auto bg-white/90 backdrop-blur-sm py-4 px-6 rounded-3xl border border-green-300 shadow-xl max-w-[280px]">
+            <p class="text-green-600 font-black text-xl animate-bounce">¡NIVEL LOGRADO! 🎉</p>
+            <p class="text-xs text-slate-600 font-bold mt-2 animate-pulse" id="mensaje-dificultad">Añadiendo más cartas...</p>
+        </div>
+
+        <div id="pantalla-gameover" class="hidden text-center my-auto bg-white/95 backdrop-blur-sm py-5 px-6 rounded-3xl border border-red-300 shadow-2xl max-w-[280px]">
+            <p class="text-red-600 font-black text-2xl tracking-tight mb-2">MENTE SATURADA</p>
+            <p class="text-sm font-bold text-slate-700 mb-4">Te has quedado sin corazones.</p>
+            <button id="btn-reiniciar" class="bg-red-600 hover:bg-red-700 text-white font-black px-5 py-2.5 rounded-xl text-sm transition-transform active:scale-95">
+                REINTENTAR EN JUEGOS
+            </button>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Tu configuración exacta de Firebase sincronizada con la red Arcade Central
+    const firebaseConfig = {
+        apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
+        authDomain: "vibezmatch-91c6d.firebaseapp.com",
+        databaseURL: "https://vibezmatch-91c6d-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "vibezmatch-91c6d",
+        storageBucket: "vibezmatch-91c6d.appspot.com",
+        messagingSenderId: "645008717503",
+        appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const BANCO_EMOJIS = [
+        '🐱', '🐶', '🦊', '🦁', '🐸', '🐵', '🐼', '🐨', 
+        '🐷', '🐯', '🐮', '🐰', '🐙', '🦄', '🐝', '🦉',
+        '🍕', '🍟', '🍩', '🥑', '🎮', '🎸', '🎨', '🚀'
+    ];
+
+    let nivelActual = 1;
+    let puntos = 0;
+    let vidas = 3;
+    let cartasSeleccionadas = [];
+    let parejasEncontradas = 0;
+    let totalParejasNivel = 2; 
+    let bloqueado = false;
+    let recordProcesado = false;
+    let juegoActivo = false;
+
+    const tablero = document.getElementById('tablero-cartas');
+    const txtNivel = document.getElementById('memo-nivel');
+    const txtPuntos = document.getElementById('memo-puntos');
+    const txtVidas = document.getElementById('memo-vidas');
+    const pantallaInicio = document.getElementById('pantalla-inicio');
+    const pantallaSuperado = document.getElementById('pantalla-nivel-superado');
+    const pantallaGameOver = document.getElementById('pantalla-gameover');
+    const msgDificultad = document.getElementById('mensaje-dificultad');
+    const btnComenzar = document.getElementById('btn-comenzar');
+    const btnReiniciar = document.getElementById('btn-reiniciar');
+    const botTrap = document.getElementById('arcade_security_hp');
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+    function playSound(freq, type, duration, endFreq = null) {
+        try {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            if (endFreq) {
+                osc.frequency.exponentialRampToValueAtTime(endFreq, audioCtx.currentTime + duration);
+            }
+            gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
+    }
+
+    function actualizarInterfazVidas() {
+        let corazones = "";
+        for (let i = 0; i < vidas; i++) corazones += "❤️";
+        if (vidas === 0) corazones = "💀";
+        txtVidas.innerText = corazones;
+    }
+
+    function iniciarNivel() {
+        tablero.innerHTML = '';
+        cartasSeleccionadas = [];
+        parejasEncontradas = 0;
+        bloqueado = false;
+        
+        txtPuntos.innerText = puntos;
+        txtNivel.innerText = nivelActual;
+        actualizarInterfazVidas();
+        
+        pantallaSuperado.classList.add('hidden');
+        tablero.classList.remove('hidden');
+
+        // REGLA SOLICITADA: Cada 3 niveles subidos (1, 4, 7...), añadimos 2 parejas más (4 cartas más)
+        if (nivelActual === 1) {
+            totalParejasNivel = 2; 
+        } else if ((nivelActual - 1) % 3 === 0) {
+            const incrementos = Math.floor((nivelActual - 1) / 3);
+            totalParejasNivel = 2 + (incrementos * 2);
+            if (totalParejasNivel > BANCO_EMOJIS.length) totalParejasNivel = BANCO_EMOJIS.length;
+        }
+
+        // Autoajuste dinámico de las rejillas de Tailwind según cantidad total de cartas
+        let totalCartas = totalParejasNivel * 2;
+        if (totalCartas <= 4) tablero.className = "grid grid-cols-2 gap-3 w-full max-w-[260px] mx-auto";
+        else if (totalCartas <= 8) tablero.className = "grid grid-cols-2 gap-3 w-full max-w-[300px] mx-auto";
+        else if (totalCartas <= 12) tablero.className = "grid grid-cols-3 gap-2 w-full max-w-[360px] mx-auto";
+        else tablero.className = "grid grid-cols-4 gap-2 w-full max-w-[380px] mx-auto";
+
+        const emojisCopiados = [...BANCO_EMOJIS];
+        emojisCopiados.sort(() => Math.random() - 0.5);
+        const emojisNivel = emojisCopiados.slice(0, totalParejasNivel);
+
+        let mazoFinal = [...emojisNivel, ...emojisNivel];
+        mazoFinal.sort(() => Math.random() - 0.5);
+
+        mazoFinal.forEach((emoji, index) => {
+            const contenedorCarta = document.createElement('div');
+            contenedorCarta.className = "h-20 w-full bg-slate-900/90 text-white rounded-2xl border-2 border-pink-500/40 cursor-pointer shadow-md flex items-center justify-center text-3xl transition-all duration-200 active:scale-95 select-none hover:border-pink-500";
+            contenedorCarta.dataset.emoji = emoji;
+            contenedorCarta.dataset.index = index;
+            contenedorCarta.innerText = '❓';
+
+            contenedorCarta.addEventListener('click', voltearCarta);
+            tablero.appendChild(contenedorCarta);
+        });
+    }
+
+    function voltearCarta() {
+        if (botTrap.value || bloqueado || !juegoActivo) return; 
+        if (this.classList.contains('bg-pink-600') || this.classList.contains('bg-green-500/20')) return;
+
+        playSound(450, 'sine', 0.08, 550);
+
+        this.innerText = this.dataset.emoji;
+        this.classList.remove('bg-slate-900/90');
+        this.classList.add('bg-pink-600', 'border-white');
+
+        cartasSeleccionadas.push(this);
+
+        if (cartasSeleccionadas.length === 2) {
+            comprobarPareja();
+        }
+    }
+
+    function comprobarPareja() {
+        bloqueado = true;
+        const [carta1, carta2] = cartasSeleccionadas;
+
+        if (carta1.dataset.emoji === carta2.dataset.emoji && carta1.dataset.index !== carta2.dataset.index) {
+            // Acierto: Sumamos puntos y cambiamos a estado resuelto
+            setTimeout(() => {
+                playSound(600, 'sine', 0.15, 900);
+                carta1.className = "h-20 w-full bg-green-500/20 border-2 border-green-500 rounded-2xl flex items-center justify-center text-3xl select-none shadow-inner";
+                carta2.className = "h-20 w-full bg-green-500/20 border-2 border-green-500 rounded-2xl flex items-center justify-center text-3xl select-none shadow-inner";
+                
+                puntos += 10 * nivelActual; // Los puntos escalan con los niveles
+                txtPuntos.innerText = puntos;
+                
+                parejasEncontradas++;
+                cartasSeleccionadas = [];
+                bloqueado = false;
+
+                if (parejasEncontradas === totalParejasNivel) {
+                    completarNivel();
+                }
+            }, 300);
+        } else {
+            // Fallo: Resta una vida y evalúa Game Over
+            setTimeout(() => {
+                playSound(200, 'triangle', 0.25);
+                vidas--;
+                actualizarInterfazVidas();
+
+                if (vidas <= 0) {
+                    finalizarJuego();
+                } else {
+                    carta1.innerText = '❓';
+                    carta1.className = "h-20 w-full bg-slate-900/90 text-white rounded-2xl border-2 border-pink-500/40 cursor-pointer flex items-center justify-center text-3xl select-none shadow-md hover:border-pink-500";
+                    
+                    carta2.innerText = '❓';
+                    carta2.className = "h-20 w-full bg-slate-900/90 text-white rounded-2xl border-2 border-pink-500/40 cursor-pointer flex items-center justify-center text-3xl select-none shadow-md hover:border-pink-500";
+
+                    cartasSeleccionadas = [];
+                    bloqueado = false;
+                }
+            }, 600);
+        }
+    }
+
+    function completarNivel() {
+        nivelActual++;
+        playSound(523.25, 'sine', 0.08); 
+        setTimeout(() => playSound(659.25, 'sine', 0.08), 80);
+        setTimeout(() => playSound(783.99, 'sine', 0.15), 160);
+
+        tablero.classList.add('hidden');
+
+        if ((nivelActual - 1) % 3 === 0) {
+            msgDificultad.innerText = "¡DIFICULTAD UP! Añadiendo +2 parejas 🚀";
+        } else {
+            msgDificultad.innerText = "Generando nueva combinación...";
+        }
+
+        pantallaSuperado.classList.remove('hidden');
+
+        setTimeout(() => {
+            iniciarNivel();
+        }, 1800);
+    }
+
+    function getCountryFlag() {
+        try {
+            const userLang = navigator.language || navigator.userLanguage;
+            if (userLang.includes('ES')) return '🇪🇸';
+            if (userLang.includes('AR')) return '🇦🇷';
+            if (userLang.includes('MX')) return '🇲🇽';
+            if (userLang.includes('CO')) return '🇨🇴';
+            if (userLang.includes('CL')) return '🇨🇱';
+            return '🇪🇸';
+        } catch (e) { return '🇪🇸'; }
+    }
+
+    async function comprobarYRegistrarRanking() {
+        if (recordProcesado) return;
+        recordProcesado = true;
+
+        setTimeout(async () => {
+            const alias = prompt(`🧠 ¡FIN DE LA PARTIDA!\nPuntuación final: ${puntos} puntos.\nIntroduce tu alias para el Top 10 mundial:`);
+            
+            if (alias && alias.trim() !== "") {
+                try {
+                    const bandera = getCountryFlag();
+                    // Sincronización exacta con la tabla global de juegos.html pasando el ID "memo"
+                    await addDoc(collection(db, "scores_arcade"), {
+                        player: alias.trim(),
+                        score: puntos,
+                        game: "memo",
+                        country: bandera
+                    });
+                } catch (err) {
+                    console.error("Error al registrar ranking:", err);
+                }
+            }
+            window.location.href = "juegos.html";
+        }, 200);
+    }
+
+    function finalizarJuego() {
+        juegoActivo = false;
+        bloqueado = true;
+        tablero.classList.add('hidden');
+        pantallaGameOver.classList.remove('hidden');
+        playSound(150, 'sawtooth', 0.5, 50);
+        comprobarYRegistrarRanking();
+    }
+
+    btnComenzar.addEventListener('click', () => {
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        juegoActivo = true;
+        pantallaInicio.classList.add('hidden');
+        iniciarNivel();
+    });
+
+    btnReiniciar.addEventListener('click', () => {
+        window.location.href = "juegos.html";
+    });
+</script>
+</body>
+</html>
