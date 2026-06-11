@@ -6,5 +6,17 @@
       "**/.*",
       "**/node_modules/**"
     ]
+  },
+  "firestore": {
+    "indexes": [
+      {
+        "collectionGroup": "sugerencias",
+        "queryScope": "COLLECTION",
+        "fields": [
+          { "fieldPath": "approved", "order": "ASCENDING" },
+          { "fieldPath": "timestamp", "order": "ASCENDING" }
+        ]
+      }
+    ]
   }
 }
