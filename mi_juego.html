@@ -114,7 +114,6 @@
             letter-spacing: 1px;
         }
 
-        /* Botón de retorno acoplado al estilo cyberpunk */
         .btn-back-container {
             margin-top: 20px;
         }
@@ -176,7 +175,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
@@ -200,7 +199,6 @@
     let currentLevel = 1;
     let numbersInRound = [];
     let bubblesCount = 4; 
-    let playerLifes = 3; // Freno preventivo contra el bucle continuo infinito
     let processingGameOver = false;
 
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -259,7 +257,6 @@
         });
     }
 
-    // OBTENCIÓN AUTOMÁTICA DE LA BANDERA DEL NAVEGADOR
     function getCountryFlag() {
         try {
             const userLang = navigator.language || navigator.userLanguage;
@@ -276,63 +273,33 @@
         }
     }
 
-    // EVALUACIÓN DE GANADORES INTERACTIVA CON FIRESTORE
-    async function evaluateLeaderboardEntrance() {
+    // SUBIDA DIRECTA BLINDADA (Frena cuelgues de índices de lectura)
+    async function ejecutarGameOverDirecto() {
         processingGameOver = true;
         container.innerHTML = `
-            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#00FFD5; font-weight:bold; letter-spacing:1px; text-align:center; padding:20px;">
-                <div>🧠 EVALUANDO CAPACIDAD COGNITIVA...</div>
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#FF0055; font-weight:bold; letter-spacing:1px; text-align:center; padding:20px;">
+                <div>💥 ¡ERROR SECUENCIAL! GAME OVER 💥</div>
             </div>
         `;
 
-        try {
-            // Consulta de registros usando el índice compuesto ordenado
-            const q = query(
-                collection(db, "scores_arcade"),
-                where("game", "==", "brain_training"),
-                orderBy("score", "desc"),
-                limit(10)
-            );
-
-            const snapshot = await getDocs(q);
-            let checkEntrance = false;
-
-            if (snapshot.size < 10) {
-                checkEntrance = true;
-            } else {
-                const scoreCut = snapshot.docs[snapshot.docs.length - 1].data().score;
-                if (currentLevel > scoreCut) {
-                    checkEntrance = true;
+        setTimeout(async () => {
+            const alias = prompt(`🏁 FIN DEL ENTRENAMIENTO\nHas alcanzado la Fase ${currentLevel}.\nIntroduce tu nombre para guardar tu récord mundial:`);
+            
+            if (alias && alias.trim() !== "") {
+                try {
+                    const flag = getCountryFlag();
+                    await addDoc(collection(db, "scores_arcade"), {
+                        player: alias.trim(),
+                        score: currentLevel,
+                        game: "brain_training",
+                        country: flag
+                    });
+                } catch (err) {
+                    console.error("Error al subir:", err);
                 }
             }
-
-            if (checkEntrance) {
-                setTimeout(async () => {
-                    const alias = prompt(`🧠 ¡FANTÁSTICO! Has alcanzado la Fase ${currentLevel}.\nTu edad mental estimada es de ${mentalAge} años.\nIntroduce tu alias para el ranking global:`);
-                    
-                    if (alias && alias.trim() !== "") {
-                        const flag = getCountryFlag();
-                        await addDoc(collection(db, "scores_arcade"), {
-                            player: alias.trim(),
-                            score: currentLevel,
-                            game: "brain_training",
-                            country: flag
-                        });
-                        alert("🏆 ¡Récord registrado en el bloque central!");
-                    }
-                    window.location.href = "juegos.html";
-                }, 600);
-            } else {
-                setTimeout(() => {
-                    alert(`🏁 ENTRENAMIENTO FINALIZADO\nFase alcanzada: ${currentLevel}.\nNo has superado la puntuación mínima del Top 10 actual.`);
-                    window.location.href = "juegos.html";
-                }, 600);
-            }
-
-        } catch (err) {
-            console.error("Error evaluando records:", err);
             window.location.href = "juegos.html";
-        }
+        }, 600);
     }
 
     function checkSelection(element, value) {
@@ -341,7 +308,6 @@
             return;
         }
 
-        // DESBLOQUEO DEL CONTEXTO DE AUDIO SUSPENDIDO TRAS EL PRIMER GESTO DE PULSACIÓN EN BURBUJA
         if (audioCtx.state === 'suspended') {
             audioCtx.resume();
         }
@@ -368,23 +334,13 @@
                 setTimeout(initRound, 600);
             }
         } else {
-            playerLifes--;
+            // MUERTE SÚBITA: Al primer fallo, sonido de error y Game Over directo
             playSound(120, 'sawtooth', 0.3);
             container.classList.add('glitch-error');
-            setTimeout(() => container.classList.remove('glitch-error'), 400);
-
-            mentalAge = Math.min(80, mentalAge + 2);
-            ageDisplay.innerText = `${mentalAge} AÑOS`;
-            
-            if (playerLifes <= 0) {
-                evaluateLeaderboardEntrance();
-            } else {
-                setTimeout(initRound, 500);
-            }
+            ejecutarGameOverDirecto();
         }
     }
 
-    // Lógica de defensa cibernética de Amy Software intacta
     function handleBotDetection() {
         playSound(80, 'sawtooth', 1.0);
         container.innerHTML = `

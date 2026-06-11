@@ -29,7 +29,6 @@
             position: relative;
             width: 100%;
             max-width: 430px;
-            /* Usamos vh para que en móvil nunca sobresalga */
             height: 70vh;
             max-height: 700px;
             background-image: url('fondocorazon.jpg');
@@ -98,7 +97,23 @@
         </a>
     </footer>
 
-<script>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
+        authDomain: "vibezmatch-91c6d.firebaseapp.com",
+        databaseURL: "https://vibezmatch-91c6d-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "vibezmatch-91c6d",
+        storageBucket: "vibezmatch-91c6d.appspot.com",
+        messagingSenderId: "645008717503",
+        appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     const canvas = document.getElementById("canvasJuego");
     const ctx = canvas.getContext("2d");
     const txtPuntuacion = document.getElementById("puntuacion");
@@ -108,7 +123,6 @@
     const contenedor = document.getElementById("contenedor-juego");
     const botTrap = document.getElementById('arcade_security_hp');
 
-    // Inicialización del motor de audio nativo
     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
     function playSound(freq, type, duration, endFreq = null) {
@@ -136,21 +150,20 @@
     window.addEventListener("resize", redimensionar);
     redimensionar();
 
-    // Valores adaptativos: reducimos un poco las distancias para móviles
     const GRAVEDAD = 0.4;
     const IMPULSO = -8;
     const VELOCIDAD_OBSTACULOS = 3;
-    const HUECO_PASO = 250; // Hueco un poco más grande para facilitar en móvil
+    const HUECO_PASO = 250; 
     const RADIO_MASCOTA = 25;
-    const ANCHO_BARRERA = 80; // CORRECCIÓN: Barreras más largas y consistentes (Base de 80px)
+    const ANCHO_BARRERA = 80; 
 
     let juegoIniciado = false, gameOver = false, puntuacion = 0;
     let mascotaY = 200, velocidadY = 0, obstaculos = [];
+    let recordProcesado = false;
 
     function dibujarCorazon(centroX, centroY, roto) {
         ctx.fillStyle = "#ff0000";
         ctx.beginPath();
-        // Dibujo simplificado para que escale bien
         ctx.arc(centroX-15, centroY, 20, 0, Math.PI * 2);
         ctx.arc(centroX+15, centroY, 20, 0, Math.PI * 2);
         ctx.fill();
@@ -168,21 +181,66 @@
         return { x: canvas.width, altoSuperior: altoSuperior, pasado: false };
     }
 
+    function getCountryFlag() {
+        try {
+            const userLang = navigator.language || navigator.userLanguage;
+            if (userLang.includes('ES')) return '🇪🇸';
+            if (userLang.includes('AR')) return '🇦🇷';
+            if (userLang.includes('MX')) return '🇲🇽';
+            if (userLang.includes('CO')) return '🇨🇴';
+            if (userLang.includes('CL')) return '🇨🇱';
+            if (userLang.includes('PE')) return '🇵🇪';
+            if (userLang.includes('US')) return '🇺🇸';
+            return '🇪🇸';
+        } catch (e) {
+            return '🇪🇸';
+        }
+    }
+
+    // SUBIDA DIRECTA OPTIMIZADA SIN VERIFICACIÓN DE LECTURA PREVIA
+    async function comprobarYRegistrarRanking() {
+        if (recordProcesado) return;
+        recordProcesado = true;
+
+        setTimeout(async () => {
+            const alias = prompt(`🎉 ¡FIN DE LA PARTIDA!\nTu récord: ${puntuacion} puntos.\nIntroduce tu nombre para la tabla mundial:`);
+            
+            if (alias && alias.trim() !== "") {
+                try {
+                    const bandera = getCountryFlag();
+                    await addDoc(collection(db, "scores_arcade"), {
+                        player: alias.trim(),
+                        score: puntuacion,
+                        game: "vibez_fly",
+                        country: bandera
+                    });
+                } catch (err) {
+                    console.error("Error al subir:", err);
+                }
+            }
+            window.location.href = "juegos.html";
+        }, 700);
+    }
+
+    function finalizarPartida() {
+        gameOver = true; 
+        pantallaGameOver.classList.remove("hidden"); 
+        playSound(220, 'sawtooth', 0.4, 60);
+        comprobarYRegistrarRanking();
+    }
+
     function actualizarJuego() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         if (juegoIniciado && !gameOver) {
             velocidadY += GRAVEDAD;
             mascotaY += velocidadY;
             if (mascotaY > canvas.height || mascotaY < 0) { 
-                gameOver = true; 
-                pantallaGameOver.classList.remove("hidden"); 
-                playSound(220, 'sawtooth', 0.4, 60); 
+                finalizarPartida();
             }
             if (obstaculos.length === 0 || obstaculos[obstaculos.length-1].x < canvas.width - 280) obstaculos.push(crearObstaculo());
             obstaculos.forEach(obs => {
                 obs.x -= VELOCIDAD_OBSTACULOS;
                 
-                // CORRECCIÓN: Ajuste de paso basado en el nuevo ancho de barrera
                 if (!obs.pasado && obs.x + ANCHO_BARRERA < canvas.width/2) { 
                     obs.pasado = true; 
                     puntuacion++; 
@@ -190,19 +248,15 @@
                     playSound(750, 'sine', 0.12); 
                 }
                 
-                // CORRECCIÓN: Caja de colisión adaptada al nuevo grosor de 80px de forma milimétrica
                 if (canvas.width/2 + 32 > obs.x && canvas.width/2 - 32 < obs.x + ANCHO_BARRERA) {
                     if (mascotaY - 20 < obs.altoSuperior || mascotaY + 40 > obs.altoSuperior + HUECO_PASO) {
-                        gameOver = true; 
-                        pantallaGameOver.classList.remove("hidden");
-                        playSound(220, 'sawtooth', 0.4, 60); 
+                        finalizarPartida();
                     }
                 }
             });
             obstaculos = obstaculos.filter(o => o.x > -100);
         }
         
-        // Dibujar obstáculos con el nuevo grosor robusto
         ctx.fillStyle = "#78909C";
         obstaculos.forEach(obs => {
             ctx.fillRect(obs.x, 0, ANCHO_BARRERA, obs.altoSuperior);
@@ -225,6 +279,11 @@
     
     function realizarSalto() { 
         if (botTrap.value) return; 
+
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
         if (!gameOver) { 
             juegoIniciado = true; 
             pantallaInicio.classList.add("hidden"); 
@@ -237,7 +296,7 @@
         e.preventDefault();
         e.stopPropagation(); 
         mascotaY = 200; velocidadY = 0; obstaculos = []; puntuacion = 0;
-        txtPuntuacion.innerText = "0"; gameOver = false; juegoIniciado = false;
+        txtPuntuacion.innerText = "0"; gameOver = false; juegoIniciado = false; recordProcesado = false;
         pantallaGameOver.classList.add("hidden"); 
         pantallaInicio.classList.remove("hidden");
     });
@@ -246,7 +305,7 @@
         e.preventDefault();
         e.stopPropagation(); 
         mascotaY = 200; velocidadY = 0; obstaculos = []; puntuacion = 0;
-        txtPuntuacion.innerText = "0"; gameOver = false; juegoIniciado = false;
+        txtPuntuacion.innerText = "0"; gameOver = false; juegoIniciado = false; recordProcesado = false;
         pantallaGameOver.classList.add("hidden"); 
         pantallaInicio.classList.remove("hidden");
     }, { passive: false });
