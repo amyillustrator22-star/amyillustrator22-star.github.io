@@ -92,7 +92,7 @@
         <div class="grid grid-cols-3 gap-2 w-full text-center font-black bg-slate-900/80 backdrop-blur-md py-2 px-3 rounded-2xl border border-white/10 shadow-md mb-4 text-white text-sm">
             <div>Nivel: <span id="memo-nivel" class="text-rose-400 block text-lg">1</span></div>
             <div>Puntos: <span id="memo-puntos" class="text-purple-400 block text-lg">0</span></div>
-            <div>Vidas: <span id="memo-vidas" class="text-red-400 block text-lg">❤️❤️❤️</span></div>
+            <div>Vidas: <span id="memo-vidas" class="text-red-400 block text-lg">❤️❤️❤️❤️❤️</span></div>
         </div>
 
         <div id="pantalla-inicio" class="my-auto text-center z-10">
@@ -105,7 +105,7 @@
         </div>
 
         <div id="pantalla-nivel-superado" class="hidden text-center my-auto bg-slate-900/90 backdrop-blur-md py-4 px-6 rounded-3xl border border-green-500/30 shadow-xl max-w-[280px]">
-            <p class="text-green-400 font-black text-xl animate-bounce">¡NIVEL LOGRADO! 🎉</p>
+            <p class="text-green-400 font-black text-xl animate-bounce" id="titulo-superado">¡NIVEL LOGRADO! 🎉</p>
             <p class="text-xs text-slate-300 font-bold mt-2 animate-pulse" id="mensaje-dificultad">Añadiendo más cartas...</p>
         </div>
 
@@ -144,7 +144,7 @@
 
     let nivelActual = 1;
     let puntos = 0;
-    let vidas = 3;
+    let vidas = 5; // 💾 REGLA NUEVA: Iniciamos con 5 corazones en vez de 3
     let cartasSeleccionadas = [];
     let parejasEncontradas = 0;
     let totalParejasNivel = 2; 
@@ -197,7 +197,6 @@
         cartasSeleccionadas = [];
         parejasEncontradas = 0;
         
-        // Bloqueamos interactividad durante la previsualización inicial
         bloqueado = true; 
         
         txtPuntos.innerText = puntos;
@@ -230,27 +229,21 @@
 
         mazoFinal.forEach((emoji, index) => {
             const contenedorCarta = document.createElement('div');
-            // 💎 Diseño de cartas cristal translúcido inicial (fase de memorización)
             contenedorCarta.className = "h-20 w-full bg-gradient-to-b from-white/20 to-white/5 text-white rounded-2xl border border-white/20 cursor-pointer shadow-lg flex items-center justify-center text-3xl transition-all duration-200 active:scale-95 select-none backdrop-blur-sm hover:border-rose-400 hover:bg-white/20";
             contenedorCarta.dataset.emoji = emoji;
             contenedorCarta.dataset.index = index;
-            
-            // Se pintan abiertas al principio de cada ronda
             contenedorCarta.innerText = emoji; 
 
             contenedorCarta.addEventListener('click', voltearCarta);
             tablero.appendChild(contenedorCarta);
         });
 
-        // ⏱️ REGLA AJUSTADA: 2.5 segundos para memorizar sin peligro de perder vidas
         setTimeout(() => {
             const todasLasCartas = tablero.querySelectorAll('div');
             todasLasCartas.forEach(carta => {
                 carta.innerText = '❓';
-                // Cambian a la nueva clase CSS blindada con fondo púrpura espacial
                 carta.className = "h-20 w-full rounded-2xl border-2 flex items-center justify-center text-3xl transition-all duration-200 active:scale-95 select-none cursor-pointer carta-oculta";
             });
-            // Desbloqueo oficial del tablero. Las penalizaciones empiezan ahora
             bloqueado = false; 
         }, 2500);
     }
@@ -321,6 +314,18 @@
         setTimeout(() => playSound(783.99, 'sine', 0.15), 160);
 
         tablero.classList.add('hidden');
+
+        // 💾 REGLA NUEVA: Cada 5 pantallas superadas (al llegar al nivel 6, 11, 16...), regalamos una vida si ha perdido alguna
+        let tituloSuperadoTxt = "¡NIVEL LOGRADO! 🎉";
+        if ((nivelActual - 1) % 5 === 0) {
+            if (vidas < 5) {
+                vidas++;
+                tituloSuperadoTxt = "¡BONUS: VIDA EXTRA! ❤️";
+                playSound(440, 'sine', 0.1);
+                setTimeout(() => playSound(880, 'sine', 0.2), 100);
+            }
+        }
+        document.getElementById('titulo-superado').innerText = tituloSuperadoTxt;
 
         if ((nivelActual - 1) % 3 === 0) {
             msgDificultad.innerText = "¡DIFICULTAD UP! Añadiendo +2 parejas 🚀";

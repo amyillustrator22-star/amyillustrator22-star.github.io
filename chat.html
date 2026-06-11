@@ -28,6 +28,7 @@
 
         let unsubscribeChat = null;
         let currentUser = null;
+        let aliasGuardadoChat = ""; // Guarda el nombre que elija el usuario en el modal
 
         // Escuchar el estado de autenticación y verificar baneos
         onAuthStateChanged(auth, async (user) => {
@@ -98,8 +99,17 @@
             await signOut(auth);
         };
 
-        // Lógica de la Sala Global
+        // Lógica de la Sala Global con Selección de Alias
         window.acceptRulesAndEnter = function() {
+            const inputAlias = document.getElementById('chat-user-alias').value.trim();
+            if (!inputAlias) {
+                alert("Por favor, introduce un nombre o alias para mostrar en la sala.");
+                return;
+            }
+            
+            // Asignamos el alias escrito a la sesión actual del chat
+            aliasGuardadoChat = inputAlias;
+
             document.getElementById('rules-modal').classList.add('hidden');
             document.getElementById('chat-container').classList.remove('hidden');
             loadMessages();
@@ -125,7 +135,9 @@
                     
                     // Sincronizado al 100% con los campos de la app en Kotlin (usuario y texto)
                     const userIdentifier = data.usuario || ''; 
-                    const isMine = userIdentifier === currentUser.email; // Compara con el email de login en la web
+                    
+                    // Compara con el alias elegido en el formulario para saber si el mensaje es del cliente actual
+                    const isMine = userIdentifier === aliasGuardadoChat; 
                     const text = data.texto || '';
                     const timeString = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
                     
@@ -164,30 +176,29 @@
             });
         }
 
-       window.handleSendMessage = async function(e) {
-        e.preventDefault();
-        const chatHp = e.target.elements['chat_msg_honeypot'].value;
-        if (chatHp) return;
+        window.handleSendMessage = async function(e) {
+            e.preventDefault();
+            const chatHp = e.target.elements['chat_msg_honeypot'].value;
+            if (chatHp) return;
 
-        const input = document.getElementById('chat-message-input');
-        const text = input.value.trim();
-        if (!text || !currentUser) return;
+            const input = document.getElementById('chat-message-input');
+            const text = input.value.trim();
+            if (!text || !currentUser) return;
 
-        input.value = ''; 
+            input.value = ''; 
 
-        try {
-            // Si el usuario tiene displayName lo usa, si no, te pone un alias limpio de pruebas
-            const aliasUsuario = currentUser.displayName || "Amy (Web)";
+            try {
+                // Inyectamos el alias personalizado validado en lugar del correo o fallbacks estáticos
+                await addDoc(collection(db, 'chat_global'), {
+                    texto: text,
+                    usuario: aliasGuardadoChat, 
+                    timestamp: serverTimestamp()
+                });
+            } catch (error) {
+                alert("No se pudo enviar el mensaje. Verifica tu conexión o si tu cuenta tiene restricciones.");
+            }
+        };
 
-            await addDoc(collection(db, 'chat_global'), {
-                texto: text,
-                usuario: aliasUsuario, // 
-                timestamp: serverTimestamp()
-            });
-        } catch (error) {
-            alert("No se pudo enviar el mensaje. Verifica tu conexión o si tu cuenta tiene restricciones.");
-        }
-    };
         window.simulatedBan = async function(uidToBan) {
             if(!confirm("¿Confirmas la expulsión definitiva de este usuario?")) return;
             try {
@@ -251,13 +262,20 @@
 
     <div id="rules-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-[2.5rem] max-w-md w-full p-8 shadow-2xl">
-            <h3 class="text-2xl font-black text-center mb-6">Normas de Convivencia</h3>
+            <h3 class="text-2xl font-black text-center mb-2">Identificación en la Sala</h3>
+            
+            <div class="mb-6 mt-4">
+                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider text-left">Elige tu nombre de usuario o alias:</label>
+                <input type="text" id="chat-user-alias" placeholder="Ej: Amiga_22, GamerX..." class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-slate-50 focus:ring-2 focus:ring-slate-900 focus:outline-none font-bold text-sm">
+            </div>
+
+            <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 text-left">Normas de Convivencia</h4>
             <ul class="space-y-3 text-sm text-gray-700 font-medium mb-8 bg-slate-50 p-4 rounded-2xl border border-slate-100">
                 <li class="flex items-start gap-2"><span class="text-red-500 font-bold">❌</span> <span>Prohibido insultos o lenguaje ofensivo.</span></li>
                 <li class="flex items-start gap-2"><span class="text-red-500 font-bold">❌</span> <span>Cero tolerancia a material explícito o acoso.</span></li>
-                <li class="flex items-start gap-2"><span class="text-green-500 font-bold">✨</span> <span>El respeto es obligatorio. Las faltas terminan en expulsión.</span></li>
+                <li class="flex items-start gap-2"><span class="text-green-500 font-bold">✨</span> <span>El respeto es obligatorio. Las faltas terminan en baneo.</span></li>
             </ul>
-            <button onclick="acceptRulesAndEnter()" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-md shadow-emerald-200">Acepto las reglas</button>
+            <button onclick="acceptRulesAndEnter()" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-md shadow-emerald-200 uppercase tracking-wider text-xs">Aceptar y Entrar al Chat</button>
         </div>
     </div>
 
