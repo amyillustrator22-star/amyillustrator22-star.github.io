@@ -114,6 +114,27 @@
             letter-spacing: 1px;
         }
 
+        /* Botón de retorno acoplado al estilo cyberpunk */
+        .btn-back-container {
+            margin-top: 20px;
+        }
+        .btn-cyber-back {
+            background: transparent;
+            border: 1px solid rgba(255, 0, 85, 0.4);
+            color: #ff0055;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-cyber-back:hover {
+            background: rgba(255, 0, 85, 0.1);
+            box-shadow: 0 0 10px rgba(255, 0, 85, 0.2);
+        }
+
         @keyframes floatBobbing {
             0% { margin-top: 0px; }
             100% { margin-top: 8px; }
@@ -149,133 +170,238 @@
 
     <div id="instruction">ORDENA LOS PATRONES NUMÉRICOS: PULSA DE MENOR A MAYOR ⬆</div>
 
-    <script>
-        const container = document.getElementById('game-container');
-        const ageDisplay = document.getElementById('age-display');
-        const levelDisplay = document.getElementById('level-display');
-        const botTrap = document.getElementById('arcade_security_hp');
+    <div class="btn-back-container">
+        <a href="juegos.html" class="btn-cyber-back">❌ ABANDONAR ENTRENAMIENTO</a>
+    </div>
 
-        let mentalAge = 35;
-        let currentLevel = 1;
-        let numbersInRound = [];
-        let bubblesCount = 4; 
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const firebaseConfig = {
+        apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
+        authDomain: "vibezmatch-91c6d.firebaseapp.com",
+        databaseURL: "https://vibezmatch-91c6d-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "vibezmatch-91c6d",
+        storageBucket: "vibezmatch-91c6d.appspot.com",
+        messagingSenderId: "645008717503",
+        appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const container = document.getElementById('game-container');
+    const ageDisplay = document.getElementById('age-display');
+    const levelDisplay = document.getElementById('level-display');
+    const botTrap = document.getElementById('arcade_security_hp');
+
+    let mentalAge = 35;
+    let currentLevel = 1;
+    let numbersInRound = [];
+    let bubblesCount = 4; 
+    let playerLifes = 3; // Freno preventivo contra el bucle continuo infinito
+    let processingGameOver = false;
+
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playSound(freq, type, duration) {
+        try {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        } catch(e) { }
+    }
+
+    function initRound() {
+        if (processingGameOver) return;
+        if (botTrap.value) {
+            handleBotDetection();
+            return;
+        }
+
+        container.innerHTML = '';
+        numbersInRound = [];
         
-        function playSound(freq, type, duration) {
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e) { }
+        bubblesCount = Math.min(3 + currentLevel, 8);
+        levelDisplay.innerText = `FASE ${String(currentLevel).padStart(2, '0')}`;
+
+        while(numbersInRound.length < bubblesCount) {
+            let num = Math.floor(Math.random() * 99) + 1;
+            if(!numbersInRound.includes(num)) {
+                numbersInRound.push(num);
+            }
         }
 
-        function initRound() {
-            // Verificación del Honeypot: si el input invisible tiene texto, bloquea el juego por bot detection
-            if (botTrap.value) {
-                handleBotDetection();
-                return;
-            }
+        numbersInRound.forEach(num => {
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble';
+            bubble.innerText = num;
+            bubble.dataset.value = num;
 
-            container.innerHTML = '';
-            numbersInRound = [];
+            const posX = Math.random() * (container.clientWidth - 80);
+            const posY = Math.random() * (container.clientHeight - 80);
             
-            bubblesCount = Math.min(3 + currentLevel, 8);
-            levelDisplay.innerText = `FASE ${String(currentLevel).padStart(2, '0')}`;
+            bubble.style.left = `${posX}px`;
+            bubble.style.top = `${posY}px`;
+            
+            bubble.style.animationDelay = `${Math.random() * 2}s`;
 
-            while(numbersInRound.length < bubblesCount) {
-                let num = Math.floor(Math.random() * 99) + 1;
-                if(!numbersInRound.includes(num)) {
-                    numbersInRound.push(num);
+            bubble.addEventListener('click', () => checkSelection(bubble, num));
+            container.appendChild(bubble);
+        });
+    }
+
+    // OBTENCIÓN AUTOMÁTICA DE LA BANDERA DEL NAVEGADOR
+    function getCountryFlag() {
+        try {
+            const userLang = navigator.language || navigator.userLanguage;
+            if (userLang.includes('ES')) return '🇪🇸';
+            if (userLang.includes('AR')) return '🇦🇷';
+            if (userLang.includes('MX')) return '🇲🇽';
+            if (userLang.includes('CO')) return '🇨🇴';
+            if (userLang.includes('CL')) return '🇨🇱';
+            if (userLang.includes('PE')) return '🇵🇪';
+            if (userLang.includes('US')) return '🇺🇸';
+            return '🇪🇸';
+        } catch (e) {
+            return '🇪🇸';
+        }
+    }
+
+    // EVALUACIÓN DE GANADORES INTERACTIVA CON FIRESTORE
+    async function evaluateLeaderboardEntrance() {
+        processingGameOver = true;
+        container.innerHTML = `
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#00FFD5; font-weight:bold; letter-spacing:1px; text-align:center; padding:20px;">
+                <div>🧠 EVALUANDO CAPACIDAD COGNITIVA...</div>
+            </div>
+        `;
+
+        try {
+            // Consulta de registros usando el índice compuesto ordenado
+            const q = query(
+                collection(db, "scores_arcade"),
+                where("game", "==", "brain_training"),
+                orderBy("score", "desc"),
+                limit(10)
+            );
+
+            const snapshot = await getDocs(q);
+            let checkEntrance = false;
+
+            if (snapshot.size < 10) {
+                checkEntrance = true;
+            } else {
+                const scoreCut = snapshot.docs[snapshot.docs.length - 1].data().score;
+                if (currentLevel > scoreCut) {
+                    checkEntrance = true;
                 }
             }
 
-            numbersInRound.forEach(num => {
-                const bubble = document.createElement('div');
-                bubble.className = 'bubble';
-                bubble.innerText = num;
-                bubble.dataset.value = num;
+            if (checkEntrance) {
+                setTimeout(async () => {
+                    const alias = prompt(`🧠 ¡FANTÁSTICO! Has alcanzado la Fase ${currentLevel}.\nTu edad mental estimada es de ${mentalAge} años.\nIntroduce tu alias para el ranking global:`);
+                    
+                    if (alias && alias.trim() !== "") {
+                        const flag = getCountryFlag();
+                        await addDoc(collection(db, "scores_arcade"), {
+                            player: alias.trim(),
+                            score: currentLevel,
+                            game: "brain_training",
+                            country: flag
+                        });
+                        alert("🏆 ¡Récord registrado en el bloque central!");
+                    }
+                    window.location.href = "juegos.html";
+                }, 600);
+            } else {
+                setTimeout(() => {
+                    alert(`🏁 ENTRENAMIENTO FINALIZADO\nFase alcanzada: ${currentLevel}.\nNo has superado la puntuación mínima del Top 10 actual.`);
+                    window.location.href = "juegos.html";
+                }, 600);
+            }
 
-                const posX = Math.random() * (container.clientWidth - 80);
-                const posY = Math.random() * (container.clientHeight - 80);
-                
-                bubble.style.left = `${posX}px`;
-                bubble.style.top = `${posY}px`;
-                
-                bubble.style.animationDelay = `${Math.random() * 2}s`;
+        } catch (err) {
+            console.error("Error evaluando records:", err);
+            window.location.href = "juegos.html";
+        }
+    }
 
-                bubble.addEventListener('click', () => checkSelection(bubble, num));
-                container.appendChild(bubble);
-            });
+    function checkSelection(element, value) {
+        if (botTrap.value || processingGameOver) {
+            handleBotDetection();
+            return;
         }
 
-        function checkSelection(element, value) {
-            // Re-verificar Honeypot en cada clic por si el bot inyecta el valor en caliente
-            if (botTrap.value) {
-                handleBotDetection();
-                return;
-            }
+        const minRemaining = Math.min(...numbersInRound);
 
-            const minRemaining = Math.min(...numbersInRound);
+        if (value === minRemaining) {
+            numbersInRound = numbersInRound.filter(n => n !== value);
+            element.style.transform = 'scale(0)';
+            element.style.opacity = '0';
+            
+            playSound(600 + (value * 5), 'sine', 0.1);
 
-            if (value === minRemaining) {
-                numbersInRound = numbersInRound.filter(n => n !== value);
-                element.style.transform = 'scale(0)';
-                element.style.opacity = '0';
+            setTimeout(() => element.remove(), 100);
+
+            if (numbersInRound.length === 0) {
+                playSound(880, 'sine', 0.15);
+                setTimeout(() => playSound(1200, 'sine', 0.2), 100);
                 
-                playSound(600 + (value * 5), 'sine', 0.1);
-
-                setTimeout(() => element.remove(), 100);
-
-                if (numbersInRound.length === 0) {
-                    playSound(880, 'sine', 0.15);
-                    setTimeout(() => playSound(1200, 'sine', 0.2), 100);
-                    
-                    currentLevel++;
-                    mentalAge = Math.max(15, mentalAge - 1);
-                    ageDisplay.innerText = `${mentalAge} AÑOS`;
-                    
-                    setTimeout(initRound, 600);
-                }
-            } else {
-                playSound(120, 'sawtooth', 0.3);
-                container.classList.add('glitch-error');
-                setTimeout(() => container.classList.remove('glitch-error'), 400);
-
-                mentalAge = Math.min(80, mentalAge + 2);
+                currentLevel++;
+                mentalAge = Math.max(15, mentalAge - 1);
                 ageDisplay.innerText = `${mentalAge} AÑOS`;
                 
+                setTimeout(initRound, 600);
+            }
+        } else {
+            // El usuario ha cometido un error en la secuencia
+            playerLifes--;
+            playSound(120, 'sawtooth', 0.3);
+            container.classList.add('glitch-error');
+            setTimeout(() => container.classList.remove('glitch-error'), 400);
+
+            mentalAge = Math.min(80, mentalAge + 2);
+            ageDisplay.innerText = `${mentalAge} AÑOS`;
+            
+            if (playerLifes <= 0) {
+                // Al tercer fallo salta el fin de juego controlado y frena el reinicio
+                evaluateLeaderboardEntrance();
+            } else {
                 setTimeout(initRound, 500);
             }
         }
+    }
 
-        // Lógica de defensa cibernética de Amy Software
-        function handleBotDetection() {
-            playSound(80, 'sawtooth', 1.0);
-            container.innerHTML = `
-                <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#ff0055; font-weight:bold; letter-spacing:2px; text-align:center; padding:20px;">
-                    <div>⚠️ ERROR CRÍTICO DE SISTEMA ⚠️</div>
-                    <div style="font-size:11px; color:rgba(255,0,85,0.6); margin-top:15px; font-family:monospace;">ALGORITMO NO HUMANO DETECTADO.<br>ACCESO TERMINAL SUSPENDIDO.</div>
-                </div>
-            `;
-            container.style.borderColor = '#ff0055';
-            container.style.boxShadow = '0 0 25px rgba(255, 0, 85, 0.3)';
-            levelDisplay.innerText = "BLOQUEADO";
-            levelDisplay.style.color = "#ff0055";
-            ageDisplay.innerText = "99 AÑOS";
-            ageDisplay.style.color = "#ff0055";
-            document.getElementById('instruction').innerText = "PROTECCIÓN ANTIMALWARE ACTIVA - AMY SOFTWARE CO.";
-            document.getElementById('instruction').style.color = "#ff0055";
-        }
+    // Lógica de defensa cibernética de Amy Software intacta
+    function handleBotDetection() {
+        playSound(80, 'sawtooth', 1.0);
+        container.innerHTML = `
+            <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#ff0055; font-weight:bold; letter-spacing:2px; text-align:center; padding:20px;">
+                <div>⚠️ ERROR CRÍTICO DE SISTEMA ⚠️</div>
+                <div style="font-size:11px; color:rgba(255,0,85,0.6); margin-top:15px; font-family:monospace;">ALGORITMO NO HUMANO DETECTADO.<br>ACCESO TERMINAL SUSPENDIDO.</div>
+            </div>
+        `;
+        container.style.borderColor = '#ff0055';
+        container.style.boxShadow = '0 0 25px rgba(255, 0, 85, 0.3)';
+        levelDisplay.innerText = "BLOQUEADO";
+        levelDisplay.style.color = "#ff0055";
+        ageDisplay.innerText = "99 AÑOS";
+        ageDisplay.style.color = "#ff0055";
+        document.getElementById('instruction').innerText = "PROTECCIÓN ANTIMALWARE ACTIVA - AMY SOFTWARE CO.";
+        document.getElementById('instruction').style.color = "#ff0055";
+    }
 
-        initRound();
-    </script>
+    // Iniciar el juego atado a la carga del módulo
+    initRound();
+</script>
 </body>
 </html>
