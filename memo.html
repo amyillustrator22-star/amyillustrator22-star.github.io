@@ -16,52 +16,67 @@
     
     <style>
         body {
-            /* 🌌 FONDO CÓSMICO GLOBAL AUTÓNOMO (No necesita archivo .jpg externo para cargar) */
-            background-color: #0b071e;
-            background: radial-gradient(circle at 50% 50%, rgba(30, 27, 75, 0.6) 0%, rgba(15, 23, 42, 0.95) 100%), 
-                        linear-gradient(135deg, #090514 0%, #170b29 40%, #3c0954 80%, #120324 100%) !important;
+            /* 🌌 EL FONDO BONITO APLICADO A TODA LA PANTALLA COMPLETA AUTÓNOMAMENTE */
+            background-color: #060212;
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(147, 51, 234, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(244, 63, 94, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(30, 27, 75, 0.6) 0%, #060212 100%),
+                linear-gradient(135deg, #090514 0%, #180933 40%, #350b4f 80%, #0d021a 100%) !important;
             background-attachment: fixed !important;
             min-height: 100vh;
             user-select: none;
             touch-action: manipulation;
         }
+        
+        /* ✨ Efecto de red de estrellas cósmicas flotando por toda la pantalla */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image: 
+                radial-gradient(rgba(255, 255, 255, 0.5) 1px, transparent 0), 
+                radial-gradient(rgba(255, 255, 255, 0.3) 1.5px, transparent 0);
+            background-size: 60px 60px, 130px 130px;
+            background-position: 0 0, 40px 40px;
+            opacity: 0.4;
+            pointer-events: none;
+            z-index: 0;
+        }
+
         .title-nabla {
             font-family: 'Nabla', cursive;
             -webkit-text-stroke: 1px black;
             text-shadow: 2px 2px 0px black;
+            z-index: 10;
         }
+
         #contenedor-juego {
             position: relative;
             width: 100%;
             max-width: 430px;
             min-height: 550px;
-            /* 🌌 FONDO INTERIOR COSMIC ARCADE SELECCIONADO (Estilo recreativa retro espacial) */
-            background-color: #0c0822 !important;
-            background: radial-gradient(circle at 50% 50%, rgba(39, 25, 84, 0.5) 0%, rgba(11, 6, 26, 0.95) 100%) !important;
-            box-shadow: 0 0 35px rgba(244, 63, 94, 0.35), inset 0 0 20px rgba(147, 51, 234, 0.4) !important;
+            z-index: 10;
+            /* 💎 CRISTAL TRANSLÚCIDO NEÓN (Deja ver el fondo bonito de estrellas a través) */
+            background: rgba(13, 8, 30, 0.65) !important;
+            border: 4px solid #f43f5e !important; /* Marco neón fucsia */
+            box-shadow: 0 0 40px rgba(244, 63, 94, 0.4), inset 0 0 25px rgba(147, 51, 234, 0.3) !important;
+            backdrop-filter: blur(12px) !important;
+            -webkit-backdrop-filter: blur(12px) !important;
             overflow: hidden;
         }
-        /* ✨ Estrellas de fondo estables por hardware */
-        #contenedor-juego::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image: radial-gradient(white 1px, transparent 0), radial-gradient(rgba(255,255,255,0.4) 1px, transparent 0);
-            background-size: 50px 50px, 95px 95px;
-            background-position: 0 0, 25px 25px;
-            opacity: 0.3;
-            pointer-events: none;
-        }
-        /* 🎴 ESTILO BLINDADO PARA LAS CARTAS VOLTEADAS ABAJO (Púrpura y neón morado) */
+
+        /* 🎴 CARTAS VOLTEADAS ABAJO (Estilo Arcade Morado Oscuro) */
         .carta-oculta {
-            background-color: #0d0926 !important;
-            border-color: rgba(168, 85, 247, 0.6) !important;
+            background: rgba(18, 10, 46, 0.85) !important;
+            border: 2px solid rgba(168, 85, 247, 0.5) !important;
             color: #f1f5f9 !important;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(168, 85, 247, 0.2) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(168, 85, 247, 0.2) !important;
+            backdrop-filter: blur(4px);
         }
         .carta-oculta:hover {
             border-color: #f43f5e !important;
-            box-shadow: 0 0 15px rgba(244, 63, 94, 0.5) !important;
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.6) !important;
         }
         .hp-field { 
             position: absolute; left: -9999px; top: -9999px; 
@@ -69,11 +84,11 @@
         }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center p-4 font-sans text-gray-800">
+<body class="flex flex-col items-center justify-center p-4 font-sans text-gray-800 relative">
 
     <input type="text" id="arcade_security_hp" class="hp-field" tabindex="-1" autocomplete="off">
 
-    <div class="w-full max-w-md flex justify-start mb-2">
+    <div class="w-full max-w-md flex justify-start mb-2 z-10">
         <a href="juegos.html" class="bg-white/80 backdrop-blur-sm p-3 rounded-full border border-white/50 shadow-md transition-transform active:scale-95 text-gray-900 hover:bg-white">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
@@ -87,7 +102,7 @@
         </h1>
     </header>
 
-    <div id="contenedor-juego" class="rounded-[2.5rem] border-4 border-rose-500 shadow-2xl p-5 flex flex-col items-center justify-between backdrop-blur-md">
+    <div id="contenedor-juego" class="rounded-[2.5rem] p-5 flex flex-col items-center justify-between">
         
         <div class="grid grid-cols-3 gap-2 w-full text-center font-black bg-slate-900/80 backdrop-blur-md py-2 px-3 rounded-2xl border border-white/10 shadow-md mb-4 text-white text-sm">
             <div>Nivel: <span id="memo-nivel" class="text-rose-400 block text-lg">1</span></div>
@@ -122,7 +137,6 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-    // Configuración de Firebase sincronizada con Arcade Central
     const firebaseConfig = {
         apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
         authDomain: "vibezmatch-91c6d.firebaseapp.com",
@@ -144,7 +158,7 @@
 
     let nivelActual = 1;
     let puntos = 0;
-    let vidas = 5; // 💾 REGLA NUEVA: Iniciamos con 5 corazones en vez de 3
+    let vidas = 5; 
     let cartasSeleccionadas = [];
     let parejasEncontradas = 0;
     let totalParejasNivel = 2; 
@@ -196,7 +210,6 @@
         tablero.innerHTML = '';
         cartasSeleccionadas = [];
         parejasEncontradas = 0;
-        
         bloqueado = true; 
         
         txtPuntos.innerText = puntos;
@@ -229,6 +242,7 @@
 
         mazoFinal.forEach((emoji, index) => {
             const contenedorCarta = document.createElement('div');
+            // Cartas translúcidas de fase de previsualización
             contenedorCarta.className = "h-20 w-full bg-gradient-to-b from-white/20 to-white/5 text-white rounded-2xl border border-white/20 cursor-pointer shadow-lg flex items-center justify-center text-3xl transition-all duration-200 active:scale-95 select-none backdrop-blur-sm hover:border-rose-400 hover:bg-white/20";
             contenedorCarta.dataset.emoji = emoji;
             contenedorCarta.dataset.index = index;
@@ -315,7 +329,7 @@
 
         tablero.classList.add('hidden');
 
-        // 💾 REGLA NUEVA: Cada 5 pantallas superadas (al llegar al nivel 6, 11, 16...), regalamos una vida si ha perdido alguna
+        // REGLA: Cada 5 pantallas superadas, regalamos una vida si ha perdido alguna
         let tituloSuperadoTxt = "¡NIVEL LOGRADO! 🎉";
         if ((nivelActual - 1) % 5 === 0) {
             if (vidas < 5) {
