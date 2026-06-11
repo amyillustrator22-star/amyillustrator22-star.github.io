@@ -186,10 +186,16 @@
                     if (position === 2) medal = "🥈 2º";
                     if (position === 3) medal = "🥉 3º";
 
+                    // Extrae el valor del país si existe en la base de datos
+                    let flag = data.country ? data.country : "";
+
                     rowsContainer.innerHTML += `
                         <div class="grid grid-cols-3 px-4 py-3 items-center hover:bg-black/5 transition-colors duration-150">
                             <div class="font-bold ${position <= 3 ? 'text-amber-500' : 'text-gray-500'}">${medal}</div>
-                            <div class="font-semibold text-gray-900">${data.player}</div>
+                            <div class="font-semibold text-gray-900 flex items-center gap-2">
+                                <span>${data.player}</span>
+                                <span class="text-base">${flag}</span>
+                            </div>
                             <div class="text-right font-extrabold text-gray-900 tracking-wider">${data.score}</div>
                         </div>
                     `;
