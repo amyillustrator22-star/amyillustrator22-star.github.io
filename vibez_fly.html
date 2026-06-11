@@ -201,9 +201,6 @@
         if (recordProcesado) return;
         recordProcesado = true;
 
-        // Forzamos la pausa visual inmediata del canvas
-        juegoIniciado = false;
-
         setTimeout(async () => {
             const alias = prompt(`🎉 ¡FIN DE LA PARTIDA!\nTu récord: ${puntuacion} puntos.\nIntroduce tu nombre para la tabla mundial:`);
             
@@ -221,29 +218,37 @@
                 }
             }
             window.location.href = "juegos.html";
-        }, 300); // Reducimos el delay para que salte instantáneo tras el impacto
+        }, 200); 
     }
 
     function finalizarPartida() {
-        if (gameOver) return; // FRENO CRÍTICO: Evita ejecuciones infinitas por segundo
+        if (gameOver) return; 
         gameOver = true; 
+        juegoIniciado = false; // Detiene la bandera de avance de físicas inmediatamente
         pantallaGameOver.classList.remove("hidden"); 
         playSound(220, 'sawtooth', 0.4, 60);
         comprobarYRegistrarRanking();
     }
 
     function actualizarJuego() {
+        // CORTOCUITO DE BUCLE CRÍTICO: Si es gameOver, destruye el bucle gráfico para que no procese más fotogramas
+        if (gameOver) return;
+
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
-        // Si la partida ha terminado, congelamos las físicas por completo
-        if (juegoIniciado && !gameOver) {
+        if (juegoIniciado) {
             velocidadY += GRAVEDAD;
             mascotaY += velocidadY;
+            
             if (mascotaY > canvas.height || mascotaY < 0) { 
                 finalizarPartida();
+                return; // Freno de función instantáneo
             }
+            
             if (obstaculos.length === 0 || obstaculos[obstaculos.length-1].x < canvas.width - 280) obstaculos.push(crearObstaculo());
-            obstaculos.forEach(obs => {
+            
+            for (let i = 0; i < obstaculos.length; i++) {
+                let obs = obstaculos[i];
                 obs.x -= VELOCIDAD_OBSTACULOS;
                 
                 if (!obs.pasado && obs.x + ANCHO_BARRERA < canvas.width/2) { 
@@ -256,9 +261,10 @@
                 if (canvas.width/2 + 32 > obs.x && canvas.width/2 - 32 < obs.x + ANCHO_BARRERA) {
                     if (mascotaY - 20 < obs.altoSuperior || mascotaY + 40 > obs.altoSuperior + HUECO_PASO) {
                         finalizarPartida();
+                        return; // Freno de función instantáneo
                     }
                 }
-            });
+            }
             obstaculos = obstaculos.filter(o => o.x > -100);
         }
         
@@ -302,6 +308,7 @@
         txtPuntuacion.innerText = "0"; gameOver = false; juegoIniciado = false; recordProcesado = false;
         pantallaGameOver.classList.add("hidden"); 
         pantallaInicio.classList.remove("hidden");
+        requestAnimationFrame(actualizarJuego); // Re-arranca el bucle gráfico al reintentar
     });
 
     btnReintentar.addEventListener("touchstart", (e) => {
@@ -311,6 +318,7 @@
         txtPuntuacion.innerText = "0"; gameOver = false; juegoIniciado = false; recordProcesado = false;
         pantallaGameOver.classList.add("hidden"); 
         pantallaInicio.classList.remove("hidden");
+        requestAnimationFrame(actualizarJuego); // Re-arranca el bucle gráfico al reintentar
     }, { passive: false });
 
     requestAnimationFrame(actualizarJuego);
