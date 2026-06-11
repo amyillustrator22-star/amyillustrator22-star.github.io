@@ -15,42 +15,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
     
     <style>
-        /* 🌌 CAPA DEFINITIVA QUE OBLIGA A PINTAR EL ESPACIO PROFUNDO POR DETRÁS */
+        /* 🌌 VINCULACIÓN DIRECTA DE TU ARCHIVO JPG AL FONDO GLOBAL */
         #super-fondo-arcade {
             position: fixed;
             inset: 0;
             width: 100vw;
             height: 100vh;
             z-index: -2;
-            background-color: #060212 !important;
-            background-image: 
-                radial-gradient(circle at 10% 80%, rgba(0, 255, 255, 0.18) 0%, transparent 45%),
-                radial-gradient(circle at 90% 20%, rgba(244, 63, 94, 0.18) 0%, transparent 45%),
-                radial-gradient(circle at 50% 60%, rgba(147, 51, 234, 0.28) 0%, transparent 65%),
-                radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.4) 0%, #060212 100%),
-                linear-gradient(135deg, #090514 0%, #15082e 35%, #33084d 70%, #0d011c 100%) !important;
-        }
-        
-        /* ✨ Estrellas flotantes de la ilustración */
-        #super-fondo-arcade::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image: 
-                radial-gradient(rgba(255, 255, 255, 0.6) 1px, transparent 0), 
-                radial-gradient(rgba(0, 255, 255, 0.4) 1.5px, transparent 0),
-                radial-gradient(rgba(244, 63, 94, 0.5) 1px, transparent 0);
-            background-size: 70px 70px, 150px 150px, 200px 200px;
-            background-position: 0 0, 40px 40px, 80px 120px;
-            opacity: 0.5;
-        }
-
-        /* 🕹️ Luces de neón de recreativa en los laterales */
-        #super-fondo-arcade::after {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background-image: linear-gradient(90deg, rgba(147, 51, 234, 0.08) 0%, transparent 20%, transparent 80%, rgba(0, 255, 255, 0.08) 100%);
+            background-image: url('fondomemo.jpg') !important;
+            background-size: cover !important;
+            background-position: center center !important;
+            background-repeat: no-repeat !important;
         }
 
         .title-nabla {
@@ -64,24 +39,26 @@
             width: 100%;
             max-width: 430px;
             min-height: 550px;
-            /* 💎 CRISTAL GLASSMORPHIC */
-            background: rgba(10, 6, 26, 0.55) !important;
+            z-index: 10;
+            /* 💎 CRISTAL ULTRA TRANSLÚCIDO PARA QUE TU DIBUJO SE VEA DE LUJO POR DETRÁS */
+            background: rgba(10, 6, 26, 0.45) !important;
             border: 4px solid #f43f5e !important; 
-            box-shadow: 0 0 40px rgba(244, 63, 94, 0.45), inset 0 0 25px rgba(147, 51, 234, 0.35) !important;
-            backdrop-filter: blur(16px) !important;
-            -webkit-backdrop-filter: blur(16px) !important;
+            box-shadow: 0 0 40px rgba(244, 63, 94, 0.5), inset 0 0 25px rgba(147, 51, 234, 0.4) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
             overflow: hidden;
         }
 
+        /* 🎴 CARTAS VOLTEADAS ABAJO */
         .carta-oculta {
-            background: rgba(22, 12, 54, 0.8) !important;
+            background: rgba(19, 11, 48, 0.85) !important;
             border: 2px solid rgba(168, 85, 247, 0.6) !important;
             color: #f1f5f9 !important;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), inset 0 0 10px rgba(168, 85, 247, 0.3) !important;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6), inset 0 0 12px rgba(168, 85, 247, 0.3) !important;
         }
         .carta-oculta:hover {
             border-color: #f43f5e !important;
-            box-shadow: 0 0 15px rgba(244, 63, 94, 0.7) !important;
+            box-shadow: 0 0 15px rgba(244, 63, 94, 0.8) !important;
         }
         .hp-field { 
             position: absolute; left: -9999px; top: -9999px; 
@@ -89,7 +66,7 @@
         }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center p-4 font-sans text-gray-800 relative min-height-screen bg-transparent" style="background: transparent !important; min-height: 100vh; margin: 0;">
+<body class="flex flex-col items-center justify-center p-4 font-sans text-gray-800 relative" style="background: transparent !important; min-height: 100vh; margin: 0;">
 
     <div id="super-fondo-arcade"></div>
 
@@ -157,10 +134,13 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
+    // 🎨 BANCO DE DIBUJOS AMPLIADO CON MARCIANOS, NAVES Y GEMAS ARCADE
     const BANCO_EMOJIS = [
         '🐱', '🐶', '🦊', '🦁', '🐸', '🐵', '🐼', '🐨', 
         '🐷', '🐯', '🐮', '🐰', '🐙', '🦄', '🐝', '🦉',
-        '🍕', '🍟', '🍩', '🥑', '🎮', '🎸', '🎨', '🚀'
+        '🚀', '🛸', '👾', '🎮', '🕹️', '🪐', '🌟', '☄️',
+        '💎', '👑', '🔮', '🏆', '🎸', '🎨', '⚡', '🗝️',
+        '🍕', '🍟', '🍩', '🥑', '🍔', '🍿', '🍦', '🍉'
     ];
 
     let nivelActual = 1;
