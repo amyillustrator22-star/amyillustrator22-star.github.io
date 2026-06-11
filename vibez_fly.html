@@ -197,10 +197,12 @@
         }
     }
 
-    // SUBIDA DIRECTA OPTIMIZADA SIN VERIFICACIÓN DE LECTURA PREVIA
     async function comprobarYRegistrarRanking() {
         if (recordProcesado) return;
         recordProcesado = true;
+
+        // Forzamos la pausa visual inmediata del canvas
+        juegoIniciado = false;
 
         setTimeout(async () => {
             const alias = prompt(`🎉 ¡FIN DE LA PARTIDA!\nTu récord: ${puntuacion} puntos.\nIntroduce tu nombre para la tabla mundial:`);
@@ -219,10 +221,11 @@
                 }
             }
             window.location.href = "juegos.html";
-        }, 700);
+        }, 300); // Reducimos el delay para que salte instantáneo tras el impacto
     }
 
     function finalizarPartida() {
+        if (gameOver) return; // FRENO CRÍTICO: Evita ejecuciones infinitas por segundo
         gameOver = true; 
         pantallaGameOver.classList.remove("hidden"); 
         playSound(220, 'sawtooth', 0.4, 60);
@@ -231,6 +234,8 @@
 
     function actualizarJuego() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Si la partida ha terminado, congelamos las físicas por completo
         if (juegoIniciado && !gameOver) {
             velocidadY += GRAVEDAD;
             mascotaY += velocidadY;
@@ -278,18 +283,16 @@
     });
     
     function realizarSalto() { 
-        if (botTrap.value) return; 
+        if (botTrap.value || gameOver) return; 
 
         if (audioCtx.state === 'suspended') {
             audioCtx.resume();
         }
 
-        if (!gameOver) { 
-            juegoIniciado = true; 
-            pantallaInicio.classList.add("hidden"); 
-            velocidadY = IMPULSO; 
-            playSound(400, 'sine', 0.08, 600); 
-        } 
+        juegoIniciado = true; 
+        pantallaInicio.classList.add("hidden"); 
+        velocidadY = IMPULSO; 
+        playSound(400, 'sine', 0.08, 600); 
     }
 
     btnReintentar.addEventListener("click", (e) => {
