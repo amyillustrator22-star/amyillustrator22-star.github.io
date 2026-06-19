@@ -21,7 +21,6 @@
         .header { text-align: center; margin-bottom: 5px; }
         .title { font-size: 2rem; font-weight: bold; color: #22d3ee; text-shadow: 0 0 10px #22d3ee; letter-spacing: 1px; }
         .stats { background: #1e293b; padding: 6px 20px; border-radius: 9999px; border: 1px solid #334155; display: flex; gap: 25px; font-weight: bold; margin-top: 5px; font-size: 1.1rem; }
-        
         .ayuda-barra {
             background: rgba(6, 182, 212, 0.1);
             border: 2px solid #22d3ee;
@@ -37,7 +36,6 @@
             width: 100%;
             max-width: 490px;
         }
-
         canvas { 
             background: #020617; 
             box-shadow: 0 0 35px rgba(34, 211, 238, 0.3); 
@@ -46,7 +44,6 @@
             outline: none;
             margin-bottom: 20px;
             max-width: 100%;
-            max-height: 65vh;
         }
     </style>
 </head>
@@ -88,7 +85,6 @@
         const scoreVal = document.getElementById('score-val');
         const livesVal = document.getElementById('lives-val');
 
-        // 🛠️ CORRECCIÓN: Celdas de 26px para que la velocidad del jugador (2) encaje siempre perfecta
         const TAM_CELDA = 26; 
         let score = 0;
         let lives = 3;
@@ -103,7 +99,6 @@
 
         const ALIEN_COLORS = ['#ec4899', '#f97316', '#a855f7', '#00ff66'];
 
-        // Forzar enfoque para que no se pierdan los controles
         canvas.focus();
         window.addEventListener('DOMContentLoaded', () => { canvas.focus(); });
         canvas.addEventListener('click', () => { canvas.focus(); });
@@ -141,6 +136,7 @@
             } catch(e) {}
         }
 
+        // 🛠️ MAPA CORREGIDO: Accesos abiertos sin zonas cerradas.
         const mapa = [
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
             [1,3,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,3,1],
@@ -151,14 +147,14 @@
             [1,0,0,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,0,1],
             [1,1,1,1,0,1,1,1,2,1,1,2,1,1,1,0,1,1,1,1],
             [2,2,2,1,0,1,2,2,2,2,2,2,2,2,1,0,1,2,2,2],
-            [1,1,1,1,0,1,2,1,1,2,2,1,1,2,1,0,1,1,1,1],
+            [1,1,1,1,0,1,2,1,1,0,0,1,1,2,1,0,1,1,1,1],
             [2,2,2,2,0,2,2,1,2,2,2,2,1,2,2,0,2,2,2,2],
             [1,1,1,1,0,1,2,1,1,1,1,1,1,2,1,0,1,1,1,1],
             [2,2,2,1,0,1,2,2,2,2,2,2,2,2,1,0,1,2,2,2],
             [1,1,1,1,0,1,2,1,1,1,1,1,1,2,1,0,1,1,1,1],
             [1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
             [1,0,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1,0,1],
-            [1,0,0,1,0,0,0,0,0,2,2,0,0,0,0,0,1,0,0,1],
+            [1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,1],
             [1,1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,1],
             [1,3,0,0,0,0,1,0,0,0,1,1,0,0,0,1,0,0,3,1],
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
@@ -176,7 +172,6 @@
         window.addEventListener('keydown', e => {
             iniciarAudio();
             const tecla = e.key.toLowerCase();
-            // Prevenir el scroll por defecto si usan el teclado numérico por error
             if(['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright'].includes(tecla)) {
                 e.preventDefault();
             }
