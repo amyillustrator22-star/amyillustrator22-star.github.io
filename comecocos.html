@@ -10,6 +10,8 @@
         .title { font-size: 1.8rem; font-weight: bold; color: #22d3ee; text-shadow: 0 0 10px #22d3ee; }
         .stats { background: #1e293b; padding: 6px 16px; border-radius: 9999px; border: 1px solid #334155; display: flex; gap: 20px; font-weight: bold; margin-top: 5px; }
         canvas { background: #020617; box-shadow: 0 0 30px rgba(34, 211, 238, 0.25); border-radius: 16px; border: 4px solid #1e293b; }
+        .controles-info { margin-top: 10px; font-size: 0.8rem; color: #64748b; font-weight: bold; text-align: center; }
+        .tecla { background: #334155; color: #22d3ee; padding: 2px 6px; border-radius: 4px; border: 1px solid #475569; }
     </style>
 </head>
 <body>
@@ -23,6 +25,10 @@
     </div>
 
     <canvas id="canvas-game" width="380" height="380"></canvas>
+    
+    <div class="controles-info">
+        CONTROLES: <span class="tecla">W</span> Arriba | <span class="tecla">S</span> Abajo | <span class="tecla">A</span> Izquierda | <span class="tecla">D</span> Derecha
+    </div>
 
     <script>
         const canvas = document.getElementById('canvas-game');
@@ -35,6 +41,7 @@
         let lives = 3;
         let gameOver = false;
 
+        // 4 Colores llamativos para los 4 OVNIs enemigos
         const ALIEN_COLORS = ['#ec4899', '#f97316', '#a855f7', '#06b6d4'];
 
         const mapa = [
@@ -62,21 +69,21 @@
 
         let jugador = { x: 9 * TAM_CELDA, y: 16 * TAM_CELDA, dirX: 0, dirY: 0, sigDirX: 0, sigDirY: 0, angulo: 0 };
         
+        // CORRECCIÓN: Configurados exactamente los 4 OVNIs alineados
         let aliens = [
-            { x: 9 * TAM_CELDA, y: 8 * TAM_CELDA, dirX: 1, dirY: 0, color: ALIEN_COLORS[0], ojoAngulo: 0 },
-            { x: 8 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: -1, dirY: 0, color: ALIEN_COLORS[1], ojoAngulo: 0 },
-            { x: 10 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: 0, dirY: -1, color: ALIEN_COLORS[2], ojoAngulo: 0 }
+            { x: 9 * TAM_CELDA, y: 8 * TAM_CELDA, dirX: 1, dirY: 0, color: ALIEN_COLORS[0], ojoAngulo: 0, factorRnd: 0.1 },
+            { x: 8 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: -1, dirY: 0, color: ALIEN_COLORS[1], ojoAngulo: 0, factorRnd: 0.3 },
+            { x: 10 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: 0, dirY: -1, color: ALIEN_COLORS[2], ojoAngulo: 0, factorRnd: 0.2 },
+            { x: 9 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: 0, dirY: 1, color: ALIEN_COLORS[3], ojoAngulo: 0, factorRnd: 0.4 }
         ];
 
-        // CORRECCIÓN CRÍTICA: e.preventDefault() evita que las flechas muevan la pantalla exterior
+        // NUEVOS CONTROLES: Letras WASD (soporta mayúsculas y minúsculas)
         window.addEventListener('keydown', e => {
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
-                e.preventDefault();
-            }
-            if (e.key === 'ArrowUp')    { jugador.sigDirX = 0; jugador.sigDirY = -1; jugador.angulo = -Math.PI/2; }
-            if (e.key === 'ArrowDown')  { jugador.sigDirX = 0; jugador.sigDirY = 1; jugador.angulo = Math.PI/2; }
-            if (e.key === 'ArrowLeft')  { jugador.sigDirX = -1; jugador.sigDirY = 0; jugador.angulo = Math.PI; }
-            if (e.key === 'ArrowRight') { jugador.sigDirX = 1; jugador.sigDirY = 0; jugador.angulo = 0; }
+            const tecla = e.key.toLowerCase();
+            if (tecla === 'w') { jugador.sigDirX = 0; jugador.sigDirY = -1; jugador.angulo = -Math.PI/2; }
+            if (tecla === 's') { jugador.sigDirX = 0; jugador.sigDirY = 1; jugador.angulo = Math.PI/2; }
+            if (tecla === 'a') { jugador.sigDirX = -1; jugador.sigDirY = 0; jugador.angulo = Math.PI; }
+            if (tecla === 'd') { jugador.sigDirX = 1; jugador.sigDirY = 0; jugador.angulo = 0; }
         });
 
         function colisionPared(x, y) {
@@ -112,6 +119,7 @@
                 scoreVal.textContent = score;
             }
 
+            // INTELIGENCIA ARTIFICIAL MEJORADA DE PERSECUCIÓN INTECOCOS
             aliens.forEach(alien => {
                 if (alien.x % TAM_CELDA === 0 && alien.y % TAM_CELDA === 0) {
                     let dirsValidas = [];
@@ -120,10 +128,30 @@
                             if (!colisionPared(alien.x + d[0]*2, alien.y + d[1]*2)) dirsValidas.push(d);
                         }
                     });
+
                     if (dirsValidas.length > 0) {
-                        let elegir = dirsValidas[Math.floor(Math.random() * dirsValidas.length)];
-                        alien.dirX = elegir[0];
-                        alien.dirY = elegir[1];
+                        // Con una probabilidad persiguen, si no, se mueven al azar para romper bucles
+                        if (Math.random() > alien.factorRnd) {
+                            let mejorDir = dirsValidas[0];
+                            let distMinima = Infinity;
+
+                            dirsValidas.forEach(d => {
+                                let sigX = alien.x + d[0] * TAM_CELDA;
+                                let sigY = alien.y + d[1] * TAM_CELDA;
+                                // Distancia en línea recta hasta la posición del jugador
+                                let dist = Math.pow(sigX - jugador.x, 2) + Math.pow(sigY - jugador.y, 2);
+                                if (dist < distMinima) {
+                                    distMinima = dist;
+                                    mejorDir = d;
+                                }
+                            });
+                            alien.dirX = mejorDir[0];
+                            alien.dirY = mejorDir[1];
+                        } else {
+                            let elegir = dirsValidas[Math.floor(Math.random() * dirsValidas.length)];
+                            alien.dirX = elegir[0];
+                            alien.dirY = elegir[1];
+                        }
                     } else {
                         alien.dirX *= -1; alien.dirY *= -1;
                     }
@@ -149,7 +177,6 @@
         function dibujar() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Rejilla de Laberinto Neón
             for (let f = 0; f < mapa.length; f++) {
                 for (let c = 0; c < mapa[f].length; c++) {
                     if (mapa[f][c] === 1) {
@@ -165,7 +192,7 @@
                 }
             }
 
-            // REDISEÑO: Dibujar caza espacial en lugar de Pac-man amarillo
+            // Dibujar caza espacial estilizada neón (Jugador)
             ctx.save();
             ctx.translate(jugador.x + TAM_CELDA/2, jugador.y + TAM_CELDA/2);
             ctx.rotate(jugador.angulo);
@@ -181,7 +208,7 @@
             ctx.fill();
             ctx.restore();
 
-            // REDISEÑO: Dibujar platillos volantes OVNI en lugar de fantasmas clásicos
+            // Dibujar los 4 OVNIs vectoriales
             aliens.forEach(alien => {
                 let ax = alien.x + TAM_CELDA/2;
                 let ay = alien.y + TAM_CELDA/2;
@@ -189,19 +216,16 @@
                 ctx.shadowBlur = 8;
                 ctx.shadowColor = alien.color;
 
-                // Cúpula superior del OVNI
                 ctx.fillStyle = 'rgba(255,255,255,0.7)';
                 ctx.beginPath();
                 ctx.arc(ax, ay - 2, 4, Math.PI, 0);
                 ctx.fill();
 
-                // Cuerpo del platillo
                 ctx.fillStyle = alien.color;
                 ctx.beginPath();
                 ctx.ellipse(ax, ay + 1, 8, 3, 0, 0, Math.PI*2);
                 ctx.fill();
 
-                // Luces parpadeantes inferiores del OVNI
                 let parpadeo = Math.sin(alien.ojoAngulo) > 0;
                 ctx.fillStyle = parpadeo ? '#ffffff' : '#000000';
                 ctx.beginPath();
@@ -210,7 +234,7 @@
                 ctx.arc(ax + 4, ay + 2, 1, 0, Math.PI*2);
                 ctx.fill();
                 
-                ctx.shadowBlur = 0; // reset
+                ctx.shadowBlur = 0;
             });
 
             if (gameOver) {
