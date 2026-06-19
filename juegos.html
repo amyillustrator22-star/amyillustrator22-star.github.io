@@ -13,8 +13,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
-    
-    
 
     <style>
         body {
@@ -45,12 +43,11 @@
         <p id="menu-sub" class="text-white text-lg font-medium bg-black/40 px-4 py-1 rounded-full backdrop-blur-sm">Elige tu entrenamiento mental</p>
     </header>
 
-   
-    <div id="contenedor-pantalla" class="w-full max-w-4xl glass-card rounded-[2.5rem] p-4 sm:p-6 mb-16 mx-4 flex flex-col items-center hidden">
+    <div id="contenedor-pantalla" class="w-full max-w-5xl glass-card rounded-[2.5rem] p-4 sm:p-6 mb-16 mx-4 flex flex-col items-center hidden" style="height: auto !important;">
         <button onclick="volverAlMenu()" class="mb-4 bg-red-600/80 hover:bg-red-700 text-white font-bold px-4 py-1.5 rounded-xl border border-red-500 text-xs tracking-wider uppercase transition-all shadow-md self-end">
             ❌ Cerrar Juego
         </button>
-        <iframe id="pantalla-juego" src="" class="w-full h-[600px] rounded-2xl border-4 border-slate-800 bg-black shadow-inner"></iframe>
+        <iframe id="pantalla-juego" src="" class="w-full rounded-2xl border-4 border-slate-800 bg-black shadow-inner" style="height: 850px !important; min-height: 850px !important;"></iframe>
     </div>
 
     <main id="menu-juegos" class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 px-4">
@@ -123,7 +120,7 @@
                     </div>
                     <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Neon Dog Eater</h2>
                     <p id="desc-comecocos" class="text-lg text-gray-700 leading-relaxed font-medium">
-                        Guía al tierno perrito de neón para comer todas las galletas de energía y esquiva los veloces OVNIs alienígenas que te persiguen.
+                        Guía al tierno perrito de neón para comer todas las galletas con las letras W, A, S, D y huye de los OVNIs alienígenas.
                     </p>
                 </div>
                 <p class="mt-6 text-base text-cyan-500 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
@@ -188,6 +185,10 @@
                 contenedor.classList.remove('hidden');
                 menu.classList.add('hidden');
                 contenedor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                setTimeout(() => {
+                    iframe.contentWindow.focus();
+                }, 300);
             }
         }
 
@@ -204,8 +205,6 @@
         }
     </script>
 
-  
-
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -217,7 +216,8 @@
                 brainTitle: "Brain Training",
                 brainDesc: "Pon a prueba tu velocidad mental ordenando secuencias de burbujas numéricas de menor a mayor.",
                 memoDesc: "Potencia tu memoria fotográfica emparejando elementos ocultos. El tablero se expande cada 3 niveles superados.",
-                blockDesc: "Entrena tu visión espacial y lógica encajando fragmentos de datos en un entorno monocromático antiestrés.",
+                blockDesc: "Entrena tu visión espacial alineando gemas y sprites de neón modernos y llenos de colorido en este adictivo puzzle.",
+                comecocosDesc: "Guía al tierno perrito de neón para comer todas las galletas con las letras W, A, S, D y huye de los OVNIs alienígenas.",
                 playBtn: "Jugar Ahora",
                 boardTitle: "🏆 RÉCORDS MUNDIALES 🏆",
                 headPos: "Posición",
@@ -234,7 +234,8 @@
                 brainTitle: "Brain Training",
                 brainDesc: "Test your mental processing speed by sorting numerical bubble sequences from lowest to highest.",
                 memoDesc: "Boost your photographic memory by pairing hidden elements. The layout expands every 3 completed levels.",
-                blockDesc: "Train your spatial awareness and logic by fitting data fragments inside a stress-free monochromatic grid.",
+                blockDesc: "Train your spatial awareness and logic by lining up neon gemstones and vibrant blocks in this addictive puzzle.",
+                comecocosDesc: "Guide the cute neon dog to eat all the treats using W, A, S, D keys while escaping from fast alien UFOs.",
                 playBtn: "Play Now",
                 boardTitle: "🏆 WORLD LEADERBOARDS 🏆",
                 headPos: "Rank",
@@ -255,6 +256,7 @@
         document.getElementById('desc-brain').innerText = TEXTOS_JUEGOS[currentLang].brainDesc;
         document.getElementById('desc-memo').innerText = TEXTOS_JUEGOS[currentLang].memoDesc;
         document.getElementById('desc-block').innerText = TEXTOS_JUEGOS[currentLang].blockDesc;
+        document.getElementById('desc-comecocos').innerText = TEXTOS_JUEGOS[currentLang].comecocosDesc;
         document.getElementById('board-title').innerText = TEXTOS_JUEGOS[currentLang].boardTitle;
         document.getElementById('btn-back-home').lastChild.textContent = " " + TEXTOS_JUEGOS[currentLang].btnBack;
         
