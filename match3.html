@@ -58,7 +58,8 @@
         const COLUMNAS = 8;
         const TAM_CASILLA = 60;
 
-        const COLORES_JOYAS = ['#ef4444', '#3b82f6', '#10b981', '#eab308', '#a855f7', '#ff7700'];
+        // 💎 LOS EMOJIS EXACTOS DE TU CAPTURA RESTAURADOS
+        const EMOJIS = ['💎', '❤️', '🔥', '⭐', '🔮', '🍀'];
         let tablero = [];
         let score = 0;
         let casillaSeleccionada = null;
@@ -71,14 +72,13 @@
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         }
 
-        // 🎵 EFECTOS DE SONIDO BONITOS (Sintetizador Retro Chulo)
         function sonarIntercambio() {
             if (!audioCtx) return;
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
             osc.type = "sine";
-            osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // Nota D5
-            osc.frequency.linearRampToValueAtTime(880, audioCtx.currentTime + 0.1); // Sube a A5
+            osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); 
+            osc.frequency.linearRampToValueAtTime(880, audioCtx.currentTime + 0.1); 
             gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.12);
             osc.connect(gain); gain.connect(audioCtx.destination);
@@ -90,9 +90,9 @@
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
             osc.type = "triangle";
-            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.06); // E5
-            osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.12); // G5
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.06); 
+            osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.12); 
             gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
             gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.25);
             osc.connect(gain); gain.connect(audioCtx.destination);
@@ -101,7 +101,6 @@
 
         function sonarGranExplosion() {
             if (!audioCtx) return;
-            // Tono Láser sci-fi descendente
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
             osc.type = "sawtooth";
@@ -121,7 +120,7 @@
                     tablero[f] = [];
                     for (let c = 0; c < COLUMNAS; c++) {
                         tablero[f][c] = {
-                            id: Math.floor(Math.random() * COLORES_JOYAS.length),
+                            id: Math.floor(Math.random() * EMOJIS.length),
                             brillo: false
                         };
                     }
@@ -300,7 +299,7 @@
                 for (let c = 0; c < COLUMNAS; c++) {
                     if (tablero[f][c] === null) {
                         tablero[f][c] = {
-                            id: Math.floor(Math.random() * COLORES_JOYAS.length),
+                            id: Math.floor(Math.random() * EMOJIS.length),
                             brillo: false
                         };
                     }
@@ -350,69 +349,26 @@
             }
         });
 
-        // 🎨 LOS DIBUJITOS DE NEÓN DE ANTES RESTAURADOS
-        function dibujarJoyaNeon(ctx, cx, cy, id, brillo) {
+        // 🎨 RENDERIZADO DE EMOJIS EN LAS INTERSECCIONES DEL CANVAS
+        function dibujarJoyaEmoji(ctx, cx, cy, id, brillo) {
             ctx.save();
-            let color = COLORES_JOYAS[id];
+            let emoji = EMOJIS[id];
             
-            if (brillo) {
-                ctx.shadowBlur = 25; ctx.shadowColor = '#ffffff';
-                ctx.fillStyle = '#ffffff';
-                ctx.strokeStyle = '#ffffff';
-            } else {
-                ctx.shadowBlur = 15; ctx.shadowColor = color;
-                ctx.fillStyle = color + '22'; // Fondo traslúcido
-                ctx.strokeStyle = color;
-            }
-            ctx.lineWidth = 3;
-
-            switch(id) {
-                case 0: // Diamante / Rombo
-                    ctx.beginPath();
-                    ctx.moveTo(cx, cy - 16); ctx.lineTo(cx + 16, cy); ctx.lineTo(cx, cy + 16); ctx.lineTo(cx - 16, cy);
-                    ctx.closePath(); ctx.fill(); ctx.stroke();
-                    break;
-                case 1: // Cuadrado de Neón Girable
-                    ctx.beginPath();
-                    ctx.rect(cx - 13, cy - 13, 26, 26);
-                    ctx.fill(); ctx.stroke();
-                    break;
-                case 2: // Triángulo Esmeralda
-                    ctx.beginPath();
-                    ctx.moveTo(cx, cy - 16); ctx.lineTo(cx + 16, cy + 14); ctx.lineTo(cx - 16, cy + 14);
-                    ctx.closePath(); ctx.fill(); ctx.stroke();
-                    break;
-                case 3: // Estrella / Cruz Destello Oro
-                    ctx.beginPath();
-                    for (let i = 0; i < 4; i++) {
-                        ctx.lineTo(cx + Math.cos(i * Math.PI / 2) * 18, cy + Math.sin(i * Math.PI / 2) * 18);
-                        ctx.lineTo(cx + Math.cos(i * Math.PI / 2 + Math.PI / 4) * 6, cy + Math.sin(i * Math.PI / 2 + Math.PI / 4) * 6);
-                    }
-                    ctx.closePath(); ctx.fill(); ctx.stroke();
-                    break;
-                case 4: // Pentágono Amatista
-                    ctx.beginPath();
-                    for (let i = 0; i < 5; i++) {
-                        ctx.lineTo(cx + Math.cos(i * 2 * Math.PI / 5 - Math.PI / 2) * 16, cy + Math.sin(i * 2 * Math.PI / 5 - Math.PI / 2) * 16);
-                    }
-                    ctx.closePath(); ctx.fill(); ctx.stroke();
-                    break;
-                case 5: // Gema Hexagonal Naranja
-                    ctx.beginPath();
-                    for (let i = 0; i < 6; i++) {
-                        ctx.lineTo(cx + Math.cos(i * Math.PI / 3) * 16, cy + Math.sin(i * Math.PI / 3) * 16);
-                    }
-                    ctx.closePath(); ctx.fill(); ctx.stroke();
-                    break;
-            }
+            ctx.shadowBlur = brillo ? 30 : 8;
+            ctx.shadowColor = brillo ? '#ffffff' : 'rgba(168, 85, 247, 0.3)';
+            
+            ctx.font = "36px Arial";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(emoji, cx, cy + 2); 
+            
             ctx.restore();
         }
 
         function dibujar() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Rejilla cibernética de fondo
-            ctx.strokeStyle = '#111827'; ctx.lineWidth = 1;
+            ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
             for(let i=0; i<=FILAS; i++) {
                 ctx.beginPath(); ctx.moveTo(0, i*TAM_CASILLA); ctx.lineTo(canvas.width, i*TAM_CASILLA); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(i*TAM_CASILLA, 0); ctx.lineTo(i*TAM_CASILLA, canvas.height); ctx.stroke();
@@ -423,23 +379,21 @@
                     if (tablero[f]?.[c]) {
                         let cx = c * TAM_CASILLA + TAM_CASILLA/2;
                         let cy = f * TAM_CASILLA + TAM_CASILLA/2;
-                        dibujarJoyaNeon(ctx, cx, cy, tablero[f][c].id, tablero[f][c].brillo);
+                        dibujarJoyaEmoji(ctx, cx, cy, tablero[f][c].id, tablero[f][c].brillo);
                     }
                 }
             }
 
             if (casillaSeleccionada) {
-                ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
-                ctx.setLineDash([4, 4]); // Borde punteado retro
+                ctx.strokeStyle = '#a855f7'; ctx.lineWidth = 3;
                 ctx.strokeRect(casillaSeleccionada.c * TAM_CASILLA + 4, casillaSeleccionada.f * TAM_CASILLA + 4, TAM_CASILLA - 8, TAM_CASILLA - 8);
-                ctx.setLineDash([]);
             }
 
             efectosExplosion.forEach((e, i) => {
                 ctx.save();
-                ctx.strokeStyle = 'rgba(168, 85, 247, '+ (1 - e.r/e.maxR) +')';
+                ctx.strokeStyle = 'rgba(34, 211, 238, '+ (1 - e.r/e.maxR) +')';
                 ctx.lineWidth = 4;
-                ctx.shadowBlur = 15; ctx.shadowColor = '#a855f7';
+                ctx.shadowBlur = 15; ctx.shadowColor = '#22d3ee';
                 ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI*2); ctx.stroke();
                 ctx.restore();
                 e.r += 6;
