@@ -20,8 +20,6 @@
         .header { text-align: center; margin-bottom: 15px; }
         .title { font-size: 2rem; font-weight: bold; color: #22d3ee; text-shadow: 0 0 10px #22d3ee; letter-spacing: 1px; }
         .stats { background: #1e293b; padding: 8px 20px; border-radius: 9999px; border: 1px solid #334155; display: flex; gap: 25px; font-weight: bold; margin-top: 8px; font-size: 1.1rem; }
-        
-        /* PANTALLA MÁS GRANDE: Ajustada a 500px de ancho y alto */
         canvas { 
             background: #020617; 
             box-shadow: 0 0 35px rgba(34, 211, 238, 0.3); 
@@ -70,7 +68,6 @@
         const scoreVal = document.getElementById('score-val');
         const livesVal = document.getElementById('lives-val');
 
-        // Escalado dinámico de celdas para el nuevo tamaño de 500px (25px por celda)
         const TAM_CELDA = 25; 
         let score = 0;
         let lives = 3;
@@ -79,7 +76,6 @@
 
         const ALIEN_COLORS = ['#ec4899', '#f97316', '#a855f7', '#06b6d4'];
 
-        // Foco automático e instantáneo al cargar
         canvas.focus();
         window.addEventListener('DOMContentLoaded', () => { canvas.focus(); });
         canvas.addEventListener('click', () => { canvas.focus(); });
@@ -123,7 +119,6 @@
             } catch(e) {}
         }
 
-        // Matriz del laberinto perfectamente cuadrada para 20x20 celdas de 25px
         const mapa = [
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
             [1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
@@ -166,6 +161,9 @@
         });
 
         function colisionPared(x, y) {
+            // Permitir salida por los túneles laterales sin lanzar error de colisión
+            if (x < 0 || x >= canvas.width) return false;
+
             let celdaX1 = Math.floor(x / TAM_CELDA);
             let celdaY1 = Math.floor(y / TAM_CELDA);
             let celdaX2 = Math.floor((x + TAM_CELDA - 1) / TAM_CELDA);
@@ -196,6 +194,13 @@
         function actualizar() {
             if (gameOver) return;
 
+            // REGLA DE TELETRANSPORTE LATERAL PARA EL PERRITO
+            if (jugador.x + jugador.dirX * 2 < -TAM_CELDA / 2) {
+                jugador.x = canvas.width - TAM_CELDA / 2;
+            } else if (jugador.x + jugador.dirX * 2 > canvas.width - TAM_CELDA / 2) {
+                jugador.x = -TAM_CELDA / 2;
+            }
+
             if (jugador.x % TAM_CELDA === 0 && jugador.y % TAM_CELDA === 0) {
                 if (!colisionPared(jugador.x + jugador.sigDirX * 2, jugador.y + jugador.sigDirY * 2)) {
                     jugador.dirX = jugador.sigDirX;
@@ -218,6 +223,10 @@
             }
 
             aliens.forEach(alien => {
+                // Teletransporte lateral básico para los alienígenas si cruzan
+                if (alien.x < -TAM_CELDA) alien.x = canvas.width;
+                if (alien.x > canvas.width) alien.x = -TAM_CELDA;
+
                 if (alien.x % TAM_CELDA === 0 && alien.y % TAM_CELDA === 0) {
                     let dirsValidas = [];
                     [[0,-1], [0,1], [-1,0], [1,0]].forEach(d => {
@@ -289,37 +298,32 @@
                 }
             }
 
-            // Perrito Vectorial de Neón (Jugador) - Escalado proporcional al nuevo tamaño
+            // Perrito Vectorial
             let px = jugador.x + TAM_CELDA/2;
             let py = jugador.y + TAM_CELDA/2;
             ctx.save();
             ctx.shadowBlur = 12;
             ctx.shadowColor = '#22d3ee';
             
-            // Orejas caídas
             ctx.fillStyle = '#0891b2';
             ctx.beginPath(); ctx.ellipse(px - 8, py - 4, 4, 7, Math.PI/6, 0, Math.PI*2); ctx.fill();
             ctx.beginPath(); ctx.ellipse(px + 8, py - 4, 4, 7, -Math.PI/6, 0, Math.PI*2); ctx.fill();
             
-            // Cabeza principal
             ctx.fillStyle = '#22d3ee';
             ctx.beginPath(); ctx.arc(px, py + 1, 9, 0, Math.PI*2); ctx.fill();
             
-            // Hocico
             ctx.fillStyle = '#e0f2fe';
             ctx.beginPath(); ctx.ellipse(px, py + 4, 4.5, 3.5, 0, 0, Math.PI*2); ctx.fill();
             
-            // Naricita
             ctx.fillStyle = '#0f172a';
             ctx.beginPath(); ctx.arc(px, py + 2.5, 1.8, 0, Math.PI*2); ctx.fill();
             
-            // Ojitos negros
             ctx.fillStyle = '#0f172a';
             ctx.beginPath(); ctx.arc(px - 3.5, py - 1.5, 1.6, 0, Math.PI*2); ctx.fill();
             ctx.beginPath(); ctx.arc(px + 3.5, py - 1.5, 1.6, 0, Math.PI*2); ctx.fill();
             ctx.restore();
 
-            // OVNIs Alienígenas - Escalados proporcionalmente
+            // OVNIs
             aliens.forEach(alien => {
                 let ax = alien.x + TAM_CELDA/2;
                 let ay = alien.y + TAM_CELDA/2;
