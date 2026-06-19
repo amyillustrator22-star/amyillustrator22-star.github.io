@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Match 3</title>
+    <title>Neon Match 3 - MODO HARDCORE</title>
     <style>
         body {
             background: #0f172a;
@@ -16,26 +16,53 @@
             margin: 0;
             padding-top: 20px;
         }
-        .title { font-size: 2.2rem; font-weight: bold; color: #a855f7; text-shadow: 0 0 15px #a855f7; margin-bottom: 5px; }
-        .stats-container { display: flex; gap: 15px; margin-bottom: 15px; }
+        .title { font-size: 2.2rem; font-weight: bold; color: #ef4444; text-shadow: 0 0 15px #ef4444; margin-bottom: 5px; }
+        .stats-container { display: flex; gap: 15px; margin-bottom: 10px; align-items: center; }
         .score-board { background: #1e293b; padding: 8px 25px; border-radius: 9999px; border: 1px solid #475569; font-size: 1.2rem; font-weight: bold; color: #22d3ee; }
         .level-board { background: #1e293b; padding: 8px 25px; border-radius: 9999px; border: 1px solid #475569; font-size: 1.2rem; font-weight: bold; color: #f472b6; }
+        
+        /* 🛠️ ESTILO DEL NUEVO BOTÓN DE RENDICIÓN */
+        .btn-rendirse {
+            background: linear-gradient(135deg, #ef4444, #b91c1c);
+            color: white;
+            border: 2px solid #f87171;
+            padding: 8px 20px;
+            border-radius: 9999px;
+            font-family: monospace;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+            transition: all 0.2s ease;
+            margin-bottom: 15px;
+        }
+        .btn-rendirse:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.7);
+            background: linear-gradient(135deg, #f87171, #ef4444);
+        }
+        .btn-rendirse:active {
+            transform: scale(0.95);
+        }
+
         canvas {
             background: #020617;
-            border: 4px solid #334155;
+            border: 4px solid #ef4444;
             border-radius: 16px;
-            box-shadow: 0 0 30px rgba(168, 85, 247, 0.25);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.25);
             cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <div class="title">NEON MATCH 3</div>
+    <div class="title">EMOJI MATCH: INFIERNO</div>
     <div class="stats-container">
         <div class="score-board">PUNTOS: <span id="score-val">0</span></div>
         <div class="level-board">NIVEL: <span id="level-val">1</span></div>
     </div>
+
+    <button id="btn-surrender" class="btn-rendirse">🏳️ RENDIDOR / FIN DE PARTIDA</button>
 
     <canvas id="canvas-match3" width="480" height="480"></canvas>
 
@@ -59,19 +86,19 @@
         const ctx = canvas.getContext('2d');
         const scoreVal = document.getElementById('score-val');
         const levelVal = document.getElementById('level-val');
+        const btnSurrender = document.getElementById('btn-surrender');
 
         const FILAS = 8;
         const COLUMNAS = 8;
         const TAM_CASILLA = 60;
 
-        // 🛠️ BANCO TOTAL DE EMOJIS: Irán apareciendo de forma progresiva según el nivel
         const POOL_EMOJIS = ['💎', '❤️', '🔥', '⭐', '🔮', '🍀', '💀', '👽', '👻', '🤖'];
         
         let tablero = [];
         let score = 0;
         let nivel = 1;
-        let totalEmojisDisponibles = 5; // Empezamos el nivel 1 solo con 5 piezas
-        let velocidadCaida = 250; 
+        let totalEmojisDisponibles = 10; 
+        let velocidadCaida = 110; 
         let casillaSeleccionada = null;
         let bloqueado = false;
         let gameOver = false;
@@ -88,11 +115,11 @@
             let gain = audioCtx.createGain();
             osc.type = "sine";
             osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); 
-            osc.frequency.linearRampToValueAtTime(880, audioCtx.currentTime + 0.1); 
-            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.12);
+            osc.frequency.linearRampToValueAtTime(880, audioCtx.currentTime + 0.08); 
+            gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.1);
             osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.12);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.1);
         }
 
         function sonarMatchNormal() {
@@ -101,12 +128,12 @@
             let gain = audioCtx.createGain();
             osc.type = "triangle";
             osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
-            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.06); 
-            osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.12); 
-            gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.25);
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.05); 
+            osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.1); 
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.2);
             osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.2);
         }
 
         function sonarGranExplosion() {
@@ -114,12 +141,12 @@
             let osc = audioCtx.createOscillator();
             let gain = audioCtx.createGain();
             osc.type = "sawtooth";
-            osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.4);
-            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.45);
+            osc.frequency.setValueAtTime(1000, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.35);
+            gain.gain.setValueAtTime(0.07, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
             osc.connect(gain); gain.connect(audioCtx.destination);
-            osc.start(); osc.stop(audioCtx.currentTime + 0.45);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.4);
         }
 
         function iniciarTablero() {
@@ -185,25 +212,34 @@
             return false;
         }
 
-        async function finalizarPartida() {
+        // 🛠️ FUNCIÓN GENERALIZADA PARA SALVAR LOS PUNTOS EN FIRESTORE
+        async function finalizarPartida(mensajeFinal = "¡SIN MOVIMIENTOS POSIBLES!") {
             if (gameOver) return;
             gameOver = true;
             setTimeout(async () => {
-                const nombre = prompt(`¡SIN MOVIMIENTOS POSIBLES!\nPuntuación total: ${score} puntos.\n\nEscribe tu nombre para la Leaderboard:`);
+                const nombre = prompt(`${mensajeFinal}\nPuntuación final: ${score} puntos.\n\nEscribe tu nombre para la Leaderboard global:`);
                 if (nombre && nombre.trim() !== "") {
                     try {
                         await addDoc(collection(db, "scores_arcade"), {
-                            game: "match3",
+                            game: "match3", // Sincroniza clavado con el switchLeaderboard de juegos.html
                             player: nombre.trim().substring(0, 12),
                             score: parseInt(score),
                             country: "🇪🇸",
                             date: new Date().toISOString()
                         });
-                        alert("¡Puntuación guardada con éxito!");
+                        alert("¡Tu récord se ha subido a la Leaderboard global con éxito!");
                     } catch(e) { console.error(e); }
                 }
-            }, 500);
+            }, 300);
         }
+
+        // Evento del botón para gatillar la rendición manual
+        btnSurrender.addEventListener('click', () => {
+            iniciarAudio();
+            if(!gameOver) {
+                finalizarPartida("🏳️ TE HAS RENDIDO VOLUNTARIAMENTE");
+            }
+        });
 
         function procesarMatches() {
             let matches = [];
@@ -276,15 +312,11 @@
             score += eliminarSet.size * ptosPorCasilla;
             scoreVal.textContent = score;
 
-            // 🛠️ ACTUALIZACIÓN DE NIVEL Y DIFICULTAD DE PIEZAS
             let nuevoNivel = Math.floor(score / 1000) + 1;
             if (nuevoNivel !== nivel) {
                 nivel = nuevoNivel;
                 levelVal.textContent = nivel;
-                velocidadCaida = Math.max(70, 250 - (nivel * 20));
-
-                // 🌟 Añade un emoji extra cada 3 niveles (Hasta llegar al tope de 10)
-                totalEmojisDisponibles = Math.min(10, 5 + Math.floor((nivel - 1) / 3));
+                velocidadCaida = Math.max(50, 110 - (nivel * 10)); 
             }
 
             eliminarSet.forEach(key => {
@@ -295,7 +327,7 @@
             setTimeout(() => {
                 caerJoyas();
                 rellenarTablero();
-                setTimeout(() => { procesarMatches(); }, velocidadCaida - 50);
+                setTimeout(() => { procesarMatches(); }, velocidadCaida - 30);
             }, velocidadCaida);
         }
 
@@ -374,7 +406,7 @@
             ctx.save();
             let emoji = POOL_EMOJIS[id];
             ctx.shadowBlur = brillo ? 30 : 8;
-            ctx.shadowColor = brillo ? '#ffffff' : 'rgba(168, 85, 247, 0.3)';
+            ctx.shadowColor = brillo ? '#ffffff' : 'rgba(239, 68, 68, 0.2)';
             ctx.font = "36px Arial";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -385,10 +417,10 @@
         function dibujar() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
+            ctx.strokeStyle = '#334155'; ctx.lineWidth = 1;
             for(let i=0; i<=FILAS; i++) {
-                ctx.beginPath(); ctx.moveTo(0, i*TAM_CASILLA); ctx.lineTo(canvas.width, i*TAM_CASILLA); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(i*TAM_CASILLA, 0); ctx.lineTo(i*TAM_CASILLA, canvas.height); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, i*TAM_CASILLA); ctx.lineTo(canvas.width, i*TAM_CASILLA); stroke();
+                ctx.beginPath(); ctx.moveTo(i*TAM_CASILLA, 0); ctx.lineTo(i*TAM_CASILLA, canvas.height); stroke();
             }
 
             for (let f = 0; f < FILAS; f++) {
@@ -402,15 +434,15 @@
             }
 
             if (casillaSeleccionada) {
-                ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 3;
+                ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3;
                 ctx.strokeRect(casillaSeleccionada.c * TAM_CASILLA + 4, casillaSeleccionada.f * TAM_CASILLA + 4, TAM_CASILLA - 8, TAM_CASILLA - 8);
             }
 
             efectosExplosion.forEach((e, i) => {
                 ctx.save();
-                ctx.strokeStyle = 'rgba(34, 211, 238, '+ (1 - e.r/e.maxR) +')';
+                ctx.strokeStyle = 'rgba(239, 68, 68, '+ (1 - e.r/e.maxR) +')';
                 ctx.lineWidth = 4;
-                ctx.shadowBlur = 15; ctx.shadowColor = '#22d3ee';
+                ctx.shadowBlur = 15; ctx.shadowColor = '#ef4444';
                 ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI*2); ctx.stroke();
                 ctx.restore();
                 e.r += 6;
@@ -418,9 +450,9 @@
             });
 
             if (gameOver) {
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.9)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#f472b6'; ctx.font = 'bold 24px monospace'; ctx.textAlign = 'center';
-                ctx.fillText("SIN MOVIMIENTOS POSIBLES", canvas.width/2, canvas.height/2);
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.95)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#ef4444'; ctx.font = 'bold 24px monospace'; ctx.textAlign = 'center';
+                ctx.fillText("PARTIDA CONCLUIDA", canvas.width/2, canvas.height/2);
             }
 
             requestAnimationFrame(dibujar);
