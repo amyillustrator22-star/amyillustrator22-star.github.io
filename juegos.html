@@ -13,6 +13,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="radio.css">
+
     <style>
         body {
             background: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)), url('encabezaoAmySoftware.jpg') no-repeat center center fixed;
@@ -35,16 +38,31 @@
 </head>
 <body class="flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8 font-sans text-gray-800">
 
-    <header class="flex flex-col items-center gap-4 mb-16 mt-8">
+    <header class="flex flex-col items-center gap-4 mb-12 mt-8">
         <h1 class="title-nabla text-center drop-shadow-xl">
             ARCADE CENTER
         </h1>
         <p id="menu-sub" class="text-white text-lg font-medium bg-black/40 px-4 py-1 rounded-full backdrop-blur-sm">Elige tu entrenamiento mental</p>
     </header>
 
+    <div class="car-radio mb-12">
+        <div class="radio-display">
+            <div class="display-text" id="radio-status">RADIO APAGADA</div>
+        </div>
+        <div class="radio-controls">
+            <button class="radio-btn" id="btn-play">PLAY</button>
+            <button class="radio-btn" id="btn-pause">PAUSE</button>
+            <button class="radio-btn" id="btn-stop">STOP</button>
+        </div>
+    </div>
+
+    <div class="w-full max-w-4xl glass-card rounded-[2.5rem] p-4 sm:p-6 mb-16 mx-4 flex flex-col items-center">
+        <iframe id="pantalla-juego" src="vibez_fly.html" class="w-full h-[600px] rounded-2xl border-4 border-slate-800 bg-black shadow-inner"></iframe>
+    </div>
+
     <main class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 px-4">
         
-        <a href="vibez_fly.html" class="block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-pink-500 rounded-[2.5rem]">
+        <button onclick="cargarJuego('vibez_fly.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-pink-500 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-pink-500 to-red-600 text-white p-5 rounded-3xl mb-6 shadow-md">
@@ -57,9 +75,9 @@
                 </div>
                 <p class="mt-6 text-base text-pink-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
-        </a>
+        </button>
 
-        <a href="mi_juego.html" class="block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-cyan-500 rounded-[2.5rem]">
+        <button onclick="cargarJuego('mi_juego.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-cyan-500 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-5 rounded-3xl mb-6 shadow-md">
@@ -72,9 +90,9 @@
                 </div>
                 <p class="mt-6 text-base text-cyan-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
-        </a>
+        </button>
 
-        <a href="memo.html" class="block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-pink-500 rounded-[2.5rem]">
+        <button onclick="cargarJuego('memo.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-pink-500 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-pink-400 to-pink-600 text-white p-5 rounded-3xl mb-6 shadow-md">
@@ -82,14 +100,14 @@
                     </div>
                     <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">MEMO</h2>
                     <p id="desc-memo" class="text-lg text-gray-700 leading-relaxed font-medium">
-                        Potencia tu memoria fotográfica emparejando elementos ocultos. El tablero se expande cada 3 niveles superados.
+                        Potencia tu memoria fotográfica emparejando elements ocultos. El tablero se expande cada 3 niveles superados.
                     </p>
                 </div>
                 <p class="mt-6 text-base text-pink-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
-        </a>
+        </button>
 
-        <a href="block.html" class="block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-purple-500 rounded-[2.5rem]">
+        <button onclick="cargarJuego('block.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-purple-500 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-purple-500 to-indigo-600 text-white p-5 rounded-3xl mb-6 shadow-md">
@@ -102,7 +120,7 @@
                 </div>
                 <p class="mt-6 text-base text-purple-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
-        </a>
+        </button>
 
     </main>
 
@@ -148,11 +166,24 @@
         </a>
     </footer>
 
+    <script>
+        function cargarJuego(url) {
+            const iframe = document.getElementById('pantalla-juego');
+            if (iframe) {
+                iframe.src = url;
+                // Hace un scroll suave automático hacia el juego para que el usuario no tenga que bajar a mano
+                iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+    </script>
+
+    <script src="radio.js"></script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // 🌐 TEXTOS TRADUCIDOS PARA LA SARA DE MÁQUINAS
+        // 🌐 TEXTOS TRADUCIDOS PARA LA SALA DE MÁQUINAS
         const TEXTOS_JUEGOS = {
             es: {
                 sub: "Elige tu entrenamiento mental",
