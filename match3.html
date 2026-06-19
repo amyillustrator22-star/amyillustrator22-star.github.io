@@ -65,6 +65,53 @@
         let bloqueado = false;
         let gameOver = false;
         let efectosExplosion = [];
+        let audioCtx = null;
+
+        function iniciarAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        // 🎵 EFECTOS DE SONIDO BONITOS (Sintetizador Retro Chulo)
+        function sonarIntercambio() {
+            if (!audioCtx) return;
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(587.33, audioCtx.currentTime); // Nota D5
+            osc.frequency.linearRampToValueAtTime(880, audioCtx.currentTime + 0.1); // Sube a A5
+            gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.12);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.12);
+        }
+
+        function sonarMatchNormal() {
+            if (!audioCtx) return;
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = "triangle";
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+            osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.06); // E5
+            osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.12); // G5
+            gain.gain.setValueAtTime(0.06, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.25);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+        }
+
+        function sonarGranExplosion() {
+            if (!audioCtx) return;
+            // Tono Láser sci-fi descendente
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.type = "sawtooth";
+            osc.frequency.setValueAtTime(1200, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(150, audioCtx.currentTime + 0.4);
+            gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.45);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.45);
+        }
 
         function iniciarTablero() {
             let intentos = 0;
@@ -203,12 +250,18 @@
                 if (m.esp) {
                     especialActivado = true;
                     if(tablero[m.f]?.[m.c]) tablero[m.f][m.c].brillo = true;
-                    efectosExplosion.push({x: m.c * TAM_CASILLA + 30, y: m.f * TAM_CASILLA + 30, r: 10, maxR: 100});
+                    efectosExplosion.push({x: m.c * TAM_CASILLA + 30, y: m.f * TAM_CASILLA + 30, r: 10, maxR: 120});
                     
                     for(let i=0; i<COLUMNAS; i++) eliminarSet.add(`${m.f},${i}`);
                     for(let i=0; i<FILAS; i++) eliminarSet.add(`${i},${m.c}`);
                 }
             });
+
+            if (especialActivado) {
+                sonarGranExplosion();
+            } else {
+                sonarMatchNormal();
+            }
 
             let ptosPorCasilla = especialActivado ? 20 : 10;
             score += eliminarSet.size * ptosPorCasilla;
@@ -256,6 +309,7 @@
         }
 
         canvas.addEventListener('mousedown', e => {
+            iniciarAudio();
             if (bloqueado || gameOver) return;
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
@@ -272,6 +326,7 @@
 
                 if (adyacente) {
                     bloqueado = true;
+                    sonarIntercambio();
                     let temp = tablero[casillaSeleccionada.f][casillaSeleccionada.c];
                     tablero[casillaSeleccionada.f][casillaSeleccionada.c] = tablero[f][c];
                     tablero[f][c] = temp;
@@ -295,10 +350,69 @@
             }
         });
 
+        // 🎨 LOS DIBUJITOS DE NEÓN DE ANTES RESTAURADOS
+        function dibujarJoyaNeon(ctx, cx, cy, id, brillo) {
+            ctx.save();
+            let color = COLORES_JOYAS[id];
+            
+            if (brillo) {
+                ctx.shadowBlur = 25; ctx.shadowColor = '#ffffff';
+                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = '#ffffff';
+            } else {
+                ctx.shadowBlur = 15; ctx.shadowColor = color;
+                ctx.fillStyle = color + '22'; // Fondo traslúcido
+                ctx.strokeStyle = color;
+            }
+            ctx.lineWidth = 3;
+
+            switch(id) {
+                case 0: // Diamante / Rombo
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy - 16); ctx.lineTo(cx + 16, cy); ctx.lineTo(cx, cy + 16); ctx.lineTo(cx - 16, cy);
+                    ctx.closePath(); ctx.fill(); ctx.stroke();
+                    break;
+                case 1: // Cuadrado de Neón Girable
+                    ctx.beginPath();
+                    ctx.rect(cx - 13, cy - 13, 26, 26);
+                    ctx.fill(); ctx.stroke();
+                    break;
+                case 2: // Triángulo Esmeralda
+                    ctx.beginPath();
+                    ctx.moveTo(cx, cy - 16); ctx.lineTo(cx + 16, cy + 14); ctx.lineTo(cx - 16, cy + 14);
+                    ctx.closePath(); ctx.fill(); ctx.stroke();
+                    break;
+                case 3: // Estrella / Cruz Destello Oro
+                    ctx.beginPath();
+                    for (let i = 0; i < 4; i++) {
+                        ctx.lineTo(cx + Math.cos(i * Math.PI / 2) * 18, cy + Math.sin(i * Math.PI / 2) * 18);
+                        ctx.lineTo(cx + Math.cos(i * Math.PI / 2 + Math.PI / 4) * 6, cy + Math.sin(i * Math.PI / 2 + Math.PI / 4) * 6);
+                    }
+                    ctx.closePath(); ctx.fill(); ctx.stroke();
+                    break;
+                case 4: // Pentágono Amatista
+                    ctx.beginPath();
+                    for (let i = 0; i < 5; i++) {
+                        ctx.lineTo(cx + Math.cos(i * 2 * Math.PI / 5 - Math.PI / 2) * 16, cy + Math.sin(i * 2 * Math.PI / 5 - Math.PI / 2) * 16);
+                    }
+                    ctx.closePath(); ctx.fill(); ctx.stroke();
+                    break;
+                case 5: // Gema Hexagonal Naranja
+                    ctx.beginPath();
+                    for (let i = 0; i < 6; i++) {
+                        ctx.lineTo(cx + Math.cos(i * Math.PI / 3) * 16, cy + Math.sin(i * Math.PI / 3) * 16);
+                    }
+                    ctx.closePath(); ctx.fill(); ctx.stroke();
+                    break;
+            }
+            ctx.restore();
+        }
+
         function dibujar() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
+            // Rejilla cibernética de fondo
+            ctx.strokeStyle = '#111827'; ctx.lineWidth = 1;
             for(let i=0; i<=FILAS; i++) {
                 ctx.beginPath(); ctx.moveTo(0, i*TAM_CASILLA); ctx.lineTo(canvas.width, i*TAM_CASILLA); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(i*TAM_CASILLA, 0); ctx.lineTo(i*TAM_CASILLA, canvas.height); ctx.stroke();
@@ -307,39 +421,28 @@
             for (let f = 0; f < FILAS; f++) {
                 for (let c = 0; c < COLUMNAS; c++) {
                     if (tablero[f]?.[c]) {
-                        let color = COLORES_JOYAS[tablero[f][c].id];
                         let cx = c * TAM_CASILLA + TAM_CASILLA/2;
                         let cy = f * TAM_CASILLA + TAM_CASILLA/2;
-
-                        ctx.save();
-                        if (tablero[f][c].brillo) {
-                            ctx.shadowBlur = 30; ctx.shadowColor = '#ffffff';
-                            ctx.fillStyle = '#ffffff';
-                        } else {
-                            ctx.shadowBlur = 12; ctx.shadowColor = color;
-                            ctx.fillStyle = color;
-                        }
-
-                        ctx.beginPath();
-                        ctx.arc(cx, cy, 18, 0, Math.PI*2);
-                        ctx.fill();
-                        ctx.restore();
+                        dibujarJoyaNeon(ctx, cx, cy, tablero[f][c].id, tablero[f][c].brillo);
                     }
                 }
             }
 
             if (casillaSeleccionada) {
-                ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
-                ctx.strokeRect(casillaSeleccionada.c * TAM_CASILLA + 2, casillaSeleccionada.f * TAM_CASILLA + 2, TAM_CASILLA - 4, TAM_CASILLA - 4);
+                ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+                ctx.setLineDash([4, 4]); // Borde punteado retro
+                ctx.strokeRect(casillaSeleccionada.c * TAM_CASILLA + 4, casillaSeleccionada.f * TAM_CASILLA + 4, TAM_CASILLA - 8, TAM_CASILLA - 8);
+                ctx.setLineDash([]);
             }
 
             efectosExplosion.forEach((e, i) => {
                 ctx.save();
-                ctx.strokeStyle = 'rgba(255, 255, 255, '+ (1 - e.r/e.maxR) +')';
+                ctx.strokeStyle = 'rgba(168, 85, 247, '+ (1 - e.r/e.maxR) +')';
                 ctx.lineWidth = 4;
+                ctx.shadowBlur = 15; ctx.shadowColor = '#a855f7';
                 ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI*2); ctx.stroke();
                 ctx.restore();
-                e.r += 5;
+                e.r += 6;
                 if(e.r >= e.maxR) efectosExplosion.splice(i, 1);
             });
 
@@ -357,4 +460,3 @@
     </script>
 </body>
 </html>
-
