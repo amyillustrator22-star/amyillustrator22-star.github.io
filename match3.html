@@ -7,22 +7,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background: linear-gradient(rgba(9, 13, 22, 0.5), rgba(9, 13, 22, 0.5)), url('fondo_juegos.jpg') no-repeat center center fixed;
-            background-size: cover;
+            background: #090d16;
         }
-        .grid-cell img {
-            transition: transform 0.25s ease-in-out, filter 0.2s ease;
+        .grid-cell {
             user-select: none;
-            -webkit-user-drag: none;
+            transition: all 0.2s ease-in-out;
         }
-        .selected img {
+        .selected {
             filter: drop-shadow(0 0 15px #33ff33) brightness(1.3);
-            transform: scale(1.15);
+            transform: scale(1.05);
+            background-color: rgba(51, 255, 51, 0.2) !important;
         }
-        .match-exploding img {
+        .match-exploding {
             transform: scale(0);
             opacity: 0;
-            transition: all 0.2s ease-out;
         }
     </style>
 </head>
@@ -46,12 +44,12 @@
         const COLUMNAS = 6;
         
         const PIEZAS = [
-            { id: 0, nombre: 'estrella', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=80&h=80&q=80' },
-            { id: 1, nombre: 'corazon', url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=80&h=80&q=80' },
-            { id: 2, nombre: 'esmeralda', url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=80&h=80&q=80' },
-            { id: 3, nombre: 'galaxia', url: 'https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&w=80&h=80&q=80' },
-            { id: 4, nombre: 'fuego', url: 'https://images.unsplash.com/photo-1608889174637-3c44f6326f20?auto=format&fit=crop&w=80&h=80&q=80' },
-            { id: 5, nombre: 'rayo', url: 'https://images.unsplash.com/photo-1618005198143-e5283b019a72?auto=format&fit=crop&w=80&h=80&q=80' }
+            { id: 0, simbolo: '⭐', color: 'bg-yellow-500/20 border-yellow-500' },
+            { id: 1, simbolo: '❤️', color: 'bg-red-500/20 border-red-500' },
+            { id: 2, simbolo: '💎', color: 'bg-cyan-500/20 border-cyan-500' },
+            { id: 3, simbolo: '🔮', color: 'bg-purple-500/20 border-purple-500' },
+            { id: 4, simbolo: '🔥', color: 'bg-orange-500/20 border-orange-500' },
+            { id: 5, simbolo: '⚡', color: 'bg-amber-400/20 border-amber-400' }
         ];
 
         let matriz = [];
@@ -80,8 +78,8 @@
                     celda.id = `celda-${f}-${c}`;
                     celda.dataset.fila = f;
                     celda.dataset.columna = c;
-                    celda.className = "grid-cell flex items-center justify-center bg-slate-950/40 border border-slate-800/60 rounded-2xl p-1 cursor-pointer hover:bg-slate-800/30 transition-colors duration-150 aspect-square";
-                    celda.innerHTML = `<img src="${pieza.url}" alt="${pieza.nombre}" class="w-full h-full object-contain pointer-events-none rounded-xl">`;
+                    celda.className = `grid-cell flex items-center justify-center border-2 ${pieza.color} rounded-2xl cursor-pointer transition-all duration-200 aspect-square text-2xl`;
+                    celda.textContent = pieza.simbolo;
                     celda.addEventListener('click', manejarClic);
 
                     tablero.appendChild(celda);
@@ -140,9 +138,14 @@
             const celda1 = document.getElementById(`celda-${f1}-${c1}`);
             const celda2 = document.getElementById(`celda-${f2}-${c2}`);
 
-            let imgTemp = celda1.innerHTML;
-            celda1.innerHTML = celda2.innerHTML;
-            celda2.innerHTML = imgTemp;
+            let textoTemp = celda1.textContent;
+            let claseTemp = celda1.className;
+
+            celda1.textContent = celda2.textContent;
+            celda1.className = celda2.className;
+
+            celda2.textContent = textoTemp;
+            celda2.className = claseTemp;
         }
 
         function verificarYProcesarMatches() {
@@ -181,7 +184,7 @@
 
                 setTimeout(() => {
                     aplicarGravedad();
-                }, 200);
+                }, 250);
             }
 
             return encontrado;
@@ -215,13 +218,14 @@
             for (let f = 0; f < FILAS; f++) {
                 for (let c = 0; c < COLUMNAS; c++) {
                     const celda = document.getElementById(`celda-${f}-${c}`);
-                    celda.innerHTML = `<img src="${matriz[f][c].url}" alt="${matriz[f][c].nombre}" class="w-full h-full object-contain pointer-events-none rounded-xl">`;
+                    celda.textContent = matriz[f][c].simbolo;
+                    celda.className = `grid-cell flex items-center justify-center border-2 ${matriz[f][c].color} rounded-2xl cursor-pointer transition-all duration-200 aspect-square text-2xl`;
                 }
             }
 
             setTimeout(() => {
                 if (verificarYProcesarMatches()) {
-                    // Combos en cadena
+                    // En cadena
                 } else {
                     bloqueado = false;
                 }

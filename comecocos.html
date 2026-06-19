@@ -6,13 +6,9 @@
     <title>Neon Alien Eater</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { 
-            background: linear-gradient(rgba(9, 13, 22, 0.4), rgba(9, 13, 22, 0.4)), url('fondo_juegos.jpg') no-repeat center center fixed;
-            background-size: cover;
-        }
+        body { background: #090d16; }
         canvas {
-            background: rgba(2, 6, 23, 0.8);
-            backdrop-filter: blur(4px);
+            background: #020617;
             box-shadow: 0 0 30px rgba(34, 211, 238, 0.2);
         }
     </style>
@@ -31,7 +27,7 @@
 
     <canvas id="canvas-game" width="380" height="380" class="rounded-2xl border-4 border-slate-800"></canvas>
     
-    <p class="text-xs text-gray-500 mt-4 text-center">Usa las FLECHAS del teclado o DESLIZA el dedo para moverte</p>
+    <p class="text-xs text-gray-500 mt-4 text-center">Usa las FLECHAS del teclado para moverte</p>
 
     <script>
         const canvas = document.getElementById('canvas-game');
@@ -175,7 +171,7 @@
             ctx.lineTo(jugador.x + TAM_CELDA/2, jugador.y + TAM_CELDA/2);
             ctx.fill();
 
-            // Dibujar Aliens vectoriales de neón
+            // Dibujar Aliens
             aliens.forEach(alien => {
                 let ax = alien.x + TAM_CELDA/2;
                 let ay = alien.y + TAM_CELDA/2;
@@ -189,7 +185,7 @@
                 ctx.strokeStyle = alien.color;
                 ctx.lineWidth = 2;
                 ctx.beginPath(); ctx.moveTo(ax - 4, ay - 6); ctx.lineTo(ax - 7, ay - 11); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(ax + 4, ay - 6); ctx.lineTo(ax + 7, ay - 11); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(ax + 4, ay - 6); ctx.lineTo(ax + 7, ay - 11); stroke();
 
                 ctx.fillStyle = '#ffffff';
                 ctx.beginPath(); ctx.arc(ax - 3, ay - 1, 2.5, 0, Math.PI*2); ctx.fill();
