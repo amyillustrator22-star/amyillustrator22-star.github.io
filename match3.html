@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Match 3 - MODO HARDCORE</title>
+    <title>Neon Match 3</title>
     <style>
         body {
             background: #0f172a;
@@ -16,12 +16,11 @@
             margin: 0;
             padding-top: 20px;
         }
-        .title { font-size: 2.2rem; font-weight: bold; color: #ef4444; text-shadow: 0 0 15px #ef4444; margin-bottom: 5px; }
+        .title { font-size: 2.2rem; font-weight: bold; color: #f472b6; text-shadow: 0 0 15px #f472b6; margin-bottom: 5px; }
         .stats-container { display: flex; gap: 15px; margin-bottom: 10px; align-items: center; }
         .score-board { background: #1e293b; padding: 8px 25px; border-radius: 9999px; border: 1px solid #475569; font-size: 1.2rem; font-weight: bold; color: #22d3ee; }
         .level-board { background: #1e293b; padding: 8px 25px; border-radius: 9999px; border: 1px solid #475569; font-size: 1.2rem; font-weight: bold; color: #f472b6; }
         
-        /* 🛠️ ESTILO DEL NUEVO BOTÓN DE RENDICIÓN */
         .btn-rendirse {
             background: linear-gradient(135deg, #ef4444, #b91c1c);
             color: white;
@@ -47,16 +46,16 @@
 
         canvas {
             background: #020617;
-            border: 4px solid #ef4444;
+            border: 4px solid #334155;
             border-radius: 16px;
-            box-shadow: 0 0 30px rgba(239, 68, 68, 0.25);
+            box-shadow: 0 0 30px rgba(168, 85, 247, 0.25);
             cursor: pointer;
         }
     </style>
 </head>
 <body>
 
-    <div class="title">EMOJI MATCH: INFIERNO</div>
+    <div class="title">NEON MATCH 3</div>
     <div class="stats-container">
         <div class="score-board">PUNTOS: <span id="score-val">0</span></div>
         <div class="level-board">NIVEL: <span id="level-val">1</span></div>
@@ -212,7 +211,6 @@
             return false;
         }
 
-        // 🛠️ FUNCIÓN GENERALIZADA PARA SALVAR LOS PUNTOS EN FIRESTORE
         async function finalizarPartida(mensajeFinal = "¡SIN MOVIMIENTOS POSIBLES!") {
             if (gameOver) return;
             gameOver = true;
@@ -221,19 +219,18 @@
                 if (nombre && nombre.trim() !== "") {
                     try {
                         await addDoc(collection(db, "scores_arcade"), {
-                            game: "match3", // Sincroniza clavado con el switchLeaderboard de juegos.html
+                            game: "match3", 
                             player: nombre.trim().substring(0, 12),
                             score: parseInt(score),
                             country: "🇪🇸",
                             date: new Date().toISOString()
                         });
-                        alert("¡Tu récord se ha subido a la Leaderboard global con éxito!");
+                        alert("¡Tu récord se ha subido a la Leaderboard global!");
                     } catch(e) { console.error(e); }
                 }
             }, 300);
         }
 
-        // Evento del botón para gatillar la rendición manual
         btnSurrender.addEventListener('click', () => {
             iniciarAudio();
             if(!gameOver) {
@@ -406,7 +403,7 @@
             ctx.save();
             let emoji = POOL_EMOJIS[id];
             ctx.shadowBlur = brillo ? 30 : 8;
-            ctx.shadowColor = brillo ? '#ffffff' : 'rgba(239, 68, 68, 0.2)';
+            ctx.shadowColor = brillo ? '#ffffff' : 'rgba(168, 85, 247, 0.3)';
             ctx.font = "36px Arial";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
@@ -417,10 +414,10 @@
         function dibujar() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            ctx.strokeStyle = '#334155'; ctx.lineWidth = 1;
+            ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
             for(let i=0; i<=FILAS; i++) {
-                ctx.beginPath(); ctx.moveTo(0, i*TAM_CASILLA); ctx.lineTo(canvas.width, i*TAM_CASILLA); stroke();
-                ctx.beginPath(); ctx.moveTo(i*TAM_CASILLA, 0); ctx.lineTo(i*TAM_CASILLA, canvas.height); stroke();
+                ctx.beginPath(); ctx.moveTo(0, i*TAM_CASILLA); ctx.lineTo(canvas.width, i*TAM_CASILLA); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(i*TAM_CASILLA, 0); ctx.lineTo(i*TAM_CASILLA, canvas.height); ctx.stroke();
             }
 
             for (let f = 0; f < FILAS; f++) {
@@ -434,15 +431,15 @@
             }
 
             if (casillaSeleccionada) {
-                ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 3;
+                ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 3;
                 ctx.strokeRect(casillaSeleccionada.c * TAM_CASILLA + 4, casillaSeleccionada.f * TAM_CASILLA + 4, TAM_CASILLA - 8, TAM_CASILLA - 8);
             }
 
             efectosExplosion.forEach((e, i) => {
                 ctx.save();
-                ctx.strokeStyle = 'rgba(239, 68, 68, '+ (1 - e.r/e.maxR) +')';
+                ctx.strokeStyle = 'rgba(34, 211, 238, '+ (1 - e.r/e.maxR) +')';
                 ctx.lineWidth = 4;
-                ctx.shadowBlur = 15; ctx.shadowColor = '#ef4444';
+                ctx.shadowBlur = 15; ctx.shadowColor = '#22d3ee';
                 ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI*2); ctx.stroke();
                 ctx.restore();
                 e.r += 6;
@@ -451,7 +448,7 @@
 
             if (gameOver) {
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.95)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#ef4444'; ctx.font = 'bold 24px monospace'; ctx.textAlign = 'center';
+                ctx.fillStyle = '#f472b6'; ctx.font = 'bold 24px monospace'; ctx.textAlign = 'center';
                 ctx.fillText("PARTIDA CONCLUIDA", canvas.width/2, canvas.height/2);
             }
 
