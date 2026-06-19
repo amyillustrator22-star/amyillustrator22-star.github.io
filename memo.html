@@ -36,9 +36,6 @@
 
         #contenedor-juego {
             position: relative;
-            width: 100%;
-            max-width: 430px;
-            min-height: 550px;
             z-index: 10;
             /* 💎 CRISTAL ULTRA TRANSLÚCIDO PARA QUE TU DIBUJO SE VEA DE LUJO POR DETRÁS */
             background: rgba(10, 6, 26, 0.45) !important;
@@ -47,6 +44,14 @@
             backdrop-filter: blur(8px) !important;
             -webkit-backdrop-filter: blur(8px) !important;
             overflow: hidden;
+            
+            /* 👇 EDGE-TO-EDGE PARA MÓVILES INYECTADO AQUÍ 👇 */
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+            min-height: 80vh !important; /* Se ajusta a la ventana emergente */
+            touch-action: none; /* Bloquea el scroll loco en táctil */
+            /* 👆 HASTA AQUÍ 👆 */
         }
 
         /* 🎴 CARTAS VOLTEADAS ABAJO */

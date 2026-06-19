@@ -40,17 +40,20 @@
             max-width: 420px; 
         }
 
-        /* Tablero con Neón Cian - Rejilla eliminada de CSS para calcularla nativamente */
+        /* Tablero con Neón Cian - Edge to Edge corregido para Tetris */
         canvas { 
             border: 2px solid rgba(78, 205, 196, 0.6); 
             background-color: rgba(10, 10, 25, 0.88); 
-            height: 55vh; 
-            max-height: 520px; 
-            width: 100%;
-            max-width: 260px;
-            aspect-ratio: 10 / 20; 
             border-radius: 6px;
             box-shadow: 0 0 20px rgba(0, 255, 255, 0.25);
+            
+            /* Lógica responsiva táctil */
+            width: 100% !important;
+            max-width: 100% !important;
+            height: auto !important;
+            aspect-ratio: 10 / 20 !important; /* Mantiene el rectángulo perfecto */
+            object-fit: contain;
+            touch-action: none;
         }
 
         .ui { 

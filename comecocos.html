@@ -43,11 +43,25 @@
             border: 4px solid #1e293b; 
             outline: none;
             margin-bottom: 20px;
-            max-width: 100%;
+            
+            /* 📱 EXPERIENCIA EDGE-TO-EDGE INMUNE A DESBORDAMIENTOS EN POPUPS */
+            width: 100% !important;
+            max-width: 520px !important;
+            height: auto !important;
+            aspect-ratio: 1 / 1 !important;
+            object-fit: contain;
+            touch-action: none;
         }
+
+        /* HONEYPOT VISUAL TRAMPA (No tocar) */
+        .system-validate-field { position: absolute; left: -9999px; opacity: 0; }
     </style>
 </head>
 <body>
+
+    <div class="system-validate-field" aria-hidden="true">
+        <input type="text" id="auth_token_verification" tabindex="-1" autocomplete="off">
+    </div>
 
     <div class="header">
         <div class="title">NEON DOG EATER</div>
@@ -58,8 +72,8 @@
     </div>
 
     <div class="ayuda-barra">
-        🎮 CONTROLES: W=ARRIBA | A=IZQUIERDA | S=ABAJO | D=DERECHA <br>
-        <span style="color: #eab308;">¡PULSA LAS TECLAS EN TU TECLADO PARA MOVER AL PERRITO!</span>
+        🎮 PC: TECLAS W,A,S,D | 📱 MÓVIL: DESLIZA EL DEDO (SWIPE)<br>
+        <span style="color: #eab308;">¡LIMPIA EL TABLERO Y ESQUIVA LOS OVNIS!</span>
     </div>
 
     <canvas id="canvas-game" width="520" height="520" tabindex="1"></canvas>
@@ -98,6 +112,26 @@
         let tiempoCarne = 0;
 
         const ALIEN_COLORS = ['#ec4899', '#f97316', '#a855f7', '#00ff66'];
+
+        // --- MEDIDAS DE SEGURIDAD HACK-PROOF ---
+        let securityTriggered = false;
+        window.dog_points = 0; // Variable cebo global trampa
+
+        function checkIntegrity() {
+            const botInput = document.getElementById('auth_token_verification').value;
+            if (botInput !== "" || window.dog_points !== 0) securityTriggered = true;
+        }
+
+        function triggerTrap() {
+            ctx.fillStyle = 'rgba(0,0,0,0.95)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ff0000';
+            ctx.font = 'bold 22px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText("S1ST3M4 L0CK", canvas.width/2, canvas.height/2 - 15);
+            ctx.fillText("ANOMALY DETECTED", canvas.width/2, canvas.height/2 + 15);
+        }
+        // --------------------------------------
 
         canvas.focus();
         window.addEventListener('DOMContentLoaded', () => { canvas.focus(); });
@@ -159,7 +193,6 @@
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
         ];
 
-        // 🛠️ REPOSICIONADO EXACTO: Fila 18, Columna 9 (Abajo al centro sin colisión)
         let jugador = { x: 9 * TAM_CELDA, y: 18 * TAM_CELDA, dirX: 0, dirY: 0, sigDirX: 0, sigDirY: 0 };
         
         let aliens = [
@@ -181,6 +214,36 @@
             if (tecla === 'd' || tecla === 'arrowright') { jugador.sigDirX = 1; jugador.sigDirY = 0; }
         });
 
+        // 📱 DETECTOR DE DESLIZAMIENTO TÁCTIL (SWIPE) RESPONSIVO PARA MÓVIL
+        let touchStartX = 0;
+        let touchStartY = 0;
+
+        canvas.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+            touchStartY = e.changedTouches[0].screenY;
+        }, {passive: true});
+
+        canvas.addEventListener('touchmove', e => { e.preventDefault(); }, {passive: false});
+
+        canvas.addEventListener('touchend', e => {
+            let touchEndX = e.changedTouches[0].screenX;
+            let touchEndY = e.changedTouches[0].screenY;
+            
+            let dx = touchEndX - touchStartX;
+            let dy = touchEndY - touchStartY;
+            
+            if (Math.abs(dx) < 20 && Math.abs(dy) < 20) return;
+
+            if (Math.abs(dx) > Math.abs(dy)) {
+                if (dx > 0) { jugador.sigDirX = 1; jugador.sigDirY = 0; }
+                else { jugador.sigDirX = -1; jugador.sigDirY = 0; }
+            } else {
+                if (dy > 0) { jugador.sigDirX = 0; jugador.sigDirY = 1; }
+                else { jugador.sigDirX = 0; jugador.sigDirY = -1; }
+            }
+            iniciarAudio();
+        });
+
         function colisionPared(x, y) {
             if (x < 0 || x >= canvas.width) return false;
             let celdaX1 = Math.floor(x / TAM_CELDA);
@@ -192,6 +255,8 @@
         }
 
         async function guardarRecord() {
+            checkIntegrity();
+            if (securityTriggered) return;
             const nombre = prompt(`¡FIN DE LA PARTIDA!\nTu puntuación: ${score} puntos.\n\nEscribe tu nombre para la Leaderboard:`);
             if (nombre && nombre.trim() !== "") {
                 try {
@@ -208,7 +273,7 @@
         }
 
         function actualizar() {
-            if (gameOver) return;
+            if (gameOver || securityTriggered) return;
 
             if (modoAsustado) {
                 tiempoAsustado--;
@@ -246,13 +311,13 @@
             let centroX = Math.floor((jugador.x + TAM_CELDA / 2) / TAM_CELDA);
             let centroY = Math.floor((jugador.y + TAM_CELDA / 2) / TAM_CELDA);
             
-            if (mapa[centroY]?.[centroX] === 0) {
+            if (mapa[centroY]?.[centroX] === 0 && !securityTriggered) {
                 mapa[centroY][centroX] = 2;
                 score += 10;
                 scoreVal.textContent = score;
                 sonarBip(700, 0.05);
             }
-            else if (mapa[centroY]?.[centroX] === 3) {
+            else if (mapa[centroY]?.[centroX] === 3 && !securityTriggered) {
                 mapa[centroY][centroX] = 2;
                 score += 50;
                 scoreVal.textContent = score;
@@ -261,7 +326,7 @@
                 sonarBip(900, 0.15);
             }
 
-            if (carneX !== -1 && Math.abs(jugador.x - carneX) < 15 && Math.abs(jugador.y - carneY) < 15) {
+            if (carneX !== -1 && Math.abs(jugador.x - carneX) < 15 && Math.abs(jugador.y - carneY) < 15 && !securityTriggered) {
                 carneX = -1; carneY = -1; tiempoCarne = 0;
                 score += 500;
                 scoreVal.textContent = score;
@@ -359,6 +424,9 @@
         }
 
         function dibujar() {
+            checkIntegrity();
+            if (securityTriggered) { triggerTrap(); return; }
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             for (let f = 0; f < mapa.length; f++) {

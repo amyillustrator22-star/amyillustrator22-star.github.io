@@ -34,15 +34,15 @@
             box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
             transition: all 0.2s ease;
             margin-bottom: 15px;
+            user-select: none;
+            touch-action: manipulation;
         }
         .btn-rendirse:hover {
             transform: scale(1.05);
             box-shadow: 0 0 25px rgba(239, 68, 68, 0.7);
             background: linear-gradient(135deg, #f87171, #ef4444);
         }
-        .btn-rendirse:active {
-            transform: scale(0.95);
-        }
+        .btn-rendirse:active { transform: scale(0.95); }
 
         canvas {
             background: #020617;
@@ -50,10 +50,25 @@
             border-radius: 16px;
             box-shadow: 0 0 30px rgba(168, 85, 247, 0.25);
             cursor: pointer;
+            
+            /* 📱 AJUSTE EDGE-TO-EDGE PARA EVITAR CORTES EN POPUPS */
+            width: 100% !important;
+            max-width: 480px !important;
+            height: auto !important;
+            aspect-ratio: 1 / 1 !important;
+            object-fit: contain;
+            touch-action: none;
         }
+
+        /* HONEYPOT VISUAL TRAMPA (No tocar) */
+        .system-validate-field { position: absolute; left: -9999px; opacity: 0; }
     </style>
 </head>
 <body>
+
+    <div class="system-validate-field" aria-hidden="true">
+        <input type="text" id="auth_token_verification" tabindex="-1" autocomplete="off">
+    </div>
 
     <div class="title">NEON MATCH 3</div>
     <div class="stats-container">
@@ -103,6 +118,26 @@
         let gameOver = false;
         let efectosExplosion = [];
         let audioCtx = null;
+
+        // --- SISTEMA DE SEGURIDAD INTEGRED ---
+        let securityTriggered = false;
+        window.match_points = 0; // Variable cebo global trampa
+
+        function checkIntegrity() {
+            const botInput = document.getElementById('auth_token_verification').value;
+            if (botInput !== "" || window.match_points !== 0) securityTriggered = true;
+        }
+
+        function triggerTrap() {
+            ctx.fillStyle = 'rgba(0,0,0,0.95)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ff0000';
+            ctx.font = 'bold 22px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText("S1ST3M4 L0CK", canvas.width/2, canvas.height/2 - 15);
+            ctx.fillText("ANOMALY DETECTED", canvas.width/2, canvas.height/2 + 15);
+        }
+        // ------------------------------------
 
         function iniciarAudio() {
             if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -212,7 +247,8 @@
         }
 
         async function finalizarPartida(mensajeFinal = "¡SIN MOVIMIENTOS POSIBLES!") {
-            if (gameOver) return;
+            checkIntegrity();
+            if (gameOver || securityTriggered) return;
             gameOver = true;
             setTimeout(async () => {
                 const nombre = prompt(`${mensajeFinal}\nPuntuación final: ${score} puntos.\n\nEscribe tu nombre para la Leaderboard global:`);
@@ -305,9 +341,11 @@
                 sonarMatchNormal();
             }
 
-            let ptosPorCasilla = especialActivado ? 20 : 10;
-            score += eliminarSet.size * ptosPorCasilla;
-            scoreVal.textContent = score;
+            if (!securityTriggered) {
+                let ptosPorCasilla = especialActivado ? 20 : 10;
+                score += eliminarSet.size * ptosPorCasilla;
+                scoreVal.textContent = score;
+            }
 
             let nuevoNivel = Math.floor(score / 1000) + 1;
             if (nuevoNivel !== nivel) {
@@ -359,13 +397,14 @@
 
         canvas.addEventListener('mousedown', e => {
             iniciarAudio();
-            if (bloqueado || gameOver) return;
+            if (bloqueado || gameOver || securityTriggered) return;
             const rect = canvas.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
-            const c = Math.floor(x / TAM_CASILLA);
-            const f = Math.floor(y / TAM_CASILLA);
+            // Ajuste automático por escalado responsivo
+            const c = Math.floor((x / canvas.clientWidth) * COLUMNAS);
+            const f = Math.floor((y / canvas.clientHeight) * FILAS);
 
             if (!casillaSeleccionada) {
                 casillaSeleccionada = {f: f, c: c};
@@ -399,6 +438,51 @@
             }
         });
 
+        // 📱 CONTROLES DE TOQUE TÁCTIL MÓVIL DIRECTO (Alternativa limpia a clics)
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            iniciarAudio();
+            if (bloqueado || gameOver || securityTriggered) return;
+            const rect = canvas.getBoundingClientRect();
+            const touch = e.touches[0];
+            const x = touch.clientX - rect.left;
+            const y = touch.clientY - rect.top;
+
+            const c = Math.floor((x / canvas.clientWidth) * COLUMNAS);
+            const f = Math.floor((y / canvas.clientHeight) * FILAS);
+
+            if (!casillaSeleccionada) {
+                casillaSeleccionada = {f: f, c: c};
+            } else {
+                let adyacente = (Math.abs(casillaSeleccionada.f - f) === 1 && casillaSeleccionada.c === c) ||
+                                (Math.abs(casillaSeleccionada.c - c) === 1 && casillaSeleccionada.f === f);
+
+                if (adyacente) {
+                    bloqueado = true;
+                    sonarIntercambio();
+                    let temp = tablero[casillaSeleccionada.f][casillaSeleccionada.c];
+                    tablero[casillaSeleccionada.f][casillaSeleccionada.c] = tablero[f][c];
+                    tablero[f][c] = temp;
+
+                    let matches = evaluarMatchInmediato();
+                    if (matches.length > 0) {
+                        casillaSeleccionada = null;
+                        procesarMatches();
+                    } else {
+                        setTimeout(() => {
+                            let rev = tablero[casillaSeleccionada.f][casillaSeleccionada.c];
+                            tablero[casillaSeleccionada.f][casillaSeleccionada.c] = tablero[f][c];
+                            tablero[f][c] = rev;
+                            casillaSeleccionada = null;
+                            bloqueado = false;
+                        }, 180);
+                    }
+                } else {
+                    casillaSeleccionada = {f: f, c: c};
+                }
+            }
+        }, {passive: false});
+
         function dibujarJoyaEmoji(ctx, cx, cy, id, brillo) {
             ctx.save();
             let emoji = POOL_EMOJIS[id];
@@ -412,6 +496,9 @@
         }
 
         function dibujar() {
+            checkIntegrity();
+            if (securityTriggered) { triggerTrap(); return; }
+
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
