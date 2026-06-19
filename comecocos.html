@@ -4,30 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neon Alien Eater</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #090d16; }
-        canvas {
-            background: #020617;
-            box-shadow: 0 0 30px rgba(34, 211, 238, 0.2);
-        }
+        body { background: #090d16; color: white; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .header { text-align: center; margin-bottom: 15px; }
+        .title { font-size: 1.8rem; font-weight: bold; color: #22d3ee; text-shadow: 0 0 10px #22d3ee; }
+        .stats { background: #1e293b; padding: 6px 16px; border-radius: 9999px; border: 1px solid #334155; display: flex; gap: 20px; font-weight: bold; margin-top: 5px; }
+        canvas { background: #020617; box-shadow: 0 0 30px rgba(34, 211, 238, 0.25); border-radius: 16px; border: 4px solid #1e293b; }
     </style>
 </head>
-<body class="text-white flex flex-col items-center justify-center min-h-screen font-mono p-4">
+<body>
 
-    <div class="text-center mb-4">
-        <h1 class="text-3xl font-extrabold tracking-widest text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 drop-shadow-[0_0_10px_rgba(6,182,212,0.3)]">
-            NEON ALIEN EATER
-        </h1>
-        <div class="mt-2 bg-slate-900/80 px-4 py-1.5 rounded-full border border-slate-800 shadow-md inline-flex gap-4 text-sm font-bold">
-            <div>PUNTOS: <span id="score-val" class="text-cyan-400">0</span></div>
-            <div>VIDAS: <span id="lives-val" class="text-pink-500">3</span></div>
+    <div class="header">
+        <div class="title">SPACE ALIEN EATER</div>
+        <div class="stats">
+            <div>PUNTOS: <span id="score-val" style="color:#22d3ee">0</span></div>
+            <div>VIDAS: <span id="lives-val" style="color:#ec4899">3</span></div>
         </div>
     </div>
 
-    <canvas id="canvas-game" width="380" height="380" class="rounded-2xl border-4 border-slate-800"></canvas>
-    
-    <p class="text-xs text-gray-500 mt-4 text-center">Usa las FLECHAS del teclado para moverte</p>
+    <canvas id="canvas-game" width="380" height="380"></canvas>
 
     <script>
         const canvas = document.getElementById('canvas-game');
@@ -65,7 +60,7 @@
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
         ];
 
-        let jugador = { x: 9 * TAM_CELDA, y: 16 * TAM_CELDA, dirX: 0, dirY: 0, sigDirX: 0, sigDirY: 0 };
+        let jugador = { x: 9 * TAM_CELDA, y: 16 * TAM_CELDA, dirX: 0, dirY: 0, sigDirX: 0, sigDirY: 0, angulo: 0 };
         
         let aliens = [
             { x: 9 * TAM_CELDA, y: 8 * TAM_CELDA, dirX: 1, dirY: 0, color: ALIEN_COLORS[0], ojoAngulo: 0 },
@@ -73,11 +68,15 @@
             { x: 10 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: 0, dirY: -1, color: ALIEN_COLORS[2], ojoAngulo: 0 }
         ];
 
+        // CORRECCIÓN CRÍTICA: e.preventDefault() evita que las flechas muevan la pantalla exterior
         window.addEventListener('keydown', e => {
-            if (e.key === 'ArrowUp')    { jugador.sigDirX = 0; jugador.sigDirY = -1; }
-            if (e.key === 'ArrowDown')  { jugador.sigDirX = 0; jugador.sigDirY = 1; }
-            if (e.key === 'ArrowLeft')  { jugador.sigDirX = -1; jugador.sigDirY = 0; }
-            if (e.key === 'ArrowRight') { jugador.sigDirX = 1; jugador.sigDirY = 0; }
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+            }
+            if (e.key === 'ArrowUp')    { jugador.sigDirX = 0; jugador.sigDirY = -1; jugador.angulo = -Math.PI/2; }
+            if (e.key === 'ArrowDown')  { jugador.sigDirX = 0; jugador.sigDirY = 1; jugador.angulo = Math.PI/2; }
+            if (e.key === 'ArrowLeft')  { jugador.sigDirX = -1; jugador.sigDirY = 0; jugador.angulo = Math.PI; }
+            if (e.key === 'ArrowRight') { jugador.sigDirX = 1; jugador.sigDirY = 0; jugador.angulo = 0; }
         });
 
         function colisionPared(x, y) {
@@ -131,7 +130,7 @@
                 }
                 alien.x += alien.dirX * 1;
                 alien.y += alien.dirY * 1;
-                alien.ojoAngulo += 0.05;
+                alien.ojoAngulo += 0.08;
 
                 if (Math.abs(jugador.x - alien.x) < 12 && Math.abs(jugador.y - alien.y) < 12) {
                     lives--;
@@ -141,6 +140,7 @@
                     } else {
                         jugador.x = 9 * TAM_CELDA; jugador.y = 16 * TAM_CELDA;
                         jugador.dirX = jugador.dirY = jugador.sigDirX = jugador.sigDirY = 0;
+                        jugador.angulo = 0;
                     }
                 }
             });
@@ -149,61 +149,77 @@
         function dibujar() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // Rejilla de Laberinto Neón
             for (let f = 0; f < mapa.length; f++) {
                 for (let c = 0; c < mapa[f].length; c++) {
                     if (mapa[f][c] === 1) {
-                        ctx.strokeStyle = '#1e40af';
+                        ctx.strokeStyle = '#1e3a8a';
                         ctx.lineWidth = 2;
                         ctx.strokeRect(c * TAM_CELDA + 2, f * TAM_CELDA + 2, TAM_CELDA - 4, TAM_CELDA - 4);
                     } else if (mapa[f][c] === 0) {
-                        ctx.fillStyle = '#22d3ee';
+                        ctx.fillStyle = '#06b6d4';
                         ctx.beginPath();
-                        ctx.arc(c * TAM_CELDA + TAM_CELDA/2, f * TAM_CELDA + TAM_CELDA/2, 3, 0, Math.PI * 2);
+                        ctx.arc(c * TAM_CELDA + TAM_CELDA/2, f * TAM_CELDA + TAM_CELDA/2, 2.5, 0, Math.PI * 2);
                         ctx.fill();
                     }
                 }
             }
 
-            // Dibujar Comecocos
-            ctx.fillStyle = '#eab308';
+            // REDISEÑO: Dibujar caza espacial en lugar de Pac-man amarillo
+            ctx.save();
+            ctx.translate(jugador.x + TAM_CELDA/2, jugador.y + TAM_CELDA/2);
+            ctx.rotate(jugador.angulo);
+            ctx.fillStyle = '#22d3ee';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#22d3ee';
             ctx.beginPath();
-            ctx.arc(jugador.x + TAM_CELDA/2, jugador.y + TAM_CELDA/2, TAM_CELDA/2 - 2, 0.2 * Math.PI, 1.8 * Math.PI);
-            ctx.lineTo(jugador.x + TAM_CELDA/2, jugador.y + TAM_CELDA/2);
+            ctx.moveTo(8, 0);
+            ctx.lineTo(-6, -6);
+            ctx.lineTo(-3, 0);
+            ctx.lineTo(-6, 6);
+            ctx.closePath();
             ctx.fill();
+            ctx.restore();
 
-            // Dibujar Aliens
+            // REDISEÑO: Dibujar platillos volantes OVNI en lugar de fantasmas clásicos
             aliens.forEach(alien => {
                 let ax = alien.x + TAM_CELDA/2;
                 let ay = alien.y + TAM_CELDA/2;
 
-                ctx.fillStyle = alien.color;
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = alien.color;
+
+                // Cúpula superior del OVNI
+                ctx.fillStyle = 'rgba(255,255,255,0.7)';
                 ctx.beginPath();
-                ctx.arc(ax, ay - 2, 7, Math.PI, 0, false);
-                ctx.ellipse(ax, ay + 2, 7, 5, 0, 0, Math.PI);
+                ctx.arc(ax, ay - 2, 4, Math.PI, 0);
                 ctx.fill();
 
-                ctx.strokeStyle = alien.color;
-                ctx.lineWidth = 2;
-                ctx.beginPath(); ctx.moveTo(ax - 4, ay - 6); ctx.lineTo(ax - 7, ay - 11); ctx.stroke();
-                ctx.beginPath(); ctx.moveTo(ax + 4, ay - 6); ctx.lineTo(ax + 7, ay - 11); stroke();
+                // Cuerpo del platillo
+                ctx.fillStyle = alien.color;
+                ctx.beginPath();
+                ctx.ellipse(ax, ay + 1, 8, 3, 0, 0, Math.PI*2);
+                ctx.fill();
 
-                ctx.fillStyle = '#ffffff';
-                ctx.beginPath(); ctx.arc(ax - 3, ay - 1, 2.5, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(ax + 3, ay - 1, 2.5, 0, Math.PI*2); ctx.fill();
-
-                let movOjoX = Math.sin(alien.ojoAngulo) * 1;
-                ctx.fillStyle = '#000000';
-                ctx.beginPath(); ctx.arc(ax - 3 + movOjoX, ay - 1, 1, 0, Math.PI*2); ctx.fill();
-                ctx.beginPath(); ctx.arc(ax + 3 + movOjoX, ay - 1, 1, 0, Math.PI*2); ctx.fill();
+                // Luces parpadeantes inferiores del OVNI
+                let parpadeo = Math.sin(alien.ojoAngulo) > 0;
+                ctx.fillStyle = parpadeo ? '#ffffff' : '#000000';
+                ctx.beginPath();
+                ctx.arc(ax - 4, ay + 2, 1, 0, Math.PI*2);
+                ctx.arc(ax, ay + 2, 1, 0, Math.PI*2);
+                ctx.arc(ax + 4, ay + 2, 1, 0, Math.PI*2);
+                ctx.fill();
+                
+                ctx.shadowBlur = 0; // reset
             });
 
             if (gameOver) {
-                ctx.fillStyle = 'rgba(0,0,0,0.85)';
+                ctx.fillStyle = 'rgba(2, 6, 23, 0.9)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#ef4444';
                 ctx.font = 'bold 24px monospace';
                 ctx.textAlign = 'center';
-                ctx.fillText("GAME OVER", canvas.width/2, canvas.height/2);
+                ctx.fillText("MISION FALLIDA", canvas.width/2, canvas.height/2);
             }
         }
 
