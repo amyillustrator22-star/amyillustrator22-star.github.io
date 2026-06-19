@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5491883632835608" crossorigin="anonymous"></script>
+
+    <script data-goatcounter="https://amysoftware.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amy Software - Arcade Central</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)), url('encabezaoAmySoftware.jpg') no-repeat center center fixed;
+            background-size: cover;
+            min-height: 100vh;
+        }
+        .title-nabla {
+            font-family: 'Nabla', cursive;
+            font-size: 3rem;
+            -webkit-text-stroke: 1px black;
+            text-shadow: 2px 2px 0px black;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8 font-sans text-gray-800">
+
+    <header class="flex flex-col items-center gap-4 mb-12 mt-8">
+        <h1 class="title-nabla text-center drop-shadow-xl">
+            ARCADE CENTER
+        </h1>
+        <p id="menu-sub" class="text-white text-lg font-medium bg-black/40 px-4 py-1 rounded-full backdrop-blur-sm">Elige tu entrenamiento mental</p>
+    </header>
+
+    <div id="contenedor-pantalla" class="w-full max-w-4xl glass-card rounded-[2.5rem] p-4 sm:p-6 mb-16 mx-4 flex flex-col items-center hidden">
+        <button onclick="volverAlMenu()" class="mb-4 bg-red-600/80 hover:bg-red-700 text-white font-bold px-4 py-1.5 rounded-xl border border-red-500 text-xs tracking-wider uppercase transition-all shadow-md self-end">
+            ❌ Cerrar Juego
+        </button>
+        <iframe id="pantalla-juego" src="" class="w-full h-[640px] rounded-2xl border-4 border-slate-800 bg-black shadow-inner"></iframe>
+    </div>
+
+    <main id="menu-juegos" class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 px-4">
+        
+        <button onclick="cargarJuego('vibez_fly.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-pink-500 rounded-[2.5rem]">
+            <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
+                <div class="flex flex-col items-center">
+                    <div class="bg-gradient-to-br from-pink-500 to-red-600 text-white p-5 rounded-3xl mb-6 shadow-md">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Vibez Fly</h2>
+                    <p id="desc-vfly" class="text-lg text-gray-700 leading-relaxed font-medium">
+                        Mantén el vuelo del corazón a base de toques y esquiva los letales cuchillos en este reto de reflejos.
+                    </p>
+                </div>
+                <p class="mt-6 text-base text-pink-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
+            </article>
+        </button>
+
+        <button onclick="cargarJuego('mi_juego.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-cyan-500 rounded-[2.5rem]">
+            <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
+                <div class="flex flex-col items-center">
+                    <div class="bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-5 rounded-3xl mb-6 shadow-md">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                    </div>
+                    <h2 id="title-brain" class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Brain Training</h2>
+                    <p id="desc-brain" class="text-lg text-gray-700 leading-relaxed font-medium">
+                        Pon a prueba tu velocidad mental ordenando secuencias de burbujas numéricas de menor a mayor.
+                    </p>
+                </div>
+                <p class="mt-6 text-base text-cyan-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
+            </article>
+        </button>
+
+        <button onclick="cargarJuego('memo.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-pink-500 rounded-[2.5rem]">
+            <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
+                <div class="flex flex-col items-center">
+                    <div class="bg-gradient-to-br from-pink-400 to-pink-600 text-white p-5 rounded-3xl mb-6 shadow-md">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">MEMO</h2>
+                    <p id="desc-memo" class="text-lg text-gray-700 leading-relaxed font-medium">
+                        Potencia tu memoria fotográfica emparejando elements ocultos. El tablero se expande cada 3 niveles superados.
+                    </p>
+                </div>
+                <p class="mt-6 text-base text-pink-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
+            </article>
+        </button>
+
+        <button onclick="cargarJuego('match3.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-purple-500 rounded-[2.5rem]">
+            <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
+                <div class="flex flex-col items-center">
+                    <div class="bg-gradient-to-br from-purple-500 to-indigo-600 text-white p-5 rounded-3xl mb-6 shadow-md">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Neon Match 3</h2>
+                    <p id="desc-block" class="text-lg text-gray-700 leading-relaxed font-medium">
+                        Entrena tu visión espacial alineando gemas y sprites de neón modernos y llenos de colorido en este adictivo puzzle.
+                    </p>
+                </div>
+                <p class="mt-6 text-base text-purple-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
+            </article>
+        </button>
+
+        <button onclick="cargarJuego('comecocos.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-cyan-400 rounded-[2.5rem]">
+            <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
+                <div class="flex flex-col items-center">
+                    <div class="bg-gradient-to-br from-cyan-400 to-blue-600 text-white p-5 rounded-3xl mb-6 shadow-md">
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Neon Dog Eater</h2>
+                    <p id="desc-comecocos" class="text-lg text-gray-700 leading-relaxed font-medium">
+                        Guía al tierno perrito de neón para comer todas las galletas de energía y esquiva los veloces OVNIs alienígenas que te persiguen.
+                    </p>
+                </div>
+                <p class="mt-6 text-base text-cyan-500 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
+            </article>
+        </button>
+
+ main>
+
+    <section class="w-full max-w-2xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-16 mx-4">
+        <h2 id="board-title" class="text-2xl font-extrabold text-center text-gray-900 mb-6 tracking-tight flex items-center justify-center gap-2">
+            🏆 RÉCORDS MUNDIALES 🏆
+        </h2>
+
+        <div class="flex justify-center gap-2 mb-6 bg-black/10 p-1.5 rounded-2xl backdrop-blur-sm flex-wrap">
+            <button id="btn-vibez" onclick="switchLeaderboard('vibez_fly')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-pink-600 text-white shadow-md">
+                Vibez Fly
+            </button>
+            <button id="btn-brain" onclick="switchLeaderboard('brain_training')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">
+                Brain Training
+            </button>
+            <button id="btn-memo" onclick="switchLeaderboard('memo')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">
+                MEMO
+            </button>
+            <button id="btn-match3" onclick="switchLeaderboard('match3')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">
+                MATCH 3
+            </button>
+            <button id="btn-dog" onclick="switchLeaderboard('dog_eater')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">
+                DOG EATER
+            </button>
+        </div>
+
+        <div class="bg-white/50 rounded-2xl overflow-hidden shadow-inner border border-white/30">
+            <div id="leaderboard-header" class="grid grid-cols-3 bg-black/10 px-4 py-3 font-bold text-gray-900 text-sm tracking-wide uppercase">
+                <div>Posición</div>
+                <div>Jugador</div>
+                <div class="text-right">Puntos</div>
+            </div>
+            
+            <div id="leaderboard-rows" class="divide-y divide-black/5 font-medium text-gray-800">
+                <div id="loading-msg" class="grid grid-cols-3 px-4 py-4 items-center text-center text-gray-500 col-span-3">
+                    Cargando puntuaciones online...
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="mt-6">
+        <a href="index.html" id="btn-back-home" class="inline-flex items-center justify-center px-6 py-3 font-bold text-white transition-all duration-200 bg-gray-900 rounded-xl hover:bg-gray-800 hover:-translate-y-0.5 shadow-md">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Volver al Inicio
+        </a>
+    </footer>
+
+    <script>
+        function cargarJuego(url) {
+            const iframe = document.getElementById('pantalla-juego');
+            const contenedor = document.getElementById('contenedor-pantalla');
+            const menu = document.getElementById('menu-juegos');
+
+            if (iframe && menu && contenedor) {
+                iframe.src = url;
+                contenedor.classList.remove('hidden');
+                menu.classList.add('hidden');
+                contenedor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // ⚡ TRUCO DE ENFOQUE CRÍTICO: Da la prioridad al iframe en cuanto se abre el juego
+                setTimeout(() => {
+                    iframe.contentWindow.focus();
+                }, 300);
+            }
+        }
+
+        function volverAlMenu() {
+            const iframe = document.getElementById('pantalla-juego');
+            const contenedor = document.getElementById('contenedor-pantalla');
+            const menu = document.getElementById('menu-juegos');
+
+            if (iframe && menu && contenedor) {
+                iframe.src = '';
+                contenedor.classList.add('hidden');
+                menu.classList.remove('hidden');
+            }
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        // CORRECCIÓN: Textos informativos de ayuda actualizados para WASD
+        const TEXTOS_JUEGOS = {
+            es: {
+                sub: "Elige tu entrenamiento mental",
+                vflyDesc: "Mantén el vuelo del corazón a base de toques y esquiva los letales cuchillos en este reto de reflejos.",
+                brainTitle: "Brain Training",
+                brainDesc: "Pon a prueba tu velocidad mental ordenando secuencias de burbujas numéricas de menor a mayor.",
+                memoDesc: "Potencia tu memoria fotográfica emparejando elementos ocultos. El tablero se expande cada 3 niveles superados.",
+                blockDesc: "Entrena tu visión espacial alineando gemas y sprites de neón modernos y llenos de colorido en este adictivo puzzle.",
+                comecocosDesc: "Guía al tierno perrito de neón para comer todas las galletas con las letras W, A, S, D y huye de los OVNIs alienígenas.",
+                playBtn: "Jugar Ahora",
+                boardTitle: "🏆 RÉCORDS MUNDIALES 🏆",
+                headPos: "Posición",
+                headUser: "Jugador",
+                headScore: "Puntos",
+                loading: "Cargando puntuaciones online...",
+                empty: "¡Nadie ha registrado récords aún! Sé el primero.",
+                error: "Error al conectar con los récords mundiales.",
+                btnBack: "Volver al Inicio"
+            },
+            en: {
+                sub: "Choose your mental training",
+                vflyDesc: "Keep the heart airborne with well-timed taps and dodge lethal knives in this reflection challenge.",
+                brainTitle: "Brain Training",
+                brainDesc: "Test your mental processing speed by sorting numerical bubble sequences from lowest to highest.",
+                memoDesc: "Boost your photographic memory by pairing hidden elements. The layout expands every 3 completed levels.",
+                blockDesc: "Train your spatial awareness and logic by lining up neon gemstones and vibrant blocks in this addictive puzzle.",
+                comecocosDesc: "Guide the cute neon dog to eat all the treats using W, A, S, D keys while escaping from fast alien UFOs.",
+                playBtn: "Play Now",
+                boardTitle: "🏆 WORLD LEADERBOARDS 🏆",
+                headPos: "Rank",
+                headUser: "Player",
+                headScore: "Score",
+                loading: "Loading live scores...",
+                empty: "No highscores registered yet! Be the first one.",
+                error: "Failed to connect to the global leaderboards.",
+                btnBack: "Back to Home"
+            }
+        };
+
+        const currentLang = navigator.language.startsWith('es') ? 'es' : 'en';
+
+        document.getElementById('menu-sub').innerText = TEXTOS_JUEGOS[currentLang].sub;
+        document.getElementById('desc-vfly').innerText = TEXTOS_JUEGOS[currentLang].vflyDesc;
+        document.getElementById('title-brain').innerText = TEXTOS_JUEGOS[currentLang].brainTitle;
+        document.getElementById('desc-brain').innerText = TEXTOS_JUEGOS[currentLang].brainDesc;
+        document.getElementById('desc-memo').innerText = TEXTOS_JUEGOS[currentLang].memoDesc;
+        document.getElementById('desc-block').innerText = TEXTOS_JUEGOS[currentLang].blockDesc;
+        document.getElementById('desc-comecocos').innerText = TEXTOS_JUEGOS[currentLang].comecocosDesc;
+        document.getElementById('board-title').innerText = TEXTOS_JUEGOS[currentLang].boardTitle;
+        document.getElementById('btn-back-home').lastChild.textContent = " " + TEXTOS_JUEGOS[currentLang].btnBack;
+        
+        document.querySelectorAll('.btn-play-text').forEach(p => {
+            p.innerText = TEXTOS_JUEGOS[currentLang].playBtn;
+        });
+
+        document.getElementById('leaderboard-header').innerHTML = `
+            <div>${TEXTOS_JUEGOS[currentLang].headPos}</div>
+            <div>${TEXTOS_JUEGOS[currentLang].headUser}</div>
+            <div class="text-right">${TEXTOS_JUEGOS[currentLang].headScore}</div>
+        `;
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
+            authDomain: "vibezmatch-91c6d.firebaseapp.com",
+            databaseURL: "https://vibezmatch-91c6d-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "vibezmatch-91c6d",
+            storageBucket: "vibezmatch-91c6d.appspot.com",
+            messagingSenderId: "645008717503",
+            appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function loadLeaderboard(gameId) {
+            const rowsContainer = document.getElementById('leaderboard-rows');
+            rowsContainer.innerHTML = `
+                <div class="grid grid-cols-3 px-4 py-4 items-center text-center text-gray-500 col-span-3">
+                    ${TEXTOS_JUEGOS[currentLang].loading}
+                </div>
+            `;
+
+            try {
+                const q = query(
+                    collection(db, "scores_arcade"),
+                    where("game", "==", gameId),
+                    orderBy("score", "desc"),
+                    limit(10)
+                );
+
+                const querySnapshot = await getDocs(q);
+                rowsContainer.innerHTML = "";
+
+                if (querySnapshot.empty) {
+                    rowsContainer.innerHTML = `
+                        <div class="grid grid-cols-3 px-4 py-4 items-center text-center text-gray-400 italic col-span-3">
+                            ${TEXTOS_JUEGOS[currentLang].empty}
+                        </div>
+                    `;
+                    return;
+                }
+
+                let position = 1;
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    let medal = `${position}º`;
+                    if (position === 1) medal = "🥇 1º";
+                    if (position === 2) medal = "🥈 2º";
+                    if (position === 3) medal = "🥉 3º";
+
+                    let flag = data.country ? data.country : "";
+
+                    rowsContainer.innerHTML += `
+                        <div class="grid grid-cols-3 px-4 py-3 items-center hover:bg-black/5 transition-colors duration-150">
+                            <div class="font-bold ${position <= 3 ? 'text-amber-500' : 'text-gray-500'}">${medal}</div>
+                            <div class="font-semibold text-gray-900 flex items-center gap-2">
+                                <span>${data.player}</span>
+                                <span class="text-base">${flag}</span>
+                            </div>
+                            <div class="text-right font-extrabold text-gray-900 tracking-wider">${data.score}</div>
+                        </div>
+                    `;
+                    position++;
+                });
+
+            } catch (error) {
+                console.error("Error cargando Firestore:", error);
+                rowsContainer.innerHTML = `
+                    <div class="grid grid-cols-3 px-4 py-4 items-center text-center text-red-500 font-semibold col-span-3">
+                        ${TEXTOS_JUEGOS[currentLang].error}
+                    </div>
+                `;
+            }
+        }
+
+        window.switchLeaderboard = function(gameId) {
+            const btnVibez = document.getElementById('btn-vibez');
+            const btnBrain = document.getElementById('btn-brain');
+            const btnMemo = document.getElementById('btn-memo');
+            const btnMatch3 = document.getElementById('btn-match3');
+            const btnDog = document.getElementById('btn-dog');
+            
+            [btnVibez, btnBrain, btnMemo, btnMatch3, btnDog].forEach(btn => {
+                if (btn) btn.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40";
+            });
+
+            const targetBtn = document.getElementById(gameId === 'vibez_fly' ? 'btn-vibez' : gameId === 'brain_training' ? 'btn-brain' : gameId === 'memo' ? 'btn-memo' : gameId === 'match3' ? 'btn-match3' : 'btn-dog');
+            if (targetBtn) {
+                const colorClass = gameId === 'match3' ? 'bg-purple-600' : gameId === 'dog_eater' ? 'bg-cyan-600' : 'bg-pink-600';
+                targetBtn.className = `px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 ${colorClass} text-white shadow-md`;
+            }
+
+            loadLeaderboard(gameId);
+        }
+        
+        window.switchLeaderboard('vibez_fly');
+    </script>
+</body>
+</html>
