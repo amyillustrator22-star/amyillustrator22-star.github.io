@@ -17,7 +17,9 @@
             padding-top: 20px;
         }
         .title { font-size: 2.2rem; font-weight: bold; color: #a855f7; text-shadow: 0 0 15px #a855f7; margin-bottom: 5px; }
-        .score-board { background: #1e293b; padding: 8px 25px; border-radius: 9999px; border: 1px solid #475569; font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; color: #f472b6; }
+        .stats-container { display: flex; gap: 15px; margin-bottom: 15px; }
+        .score-board { background: #1e293b; padding: 8px 25px; border-radius: 9999px; border: 1px solid #475569; font-size: 1.2rem; font-weight: bold; color: #22d3ee; }
+        .level-board { background: #1e293b; padding: 8px 25px; border-radius: 9999px; border: 1px solid #475569; font-size: 1.2rem; font-weight: bold; color: #f472b6; }
         canvas {
             background: #020617;
             border: 4px solid #334155;
@@ -30,7 +32,10 @@
 <body>
 
     <div class="title">NEON MATCH 3</div>
-    <div class="score-board">PUNTOS: <span id="score-val">0</span></div>
+    <div class="stats-container">
+        <div class="score-board">PUNTOS: <span id="score-val">0</span></div>
+        <div class="level-board">NIVEL: <span id="level-val">1</span></div>
+    </div>
 
     <canvas id="canvas-match3" width="480" height="480"></canvas>
 
@@ -53,15 +58,17 @@
         const canvas = document.getElementById('canvas-match3');
         const ctx = canvas.getContext('2d');
         const scoreVal = document.getElementById('score-val');
+        const levelVal = document.getElementById('level-val');
 
         const FILAS = 8;
         const COLUMNAS = 8;
         const TAM_CASILLA = 60;
 
-        // 💎 LOS EMOJIS EXACTOS DE TU CAPTURA RESTAURADOS
         const EMOJIS = ['💎', '❤️', '🔥', '⭐', '🔮', '🍀'];
         let tablero = [];
         let score = 0;
+        let nivel = 1;
+        let velocidadCaida = 250; // Retardo base inicial en milisegundos
         let casillaSeleccionada = null;
         let bloqueado = false;
         let gameOver = false;
@@ -266,6 +273,15 @@
             score += eliminarSet.size * ptosPorCasilla;
             scoreVal.textContent = score;
 
+            // 🛠️ LÓGICA DE DIFICULTAD INCREMENTAL PROGRESIVA
+            let nuevoNivel = Math.floor(score / 1000) + 1;
+            if (nuevoNivel !== nivel) {
+                nivel = nuevoNivel;
+                levelVal.textContent = nivel;
+                // Reduce el retardo de refresco haciendo caer las joyas más rápido (Mínimo seguro: 70ms)
+                velocidadCaida = Math.max(70, 250 - (nivel * 25));
+            }
+
             eliminarSet.forEach(key => {
                 let [f, c] = key.split(',').map(Number);
                 tablero[f][c] = null;
@@ -274,8 +290,8 @@
             setTimeout(() => {
                 caerJoyas();
                 rellenarTablero();
-                setTimeout(() => { procesarMatches(); }, 200);
-            }, 250);
+                setTimeout(() => { procesarMatches(); }, velocidadCaida - 50);
+            }, velocidadCaida);
         }
 
         function caerJoyas() {
@@ -349,19 +365,15 @@
             }
         });
 
-        // 🎨 RENDERIZADO DE EMOJIS EN LAS INTERSECCIONES DEL CANVAS
         function dibujarJoyaEmoji(ctx, cx, cy, id, brillo) {
             ctx.save();
             let emoji = EMOJIS[id];
-            
             ctx.shadowBlur = brillo ? 30 : 8;
             ctx.shadowColor = brillo ? '#ffffff' : 'rgba(168, 85, 247, 0.3)';
-            
             ctx.font = "36px Arial";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText(emoji, cx, cy + 2); 
-            
             ctx.restore();
         }
 
@@ -385,7 +397,7 @@
             }
 
             if (casillaSeleccionada) {
-                ctx.strokeStyle = '#a855f7'; ctx.lineWidth = 3;
+                ctx.strokeStyle = '#22d3ee'; ctx.lineWidth = 3;
                 ctx.strokeRect(casillaSeleccionada.c * TAM_CASILLA + 4, casillaSeleccionada.f * TAM_CASILLA + 4, TAM_CASILLA - 8, TAM_CASILLA - 8);
             }
 
