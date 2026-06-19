@@ -136,7 +136,6 @@
             } catch(e) {}
         }
 
-        // MAPA REVISADO: Se abren los accesos arriba y abajo de la zona central
         const mapa = [
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
             [1,3,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,3,1],
@@ -160,7 +159,8 @@
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
         ];
 
-        let jugador = { x: 9 * TAM_CELDA, y: 16 * TAM_CELDA, dirX: 0, dirY: 0, sigDirX: 0, sigDirY: 0 };
+        // 🛠️ REPOSICIONADO EXACTO: Fila 18, Columna 9 (Abajo al centro sin colisión)
+        let jugador = { x: 9 * TAM_CELDA, y: 18 * TAM_CELDA, dirX: 0, dirY: 0, sigDirX: 0, sigDirY: 0 };
         
         let aliens = [
             { x: 9 * TAM_CELDA, y: 8 * TAM_CELDA, dirX: 1, dirY: 0, color: ALIEN_COLORS[0], ojoAngulo: 0, factorRnd: 0.1, comido: false },
@@ -324,7 +324,7 @@
                             gameOver = true;
                             guardarRecord();
                         } else {
-                            jugador.x = 9 * TAM_CELDA; jugador.y = 16 * TAM_CELDA;
+                            jugador.x = 9 * TAM_CELDA; jugador.y = 18 * TAM_CELDA;
                             jugador.dirX = jugador.dirY = jugador.sigDirX = jugador.sigDirY = 0;
                         }
                     }

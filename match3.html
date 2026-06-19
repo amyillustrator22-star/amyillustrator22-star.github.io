@@ -36,8 +36,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-fold/firebase-firestore.js";
-        import { getFirestore as firestore, collection as col, addDoc as docAdd } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
@@ -49,7 +48,7 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = firestore(app);
+        const db = getFirestore(app);
 
         const canvas = document.getElementById('canvas-match3');
         const ctx = canvas.getContext('2d');
@@ -134,17 +133,17 @@
             if (gameOver) return;
             gameOver = true;
             setTimeout(async () => {
-                const nombre = prompt(`¡SE ACABARON LAS COMBINACIONES VÁLIDAS!\nPuntuación total: ${score} puntos.\n\nEscribe tu nombre para la Leaderboard:`);
+                const nombre = prompt(`¡SIN MOVIMIENTOS POSIBLES!\nPuntuación total: ${score} puntos.\n\nEscribe tu nombre para la Leaderboard:`);
                 if (nombre && nombre.trim() !== "") {
                     try {
-                        await docAdd(col(db, "scores_arcade"), {
+                        await addDoc(collection(db, "scores_arcade"), {
                             game: "match3",
                             player: nombre.trim().substring(0, 12),
                             score: parseInt(score),
                             country: "🇪🇸",
                             date: new Date().toISOString()
                         });
-                        alert("¡Récord enviado!");
+                        alert("¡Puntuación guardada con éxito!");
                     } catch(e) { console.error(e); }
                 }
             }, 500);
@@ -153,7 +152,6 @@
         function procesarMatches() {
             let matches = [];
             
-            // Buscar Horizontales (Soporta 4+ con explosiones especiales)
             for (let f = 0; f < FILAS; f++) {
                 let racha = 1;
                 for (let c = 0; c < COLUMNAS; c++) {
@@ -171,7 +169,6 @@
                 }
             }
 
-            // Buscar Verticales
             for (let c = 0; c < COLUMNAS; c++) {
                 let racha = 1;
                 for (let f = 0; f < FILAS; f++) {
@@ -208,7 +205,6 @@
                     if(tablero[m.f]?.[m.c]) tablero[m.f][m.c].brillo = true;
                     efectosExplosion.push({x: m.c * TAM_CASILLA + 30, y: m.f * TAM_CASILLA + 30, r: 10, maxR: 100});
                     
-                    // Volar la fila entera y columna entera
                     for(let i=0; i<COLUMNAS; i++) eliminarSet.add(`${m.f},${i}`);
                     for(let i=0; i<FILAS; i++) eliminarSet.add(`${i},${m.c}`);
                 }
