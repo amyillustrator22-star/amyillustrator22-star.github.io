@@ -7,7 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            background: #090d16;
+            background: linear-gradient(rgba(9, 13, 22, 0.5), rgba(9, 13, 22, 0.5)), url('fondo_juegos.jpg') no-repeat center center fixed;
+            background-size: cover;
         }
         .grid-cell img {
             transition: transform 0.25s ease-in-out, filter 0.2s ease;
@@ -44,7 +45,6 @@
         const FILAS = 6;
         const COLUMNAS = 6;
         
-        // Sprites actualizados en servidores seguros para evitar el bloqueo OpaqueResponseBlocking
         const PIEZAS = [
             { id: 0, nombre: 'estrella', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=80&h=80&q=80' },
             { id: 1, nombre: 'corazon', url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=80&h=80&q=80' },
@@ -90,7 +90,6 @@
             }
         }
 
-        // CORRECCIÓN CRÍTICA: Añadida verificación segura de límites de la matriz
         function comprobarInicio(f, c, pieza, filaActual) {
             if (c >= 2 && filaActual[c-1] && filaActual[c-2] && filaActual[c-1].id === pieza.id && filaActual[c-2].id === pieza.id) return true;
             if (f >= 2 && matriz[f-1] && matriz[f-2] && matriz[f-1][c] && matriz[f-2][c] && matriz[f-1][c].id === pieza.id && matriz[f-2][c].id === pieza.id) return true;

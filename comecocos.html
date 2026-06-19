@@ -6,9 +6,13 @@
     <title>Neon Alien Eater</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { background: #090d16; }
+        body { 
+            background: linear-gradient(rgba(9, 13, 22, 0.4), rgba(9, 13, 22, 0.4)), url('fondo_juegos.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
         canvas {
-            background: #020617;
+            background: rgba(2, 6, 23, 0.8);
+            backdrop-filter: blur(4px);
             box-shadow: 0 0 30px rgba(34, 211, 238, 0.2);
         }
     </style>
@@ -115,7 +119,7 @@
 
             aliens.forEach(alien => {
                 if (alien.x % TAM_CELDA === 0 && alien.y % TAM_CELDA === 0) {
-                    let dirsValidas = []; // CORREGIDO: Espacio eliminado de la variable
+                    let dirsValidas = [];
                     [[0,-1], [0,1], [-1,0], [1,0]].forEach(d => {
                         if (d[0] !== -alien.dirX || d[1] !== -alien.dirY) {
                             if (!colisionPared(alien.x + d[0]*2, alien.y + d[1]*2)) dirsValidas.push(d);
