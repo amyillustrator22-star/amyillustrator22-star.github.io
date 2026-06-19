@@ -45,25 +45,7 @@
         <p id="menu-sub" class="text-white text-lg font-medium bg-black/40 px-4 py-1 rounded-full backdrop-blur-sm">Elige tu entrenamiento mental</p>
     </header>
 
-    <div class="car-radio mb-12 flex flex-col items-center gap-3">
-        <div class="radio-display">
-            <div class="display-text" id="radio-status">RADIO APAGADA</div>
-        </div>
-        
-        <select id="radio-dial" class="bg-slate-900 text-cyan-400 font-bold px-3 py-1.5 rounded-xl border border-slate-700 text-xs tracking-wide focus:outline-none focus:ring-2 focus:ring-cyan-500 uppercase">
-            <option value="https://stream.syntheticfm.com/1">📻 RETRO SYNTHWAVE (Estilo 80s)</option>
-            <option value="https://streaming.radionomy.com/JamendoLounge">☕ LOFI & LOUNGE (Relax total)</option>
-            <option value="https://icecast.walmradio.com:8000/classic_rock">🎸 CLASSIC ROCK (Puro Rock Libre)</option>
-            <option value="https://pub1.stream.raddios.com/9060_sc">🎵 POP HITS (Éxitos Internacionales)</option>
-        </select>
-
-        <div class="radio-controls">
-            <button class="radio-btn" id="btn-play">PLAY</button>
-            <button class="radio-btn" id="btn-pause">PAUSE</button>
-            <button class="radio-btn" id="btn-stop">STOP</button>
-        </div>
-    </div>
-
+   
     <div id="contenedor-pantalla" class="w-full max-w-4xl glass-card rounded-[2.5rem] p-4 sm:p-6 mb-16 mx-4 flex flex-col items-center hidden">
         <button onclick="volverAlMenu()" class="mb-4 bg-red-600/80 hover:bg-red-700 text-white font-bold px-4 py-1.5 rounded-xl border border-red-500 text-xs tracking-wider uppercase transition-all shadow-md self-end">
             ❌ Cerrar Juego
@@ -222,7 +204,7 @@
         }
     </script>
 
-    <script src="radio.js"></script>
+  
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
