@@ -64,11 +64,14 @@
         const COLUMNAS = 8;
         const TAM_CASILLA = 60;
 
-        const EMOJIS = ['💎', '❤️', '🔥', '⭐', '🔮', '🍀'];
+        // 🛠️ BANCO TOTAL DE EMOJIS: Irán apareciendo de forma progresiva según el nivel
+        const POOL_EMOJIS = ['💎', '❤️', '🔥', '⭐', '🔮', '🍀', '💀', '👽', '👻', '🤖'];
+        
         let tablero = [];
         let score = 0;
         let nivel = 1;
-        let velocidadCaida = 250; // Retardo base inicial en milisegundos
+        let totalEmojisDisponibles = 5; // Empezamos el nivel 1 solo con 5 piezas
+        let velocidadCaida = 250; 
         let casillaSeleccionada = null;
         let bloqueado = false;
         let gameOver = false;
@@ -127,7 +130,7 @@
                     tablero[f] = [];
                     for (let c = 0; c < COLUMNAS; c++) {
                         tablero[f][c] = {
-                            id: Math.floor(Math.random() * EMOJIS.length),
+                            id: Math.floor(Math.random() * totalEmojisDisponibles),
                             brillo: false
                         };
                     }
@@ -273,13 +276,15 @@
             score += eliminarSet.size * ptosPorCasilla;
             scoreVal.textContent = score;
 
-            // 🛠️ LÓGICA DE DIFICULTAD INCREMENTAL PROGRESIVA
+            // 🛠️ ACTUALIZACIÓN DE NIVEL Y DIFICULTAD DE PIEZAS
             let nuevoNivel = Math.floor(score / 1000) + 1;
             if (nuevoNivel !== nivel) {
                 nivel = nuevoNivel;
                 levelVal.textContent = nivel;
-                // Reduce el retardo de refresco haciendo caer las joyas más rápido (Mínimo seguro: 70ms)
-                velocidadCaida = Math.max(70, 250 - (nivel * 25));
+                velocidadCaida = Math.max(70, 250 - (nivel * 20));
+
+                // 🌟 Añade un emoji extra cada 3 niveles (Hasta llegar al tope de 10)
+                totalEmojisDisponibles = Math.min(10, 5 + Math.floor((nivel - 1) / 3));
             }
 
             eliminarSet.forEach(key => {
@@ -315,7 +320,7 @@
                 for (let c = 0; c < COLUMNAS; c++) {
                     if (tablero[f][c] === null) {
                         tablero[f][c] = {
-                            id: Math.floor(Math.random() * EMOJIS.length),
+                            id: Math.floor(Math.random() * totalEmojisDisponibles),
                             brillo: false
                         };
                     }
@@ -367,7 +372,7 @@
 
         function dibujarJoyaEmoji(ctx, cx, cy, id, brillo) {
             ctx.save();
-            let emoji = EMOJIS[id];
+            let emoji = POOL_EMOJIS[id];
             ctx.shadowBlur = brillo ? 30 : 8;
             ctx.shadowColor = brillo ? '#ffffff' : 'rgba(168, 85, 247, 0.3)';
             ctx.font = "36px Arial";
