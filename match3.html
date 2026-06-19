@@ -9,18 +9,15 @@
         body {
             background: #090d16;
         }
-        /* Animación para que las casillas se muevan e intercambien suavemente */
         .grid-cell img {
             transition: transform 0.25s ease-in-out, filter 0.2s ease;
             user-select: none;
             -webkit-user-drag: none;
         }
-        /* Resalte neón para la gema seleccionada */
         .selected img {
             filter: drop-shadow(0 0 15px #33ff33) brightness(1.3);
             transform: scale(1.15);
         }
-        /* Animación de desaparición cuando explota un Match 3 */
         .match-exploding img {
             transform: scale(0);
             opacity: 0;
@@ -47,25 +44,24 @@
         const FILAS = 6;
         const COLUMNAS = 6;
         
-        // El set de tus sprites llamativos y llenos de color
+        // Sprites actualizados en servidores seguros para evitar el bloqueo OpaqueResponseBlocking
         const PIEZAS = [
-            { id: 0, nombre: 'estrella', url: 'https://i.postimg.co/N0YtXyYg/star.png' },
-            { id: 1, nombre: 'corazon', url: 'https://i.postimg.co/bNJ36zYQ/heart.png' },
-            { id: 2, nombre: 'esmeralda', url: 'https://i.postimg.co/g2fXmYmG/emerald.png' },
-            { id: 3, nombre: 'galaxia', url: 'https://i.postimg.co/fW0fL6v2/galaxy.png' },
-            { id: 4, nombre: 'fuego', url: 'https://i.postimg.co/76bSgYm1/fire.png' },
-            { id: 5, nombre: 'rayo', url: 'https://i.postimg.co/vH0XmXyW/lightning.png' }
+            { id: 0, nombre: 'estrella', url: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=80&h=80&q=80' },
+            { id: 1, nombre: 'corazon', url: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=80&h=80&q=80' },
+            { id: 2, nombre: 'esmeralda', url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?auto=format&fit=crop&w=80&h=80&q=80' },
+            { id: 3, nombre: 'galaxia', url: 'https://images.unsplash.com/photo-1614741118887-7a4ee193a5fa?auto=format&fit=crop&w=80&h=80&q=80' },
+            { id: 4, nombre: 'fuego', url: 'https://images.unsplash.com/photo-1608889174637-3c44f6326f20?auto=format&fit=crop&w=80&h=80&q=80' },
+            { id: 5, nombre: 'rayo', url: 'https://images.unsplash.com/photo-1618005198143-e5283b019a72?auto=format&fit=crop&w=80&h=80&q=80' }
         ];
 
         let matriz = [];
         let celdaSeleccionada = null;
         let puntuacion = 0;
-        let bloqueado = false; // Evita clics locos mientras caen piezas
+        let bloqueado = false;
 
         const tablero = document.getElementById('tablero');
         const scoreVal = document.getElementById('score-val');
 
-        // Inicializar
         function crearTablero() {
             tablero.innerHTML = '';
             matriz = [];
@@ -74,10 +70,9 @@
                 let filaMatriz = [];
                 for (let c = 0; c < COLUMNAS; c++) {
                     let pieza;
-                    // Bucle para evitar que el tablero empiece con líneas de 3 ya hechas
                     do {
                         pieza = PIEZAS[Math.floor(Math.random() * PIEZAS.length)];
-                    } while (comprobarInicio(f, c, pieza));
+                    } while (comprobarInicio(f, c, pieza, filaMatriz));
 
                     filaMatriz.push(pieza);
 
@@ -86,7 +81,7 @@
                     celda.dataset.fila = f;
                     celda.dataset.columna = c;
                     celda.className = "grid-cell flex items-center justify-center bg-slate-950/40 border border-slate-800/60 rounded-2xl p-1 cursor-pointer hover:bg-slate-800/30 transition-colors duration-150 aspect-square";
-                    celda.innerHTML = `<img src="${pieza.url}" alt="${pieza.nombre}" class="w-full h-full object-contain pointer-events-none">`;
+                    celda.innerHTML = `<img src="${pieza.url}" alt="${pieza.nombre}" class="w-full h-full object-contain pointer-events-none rounded-xl">`;
                     celda.addEventListener('click', manejarClic);
 
                     tablero.appendChild(celda);
@@ -95,9 +90,10 @@
             }
         }
 
-        function comprobarInicio(f, c, pieza) {
-            if (c >= 2 && matriz[f][c-1].id === pieza.id && matriz[f][c-2].id === pieza.id) return true;
-            if (f >= 2 && matriz[f-1][c].id === pieza.id && matriz[f-2][c].id === pieza.id) return true;
+        // CORRECCIÓN CRÍTICA: Añadida verificación segura de límites de la matriz
+        function comprobarInicio(f, c, pieza, filaActual) {
+            if (c >= 2 && filaActual[c-1] && filaActual[c-2] && filaActual[c-1].id === pieza.id && filaActual[c-2].id === pieza.id) return true;
+            if (f >= 2 && matriz[f-1] && matriz[f-2] && matriz[f-1][c] && matriz[f-2][c] && matriz[f-1][c].id === pieza.id && matriz[f-2][c].id === pieza.id) return true;
             return false;
         }
 
@@ -121,10 +117,8 @@
                     celdaSeleccionada.classList.remove('selected');
                     intercambiarPiezas(fAnt, cAnt, f, c);
 
-                    // Esperamos a que termine el efecto visual del movimiento y evaluamos
                     setTimeout(() => {
                         if (!verificarYProcesarMatches()) {
-                            // Si no hay Match 3, deshacemos el movimiento (movimiento inválido)
                             intercambiarPiezas(fAnt, cAnt, f, c);
                             bloqueado = false;
                         }
@@ -152,27 +146,22 @@
             celda2.innerHTML = imgTemp;
         }
 
-        // Lógica algorítmica para encontrar combinaciones de 3 o más en línea
         function verificarYProcesarMatches() {
             let eliminar = Array(FILAS).fill(null).map(() => Array(COLUMNAS).fill(false));
             let encontrado = false;
 
-            // Buscar en horizontal
             for (let f = 0; f < FILAS; f++) {
                 for (let c = 0; c < COLUMNAS - 2; c++) {
-                    let id = matriz[f][c].id;
-                    if (id !== null && matriz[f][c+1].id === id && matriz[f][c+2].id === id) {
+                    if (matriz[f][c] && matriz[f][c].id !== null && matriz[f][c+1] && matriz[f][c+2] && matriz[f][c+1].id === matriz[f][c].id && matriz[f][c+2].id === matriz[f][c].id) {
                         eliminar[f][c] = eliminar[f][c+1] = eliminar[f][c+2] = true;
                         encontrado = true;
                     }
                 }
             }
 
-            // Buscar en vertical
             for (let c = 0; c < COLUMNAS; c++) {
                 for (let f = 0; f < FILAS - 2; f++) {
-                    let id = matriz[f][c].id;
-                    if (id !== null && matriz[f+1][c].id === id && matriz[f+2][c].id === id) {
+                    if (matriz[f][c] && matriz[f][c].id !== null && matriz[f+1][c] && matriz[f+2][c] && matriz[f+1][c].id === matriz[f][c].id && matriz[f+2][c].id === matriz[f][c].id) {
                         eliminar[f][c] = eliminar[f+1][c] = eliminar[f+2][c] = true;
                         encontrado = true;
                     }
@@ -180,19 +169,17 @@
             }
 
             if (encontrado) {
-                // Hacer desaparecer las celdas combinadas con animación
                 for (let f = 0; f < FILAS; f++) {
                     for (let c = 0; c < COLUMNAS; c++) {
                         if (eliminar[f][c]) {
                             document.getElementById(`celda-${f}-${c}`).classList.add('match-exploding');
-                            matriz[f][c] = { id: null }; // Borrado lógico
+                            matriz[f][c] = { id: null };
                             puntuacion += 10;
                         }
                     }
                 }
                 scoreVal.textContent = puntuacion;
 
-                // Esperar a que se encojan las imágenes para reordenar la gravedad
                 setTimeout(() => {
                     aplicarGravedad();
                 }, 200);
@@ -201,51 +188,43 @@
             return encontrado;
         }
 
-        // Sistema de gravedad: caen las piezas superiores y se rellenan las de arriba
         function aplicarGravedad() {
-            // Limpiar clases de animación previas
             for (let f = 0; f < FILAS; f++) {
                 for (let c = 0; c < COLUMNAS; c++) {
                     document.getElementById(`celda-${f}-${c}`).classList.remove('match-exploding');
                 }
             }
 
-            // Recorrer de abajo hacia arriba cada columna
             for (let c = 0; c < COLUMNAS; c++) {
                 for (let f = FILAS - 1; f >= 0; f--) {
                     if (matriz[f][c].id === null) {
-                        // Buscar una pieza viva más arriba
                         let fSuperior = f - 1;
                         while (fSuperior >= 0 && matriz[fSuperior][c].id === null) {
                             fSuperior--;
                         }
 
                         if (fSuperior >= 0) {
-                            // Cae la pieza viva encontrada
                             matriz[f][c] = matriz[fSuperior][c];
                             matriz[fSuperior][c] = { id: null };
                         } else {
-                            // Si no hay más piezas vivas arriba, se genera una gema nueva aleatoria
                             matriz[f][c] = PIEZAS[Math.floor(Math.random() * PIEZAS.length)];
                         }
                     }
                 }
             }
 
-            // Redibujar el tablero completo ya actualizado por gravedad
             for (let f = 0; f < FILAS; f++) {
                 for (let c = 0; c < COLUMNAS; c++) {
                     const celda = document.getElementById(`celda-${f}-${c}`);
-                    celda.innerHTML = `<img src="${matriz[f][c].url}" alt="${matriz[f][c].nombre}" class="w-full h-full object-contain pointer-events-none">`;
+                    celda.innerHTML = `<img src="${matriz[f][c].url}" alt="${matriz[f][c].nombre}" class="w-full h-full object-contain pointer-events-none rounded-xl">`;
                 }
             }
 
-            // Comprobar si al caer nuevas piezas se genera un nuevo Match automático en cadena
             setTimeout(() => {
                 if (verificarYProcesarMatches()) {
-                    // Hay combos automáticos, sigue en bucle bloqueado
+                    // Combos en cadena
                 } else {
-                    bloqueado = false; // El tablero se detiene estable, devolvemos el control al jugador
+                    bloqueado = false;
                 }
             }, 250);
         }
