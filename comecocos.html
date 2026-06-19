@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neon Alien Eater</title>
+    <title>Neon Dog Eater</title>
     <style>
         body { background: #090d16; color: white; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
         .header { text-align: center; margin-bottom: 15px; }
@@ -17,7 +17,7 @@
 <body>
 
     <div class="header">
-        <div class="title">SPACE ALIEN EATER</div>
+        <div class="title">NEON DOG EATER</div>
         <div class="stats">
             <div>PUNTOS: <span id="score-val" style="color:#22d3ee">0</span></div>
             <div>VIDAS: <span id="lives-val" style="color:#ec4899">3</span></div>
@@ -30,7 +30,22 @@
         CONTROLES: <span class="tecla">W</span> Arriba | <span class="tecla">S</span> Abajo | <span class="tecla">A</span> Izquierda | <span class="tecla">D</span> Derecha
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
+            authDomain: "vibezmatch-91c6d.firebaseapp.com",
+            projectId: "vibezmatch-91c6d",
+            storageBucket: "vibezmatch-91c6d.appspot.com",
+            messagingSenderId: "645008717503",
+            appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         const canvas = document.getElementById('canvas-game');
         const ctx = canvas.getContext('2d');
         const scoreVal = document.getElementById('score-val');
@@ -40,9 +55,49 @@
         let score = 0;
         let lives = 3;
         let gameOver = false;
+        let audioCtx = null;
 
-        // 4 Colores llamativos para los 4 OVNIs enemigos
         const ALIEN_COLORS = ['#ec4899', '#f97316', '#a855f7', '#06b6d4'];
+
+        // Inicializador del motor de sonido sintético arcade
+        function iniciarAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function sonarBip(frecuencia, duracion) {
+            if (!audioCtx) return;
+            try {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = "sine";
+                osc.frequency.value = frecuencia;
+                gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duracion);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + duracion);
+            } catch(e) {}
+        }
+
+        function sonarExplosion() {
+            if (!audioCtx) return;
+            try {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = "sawtooth";
+                osc.frequency.setValueAtTime(250, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(60, audioCtx.currentTime + 0.4);
+                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.4);
+            } catch(e) {}
+        }
 
         const mapa = [
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -67,23 +122,22 @@
             [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
         ];
 
-        let jugador = { x: 9 * TAM_CELDA, y: 16 * TAM_CELDA, dirX: 0, dirY: 0, sigDirX: 0, sigDirY: 0, angulo: 0 };
+        let jugador = { x: 9 * TAM_CELDA, y: 16 * TAM_CELDA, dirX: 0, dirY: 0, sigDirX: 0, sigDirY: 0, ovejitasX: 0 };
         
-        // CORRECCIÓN: Configurados exactamente los 4 OVNIs alineados
         let aliens = [
             { x: 9 * TAM_CELDA, y: 8 * TAM_CELDA, dirX: 1, dirY: 0, color: ALIEN_COLORS[0], ojoAngulo: 0, factorRnd: 0.1 },
-            { x: 8 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: -1, dirY: 0, color: ALIEN_COLORS[1], ojoAngulo: 0, factorRnd: 0.3 },
-            { x: 10 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: 0, dirY: -1, color: ALIEN_COLORS[2], ojoAngulo: 0, factorRnd: 0.2 },
-            { x: 9 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: 0, dirY: 1, color: ALIEN_COLORS[3], ojoAngulo: 0, factorRnd: 0.4 }
+            { x: 8 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: -1, dirY: 0, color: ALIEN_COLORS[1], ojoAngulo: 0, factorRnd: 0.2 },
+            { x: 10 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: 0, dirY: -1, color: ALIEN_COLORS[2], ojoAngulo: 0, factorRnd: 0.15 },
+            { x: 9 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: 0, dirY: 1, color: ALIEN_COLORS[3], ojoAngulo: 0, factorRnd: 0.3 }
         ];
 
-        // NUEVOS CONTROLES: Letras WASD (soporta mayúsculas y minúsculas)
         window.addEventListener('keydown', e => {
+            iniciarAudio();
             const tecla = e.key.toLowerCase();
-            if (tecla === 'w') { jugador.sigDirX = 0; jugador.sigDirY = -1; jugador.angulo = -Math.PI/2; }
-            if (tecla === 's') { jugador.sigDirX = 0; jugador.sigDirY = 1; jugador.angulo = Math.PI/2; }
-            if (tecla === 'a') { jugador.sigDirX = -1; jugador.sigDirY = 0; jugador.angulo = Math.PI; }
-            if (tecla === 'd') { jugador.sigDirX = 1; jugador.sigDirY = 0; jugador.angulo = 0; }
+            if (tecla === 'w') { jugador.sigDirX = 0; jugador.sigDirY = -1; }
+            if (tecla === 's') { jugador.sigDirX = 0; jugador.sigDirY = 1; }
+            if (tecla === 'a') { jugador.sigDirX = -1; jugador.sigDirY = 0; }
+            if (tecla === 'd') { jugador.sigDirX = 1; jugador.sigDirY = 0; }
         });
 
         function colisionPared(x, y) {
@@ -94,6 +148,24 @@
 
             return (mapa[celdaY1]?.[celdaX1] === 1 || mapa[celdaY1]?.[celdaX2] === 1 || 
                     mapa[celdaY2]?.[celdaX1] === 1 || mapa[celdaY2]?.[celdaX2] === 1);
+        }
+
+        async function guardarRecord() {
+            const nombre = prompt(`¡FIN DE LA MISIÓN!\nHas conseguido ${score} puntos.\n\nIntroduce tu nombre para el Récord Mundial:`);
+            if (nombre && nombre.trim() !== "") {
+                try {
+                    await addDoc(collection(db, "scores_arcade"), {
+                        game: "dog_eater",
+                        player: nombre.trim().substring(0, 12),
+                        score: parseInt(score),
+                        country: "🇪🇸",
+                        date: new Date().toISOString()
+                    });
+                    alert("¡Puntuación registrada en los Récords Mundiales!");
+                } catch(e) {
+                    console.error("Error al guardar récord:", e);
+                }
+            }
         }
 
         function actualizar() {
@@ -117,9 +189,9 @@
                 mapa[centroY][centroX] = 2;
                 score += 10;
                 scoreVal.textContent = score;
+                sonarBip(650, 0.06); // Sonido sutil al comer galleta
             }
 
-            // INTELIGENCIA ARTIFICIAL MEJORADA DE PERSECUCIÓN INTECOCOS
             aliens.forEach(alien => {
                 if (alien.x % TAM_CELDA === 0 && alien.y % TAM_CELDA === 0) {
                     let dirsValidas = [];
@@ -130,7 +202,6 @@
                     });
 
                     if (dirsValidas.length > 0) {
-                        // Con una probabilidad persiguen, si no, se mueven al azar para romper bucles
                         if (Math.random() > alien.factorRnd) {
                             let mejorDir = dirsValidas[0];
                             let distMinima = Infinity;
@@ -138,7 +209,6 @@
                             dirsValidas.forEach(d => {
                                 let sigX = alien.x + d[0] * TAM_CELDA;
                                 let sigY = alien.y + d[1] * TAM_CELDA;
-                                // Distancia en línea recta hasta la posición del jugador
                                 let dist = Math.pow(sigX - jugador.x, 2) + Math.pow(sigY - jugador.y, 2);
                                 if (dist < distMinima) {
                                     distMinima = dist;
@@ -163,12 +233,13 @@
                 if (Math.abs(jugador.x - alien.x) < 12 && Math.abs(jugador.y - alien.y) < 12) {
                     lives--;
                     livesVal.textContent = lives;
+                    sonarExplosion(); // Efecto de impacto
                     if (lives <= 0) {
                         gameOver = true;
+                        guardarRecord();
                     } else {
                         jugador.x = 9 * TAM_CELDA; jugador.y = 16 * TAM_CELDA;
                         jugador.dirX = jugador.dirY = jugador.sigDirX = jugador.sigDirY = 0;
-                        jugador.angulo = 0;
                     }
                 }
             });
@@ -177,54 +248,61 @@
         function dibujar() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+            // Pintar Laberinto de Neón
             for (let f = 0; f < mapa.length; f++) {
                 for (let c = 0; c < mapa[f].length; c++) {
                     if (mapa[f][c] === 1) {
-                        ctx.strokeStyle = '#1e3a8a';
-                        ctx.lineWidth = 2;
+                        ctx.strokeStyle = '#0284c7';
+                        ctx.lineWidth = 2.5;
                         ctx.strokeRect(c * TAM_CELDA + 2, f * TAM_CELDA + 2, TAM_CELDA - 4, TAM_CELDA - 4);
                     } else if (mapa[f][c] === 0) {
-                        ctx.fillStyle = '#06b6d4';
-                        ctx.beginPath();
-                        ctx.arc(c * TAM_CELDA + TAM_CELDA/2, f * TAM_CELDA + TAM_CELDA/2, 2.5, 0, Math.PI * 2);
-                        ctx.fill();
+                        ctx.fillStyle = '#e2e8f0';
+                        ctx.fillRect(c * TAM_CELDA + TAM_CELDA/2 - 1, f * TAM_CELDA + TAM_CELDA/2 - 1, 3, 3);
                     }
                 }
             }
 
-            // Dibujar caza espacial estilizada neón (Jugador)
+            // REDISEÑO: Dibujar perrito neón de forma vectorial detallada
+            let px = jugador.x + TAM_CELDA/2;
+            let py = jugador.y + TAM_CELDA/2;
             ctx.save();
-            ctx.translate(jugador.x + TAM_CELDA/2, jugador.y + TAM_CELDA/2);
-            ctx.rotate(jugador.angulo);
-            ctx.fillStyle = '#22d3ee';
             ctx.shadowBlur = 10;
             ctx.shadowColor = '#22d3ee';
-            ctx.beginPath();
-            ctx.moveTo(8, 0);
-            ctx.lineTo(-6, -6);
-            ctx.lineTo(-3, 0);
-            ctx.lineTo(-6, 6);
-            ctx.closePath();
-            ctx.fill();
+            
+            // Orejas caídas
+            ctx.fillStyle = '#0891b2';
+            ctx.beginPath(); ctx.ellipse(px - 6, py - 3, 3, 5, Math.PI/6, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(px + 6, py - 3, 3, 5, -Math.PI/6, 0, Math.PI*2); ctx.fill();
+            
+            // Cabeza principal
+            ctx.fillStyle = '#22d3ee';
+            ctx.beginPath(); ctx.arc(px, py + 1, 6.5, 0, Math.PI*2); ctx.fill();
+            
+            // Hocico blanco-neón
+            ctx.fillStyle = '#e0f2fe';
+            ctx.beginPath(); ctx.ellipse(px, py + 3, 3.5, 2.5, 0, 0, Math.PI*2); ctx.fill();
+            
+            // Naricita negra
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath(); ctx.arc(px, py + 2, 1.2, 0, Math.PI*2); ctx.fill();
+            
+            // Ojos negros brillantes
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath(); ctx.arc(px - 2.5, py - 1, 1.2, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(px + 2.5, py - 1, 1.2, 0, Math.PI*2); ctx.fill();
             ctx.restore();
 
-            // Dibujar los 4 OVNIs vectoriales
+            // Dibujar OVNIs Alienígenas
             aliens.forEach(alien => {
                 let ax = alien.x + TAM_CELDA/2;
                 let ay = alien.y + TAM_CELDA/2;
-
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = alien.color;
+                ctx.shadowBlur = 8; ctx.shadowColor = alien.color;
 
                 ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.beginPath();
-                ctx.arc(ax, ay - 2, 4, Math.PI, 0);
-                ctx.fill();
+                ctx.beginPath(); ctx.arc(ax, ay - 2, 4, Math.PI, 0); ctx.fill();
 
                 ctx.fillStyle = alien.color;
-                ctx.beginPath();
-                ctx.ellipse(ax, ay + 1, 8, 3, 0, 0, Math.PI*2);
-                ctx.fill();
+                ctx.beginPath(); ctx.ellipse(ax, ay + 1, 8, 3, 0, 0, Math.PI*2); ctx.fill();
 
                 let parpadeo = Math.sin(alien.ojoAngulo) > 0;
                 ctx.fillStyle = parpadeo ? '#ffffff' : '#000000';
@@ -233,12 +311,11 @@
                 ctx.arc(ax, ay + 2, 1, 0, Math.PI*2);
                 ctx.arc(ax + 4, ay + 2, 1, 0, Math.PI*2);
                 ctx.fill();
-                
                 ctx.shadowBlur = 0;
             });
 
             if (gameOver) {
-                ctx.fillStyle = 'rgba(2, 6, 23, 0.9)';
+                ctx.fillStyle = 'rgba(2, 6, 23, 0.95)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#ef4444';
                 ctx.font = 'bold 24px monospace';

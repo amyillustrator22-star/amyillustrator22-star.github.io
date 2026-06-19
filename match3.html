@@ -5,20 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neon Match 3</title>
     <style>
-        body {
-            background: #090d16;
-            color: white;
-            font-family: monospace;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-        }
+        body { background: #090d16; color: white; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
         .header { text-align: center; margin-bottom: 20px; }
         .title { font-size: 2rem; font-weight: bold; letter-spacing: 2px; color: #ff007f; text-shadow: 0 0 10px #ff007f; }
-        .score-box { background: #1e293b; padding: 8px 20px; rounded-radius: 20px; border: 1px solid #334155; margin-top: 10px; display: inline-block; border-radius: 9999px; }
+        .score-box { background: #1e293b; padding: 8px 20px; border: 1px solid #334155; margin-top: 10px; display: inline-block; border-radius: 9999px; }
         .score-val { color: #06b6d4; font-weight: bold; }
         
         .tablero {
@@ -35,18 +25,7 @@
             aspect-ratio: 1/1;
             box-sizing: border-box;
         }
-        .grid-cell {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1.8rem;
-            user-select: none;
-            transition: all 0.2s ease-in-out;
-            box-sizing: border-box;
-            background: rgba(30, 41, 59, 0.5);
-        }
+        .grid-cell { display: flex; align-items: center; justify-content: center; border-radius: 12px; cursor: pointer; font-size: 1.8rem; user-select: none; transition: all 0.2s ease-in-out; box-sizing: border-box; background: rgba(30, 41, 59, 0.5); }
         .cell-0 { border: 2px solid #eab308; box-shadow: inset 0 0 8px rgba(234,179,8,0.3); }
         .cell-1 { border: 2px solid #ef4444; box-shadow: inset 0 0 8px rgba(239,68,68,0.3); }
         .cell-2 { border: 2px solid #06b6d4; box-shadow: inset 0 0 8px rgba(6,182,212,0.3); }
@@ -54,13 +33,10 @@
         .cell-4 { border: 2px solid #f97316; box-shadow: inset 0 0 8px rgba(249,115,22,0.3); }
         .cell-5 { border: 2px solid #10b981; box-shadow: inset 0 0 8px rgba(16,185,129,0.3); }
 
-        .selected {
-            filter: brightness(1.4);
-            transform: scale(1.08);
-            background: rgba(51, 255, 51, 0.2) !important;
-            border-color: #33ff33 !important;
-        }
+        .selected { filter: brightness(1.4); transform: scale(1.08); background: rgba(51, 255, 51, 0.2) !important; border-color: #33ff33 !important; }
         .match-exploding { transform: scale(0); opacity: 0; }
+        
+        .game-over-layer { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(2,6,23,0.95); display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 2rem; color: #ef4444; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -72,7 +48,22 @@
 
     <div id="tablero" class="tablero"></div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
+            authDomain: "vibezmatch-91c6d.firebaseapp.com",
+            projectId: "vibezmatch-91c6d",
+            storageBucket: "vibezmatch-91c6d.appspot.com",
+            messagingSenderId: "645008717503",
+            appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         const FILAS = 6;
         const COLUMNAS = 6;
         
@@ -89,14 +80,56 @@
         let celdaSeleccionada = null;
         let puntuacion = 0;
         let bloqueado = false;
+        let audioCtx = null;
+        let movimientosRestantes = 20; // Límite para forzar el fin de partida y guardar el récord
 
         const tablero = document.getElementById('tablero');
         const scoreVal = document.getElementById('score-val');
 
+        function iniciarAudio() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function sonarMatch() {
+            if (!audioCtx) return;
+            try {
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // Nota Do5
+                osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.08); // Nota Mi5
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.25);
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.25);
+            } catch(e) {}
+        }
+
+        async function finalizarPartida() {
+            bloqueado = true;
+            const capa = document.createElement('div');
+            capa.className = "game-over-layer";
+            capa.innerHTML = `<div>¡PARTIDA COMPLETADA!</div><div style="font-size:1.2rem; color:white; margin-top:10px;">Puntos Totales: ${puntuacion}</div>`;
+            document.body.appendChild(capa);
+
+            const nombre = prompt(`¡Buen juego!\nHas conseguido ${puntuacion} puntos.\n\nEscribe tu nombre para el Marcador Mundial:`);
+            if (nombre && nombre.trim() !== "") {
+                try {
+                    await addDoc(collection(db, "scores_arcade"), {
+                        game: "match3",
+                        player: nombre.trim().substring(0, 12),
+                        score: parseInt(puntuacion),
+                        country: "🇪🇸",
+                        date: new Date().toISOString()
+                    });
+                    alert("¡Récord subido con éxito!");
+                } catch(e) { console.error(e); }
+            }
+        }
+
         function crearTablero() {
             tablero.innerHTML = '';
             matriz = [];
-
             for (let f = 0; f < FILAS; f++) {
                 let filaMatriz = [];
                 for (let c = 0; c < COLUMNAS; c++) {
@@ -104,17 +137,14 @@
                     do {
                         pieza = PIEZAS[Math.floor(Math.random() * PIEZAS.length)];
                     } while (comprobarInicio(f, c, pieza, filaMatriz));
-
                     filaMatriz.push(pieza);
 
                     const celda = document.createElement('div');
                     celda.id = `celda-${f}-${c}`;
-                    celda.dataset.fila = f;
-                    celda.dataset.columna = c;
+                    celda.dataset.fila = f; celda.dataset.columna = c;
                     celda.className = `grid-cell ${pieza.clase}`;
                     celda.textContent = pieza.simbolo;
                     celda.addEventListener('click', manejarClic);
-
                     tablero.appendChild(celda);
                 }
                 matriz.push(filaMatriz);
@@ -128,6 +158,7 @@
         }
 
         function manejarClic(e) {
+            iniciarAudio();
             if (bloqueado) return;
             const celdaClick = e.currentTarget;
             const f = parseInt(celdaClick.dataset.fila);
@@ -139,7 +170,6 @@
             } else {
                 const fAnt = parseInt(celdaSeleccionada.dataset.fila);
                 const cAnt = parseInt(celdaSeleccionada.dataset.columna);
-
                 const esAdyacente = (Math.abs(f - fAnt) === 1 && c === cAnt) || (Math.abs(c - cAnt) === 1 && f === fAnt);
 
                 if (esAdyacente) {
@@ -151,9 +181,13 @@
                         if (!verificarYProcesarMatches()) {
                             intercambiarPiezas(fAnt, cAnt, f, c);
                             bloqueado = false;
+                        } else {
+                            movimientosRestantes--;
+                            if (movimientosRestantes <= 0) {
+                                setTimeout(finalizarPartida, 500);
+                            }
                         }
                     }, 250);
-                    
                     celdaSeleccionada = null;
                 } else {
                     celdaSeleccionada.classList.remove('selected');
@@ -167,18 +201,11 @@
             let temp = matriz[f1][c1];
             matriz[f1][c1] = matriz[f2][c2];
             matriz[f2][c2] = temp;
-
             const celda1 = document.getElementById(`celda-${f1}-${c1}`);
             const celda2 = document.getElementById(`celda-${f2}-${c2}`);
-
-            let textoTemp = celda1.textContent;
-            let claseTemp = celda1.className;
-
-            celda1.textContent = celda2.textContent;
-            celda1.className = celda2.className;
-
-            celda2.textContent = textoTemp;
-            celda2.className = claseTemp;
+            let textoTemp = celda1.textContent; let claseTemp = celda1.className;
+            celda1.textContent = celda2.textContent; celda1.className = celda2.className;
+            celda2.textContent = textoTemp; celda2.className = claseTemp;
         }
 
         function verificarYProcesarMatches() {
@@ -188,22 +215,20 @@
             for (let f = 0; f < FILAS; f++) {
                 for (let c = 0; c < COLUMNAS - 2; c++) {
                     if (matriz[f][c] && matriz[f][c].id !== null && matriz[f][c+1] && matriz[f][c+2] && matriz[f][c+1].id === matriz[f][c].id && matriz[f][c+2].id === matriz[f][c].id) {
-                        eliminar[f][c] = eliminar[f][c+1] = eliminar[f][c+2] = true;
-                        encontrado = true;
+                        eliminar[f][c] = eliminar[f][c+1] = eliminar[f][c+2] = true; encontrado = true;
                     }
                 }
             }
-
             for (let c = 0; c < COLUMNAS; c++) {
                 for (let f = 0; f < FILAS - 2; f++) {
                     if (matriz[f][c] && matriz[f][c].id !== null && matriz[f+1][c] && matriz[f+2][c] && matriz[f+1][c].id === matriz[f][c].id && matriz[f+2][c].id === matriz[f][c].id) {
-                        eliminar[f][c] = eliminar[f+1][c] = eliminar[f+2][c] = true;
-                        encontrado = true;
+                        eliminar[f][c] = eliminar[f+1][c] = eliminar[f+2][c] = true; encontrado = true;
                     }
                 }
             }
 
             if (encontrado) {
+                sonarMatch(); // Lanzar efecto de sonido retro
                 for (let f = 0; f < FILAS; f++) {
                     for (let c = 0; c < COLUMNAS; c++) {
                         if (eliminar[f][c]) {
@@ -214,12 +239,8 @@
                     }
                 }
                 scoreVal.textContent = puntuacion;
-
-                setTimeout(() => {
-                    aplicarGravedad();
-                }, 250);
+                setTimeout(aplicarGravedad, 250);
             }
-
             return encontrado;
         }
 
@@ -229,25 +250,19 @@
                     document.getElementById(`celda-${f}-${c}`).classList.remove('match-exploding');
                 }
             }
-
             for (let c = 0; c < COLUMNAS; c++) {
                 for (let f = FILAS - 1; f >= 0; f--) {
                     if (matriz[f][c].id === null) {
                         let fSuperior = f - 1;
-                        while (fSuperior >= 0 && matriz[fSuperior][c].id === null) {
-                            fSuperior--;
-                        }
-
+                        while (fSuperior >= 0 && matriz[fSuperior][c].id === null) fSuperior--;
                         if (fSuperior >= 0) {
-                            matriz[f][c] = matriz[fSuperior][c];
-                            matriz[fSuperior][c] = { id: null };
+                            matriz[f][c] = matriz[fSuperior][c]; matriz[fSuperior][c] = { id: null };
                         } else {
                             matriz[f][c] = PIEZAS[Math.floor(Math.random() * PIEZAS.length)];
                         }
                     }
                 }
             }
-
             for (let f = 0; f < FILAS; f++) {
                 for (let c = 0; c < COLUMNAS; c++) {
                     const celda = document.getElementById(`celda-${f}-${c}`);
@@ -255,14 +270,7 @@
                     celda.className = `grid-cell ${matriz[f][c].clase}`;
                 }
             }
-
-            setTimeout(() => {
-                if (verificarYProcesarMatches()) {
-                    // combos
-                } else {
-                    bloqueado = false;
-                }
-            }, 250);
+            setTimeout(() => { verificarYProcesarMatches(); if(movimientosRestantes > 0) bloqueado = false; }, 250);
         }
 
         crearTablero();

@@ -139,9 +139,9 @@
                     <div class="bg-gradient-to-br from-cyan-400 to-blue-600 text-white p-5 rounded-3xl mb-6 shadow-md">
                         <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
-                    <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Neon Alien Eater</h2>
+                    <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Neon Dog Eater</h2>
                     <p id="desc-comecocos" class="text-lg text-gray-700 leading-relaxed font-medium">
-                        Recorre el laberinto comiendo píxeles de energía y huye de los aliens mutantes multicolor que te siguen con la mirada.
+                        Guía al tierno perrito de neón para comer todas las galletas de energía y esquiva los veloces OVNIs alienígenas que te persiguen.
                     </p>
                 </div>
                 <p class="mt-6 text-base text-cyan-500 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
@@ -165,8 +165,11 @@
             <button id="btn-memo" onclick="switchLeaderboard('memo')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">
                 MEMO
             </button>
-            <button id="btn-block" onclick="switchLeaderboard('block')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">
-                BLOCK
+            <button id="btn-match3" onclick="switchLeaderboard('match3')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">
+                MATCH 3
+            </button>
+            <button id="btn-dog" onclick="switchLeaderboard('dog_eater')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">
+                DOG EATER
             </button>
         </div>
 
@@ -361,20 +364,17 @@
             const btnVibez = document.getElementById('btn-vibez');
             const btnBrain = document.getElementById('btn-brain');
             const btnMemo = document.getElementById('btn-memo');
-            const btnBlock = document.getElementById('btn-block');
+            const btnMatch3 = document.getElementById('btn-match3');
+            const btnDog = document.getElementById('btn-dog');
             
-            [btnVibez, btnBrain, btnMemo, btnBlock].forEach(btn => {
+            [btnVibez, btnBrain, btnMemo, btnMatch3, btnDog].forEach(btn => {
                 if (btn) btn.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40";
             });
 
-            if (gameId === 'vibez_fly') {
-                btnVibez.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-pink-600 text-white shadow-md";
-            } else if (gameId === 'brain_training') {
-                btnBrain.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-cyan-600 text-white shadow-md";
-            } else if (gameId === 'memo') {
-                btnMemo.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-pink-600 text-white shadow-md";
-            } else if (gameId === 'block') {
-                btnBlock.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-purple-600 text-white shadow-md";
+            const targetBtn = document.getElementById(gameId === 'vibez_fly' ? 'btn-vibez' : gameId === 'brain_training' ? 'btn-brain' : gameId === 'memo' ? 'btn-memo' : gameId === 'match3' ? 'btn-match3' : 'btn-dog');
+            if (targetBtn) {
+                const colorClass = gameId === 'match3' ? 'bg-purple-600' : gameId === 'dog_eater' ? 'bg-cyan-600' : 'bg-pink-600';
+                targetBtn.className = `px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 ${colorClass} text-white shadow-md`;
             }
 
             loadLeaderboard(gameId);
