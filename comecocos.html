@@ -5,13 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Neon Dog Eater</title>
     <style>
-        body { background: #090d16; color: white; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        body { 
+            background: #090d16; 
+            color: white; 
+            font-family: monospace; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            overflow: hidden;
+        }
         .header { text-align: center; margin-bottom: 15px; }
-        .title { font-size: 1.8rem; font-weight: bold; color: #22d3ee; text-shadow: 0 0 10px #22d3ee; }
-        .stats { background: #1e293b; padding: 6px 16px; border-radius: 9999px; border: 1px solid #334155; display: flex; gap: 20px; font-weight: bold; margin-top: 5px; }
-        canvas { background: #020617; box-shadow: 0 0 30px rgba(34, 211, 238, 0.25); border-radius: 16px; border: 4px solid #1e293b; }
-        .controles-info { margin-top: 10px; font-size: 0.8rem; color: #64748b; font-weight: bold; text-align: center; }
-        .tecla { background: #334155; color: #22d3ee; padding: 2px 6px; border-radius: 4px; border: 1px solid #475569; }
+        .title { font-size: 2rem; font-weight: bold; color: #22d3ee; text-shadow: 0 0 10px #22d3ee; letter-spacing: 1px; }
+        .stats { background: #1e293b; padding: 8px 20px; border-radius: 9999px; border: 1px solid #334155; display: flex; gap: 25px; font-weight: bold; margin-top: 8px; font-size: 1.1rem; }
+        
+        /* PANTALLA MÁS GRANDE: Ajustada a 500px de ancho y alto */
+        canvas { 
+            background: #020617; 
+            box-shadow: 0 0 35px rgba(34, 211, 238, 0.3); 
+            border-radius: 20px; 
+            border: 4px solid #1e293b; 
+            outline: none;
+        }
+        .controles-info { margin-top: 12px; font-size: 0.9rem; color: #64748b; font-weight: bold; text-align: center; }
+        .tecla { background: #334155; color: #22d3ee; padding: 3px 8px; border-radius: 5px; border: 1px solid #475569; }
     </style>
 </head>
 <body>
@@ -24,7 +43,7 @@
         </div>
     </div>
 
-    <canvas id="canvas-game" width="380" height="380"></canvas>
+    <canvas id="canvas-game" width="500" height="500" tabindex="1"></canvas>
     
     <div class="controles-info">
         CONTROLES: <span class="tecla">W</span> Arriba | <span class="tecla">S</span> Abajo | <span class="tecla">A</span> Izquierda | <span class="tecla">D</span> Derecha
@@ -51,7 +70,8 @@
         const scoreVal = document.getElementById('score-val');
         const livesVal = document.getElementById('lives-val');
 
-        const TAM_CELDA = 20;
+        // Escalado dinámico de celdas para el nuevo tamaño de 500px (25px por celda)
+        const TAM_CELDA = 25; 
         let score = 0;
         let lives = 3;
         let gameOver = false;
@@ -59,7 +79,11 @@
 
         const ALIEN_COLORS = ['#ec4899', '#f97316', '#a855f7', '#06b6d4'];
 
-        // Inicializador del motor de sonido sintético arcade
+        // Foco automático e instantáneo al cargar
+        canvas.focus();
+        window.addEventListener('DOMContentLoaded', () => { canvas.focus(); });
+        canvas.addEventListener('click', () => { canvas.focus(); });
+
         function iniciarAudio() {
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -88,47 +112,48 @@
                 let osc = audioCtx.createOscillator();
                 let gain = audioCtx.createGain();
                 osc.type = "sawtooth";
-                osc.frequency.setValueAtTime(250, audioCtx.currentTime);
-                osc.frequency.linearRampToValueAtTime(60, audioCtx.currentTime + 0.4);
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
+                osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                osc.frequency.linearRampToValueAtTime(50, audioCtx.currentTime + 0.45);
+                gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.45);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.4);
+                osc.stop(audioCtx.currentTime + 0.45);
             } catch(e) {}
         }
 
+        // Matriz del laberinto perfectamente cuadrada para 20x20 celdas de 25px
         const mapa = [
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
-            [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
-            [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
-            [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
-            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
-            [1,0,1,1,0,1,0,1,1,1,1,1,0,1,0,1,1,0,1],
-            [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
-            [1,1,1,1,0,1,1,1,2,1,2,1,1,1,0,1,1,1,1],
-            [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
-            [1,1,1,1,0,1,2,1,1,2,1,1,2,1,0,1,1,1,1],
-            [2,2,2,2,0,2,2,1,2,2,2,1,2,2,0,2,2,2,2],
-            [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1],
-            [2,2,2,1,0,1,2,2,2,2,2,2,2,1,0,1,2,2,2],
-            [1,1,1,1,0,1,2,1,1,1,1,1,2,1,0,1,1,1,1],
-            [1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,1],
-            [1,0,1,1,0,1,1,1,0,1,0,1,1,1,0,1,1,0,1],
-            [1,0,0,1,0,0,0,0,0,2,0,0,0,0,0,1,0,0,1],
-            [1,1,0,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,1],
-            [1,0,0,0,0,1,0,0,0,1,0,0,0,1,0,0,0,0,1],
-            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+            [1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1,0,1],
+            [1,0,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1,0,1],
+            [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,0,1,1,1,1,1,1,0,1,0,1,1,0,1],
+            [1,0,0,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,0,1],
+            [1,1,1,1,0,1,1,1,2,1,1,2,1,1,1,0,1,1,1,1],
+            [2,2,2,1,0,1,2,2,2,2,2,2,2,2,1,0,1,2,2,2],
+            [1,1,1,1,0,1,2,1,1,2,2,1,1,2,1,0,1,1,1,1],
+            [2,2,2,2,0,2,2,1,2,2,2,2,1,2,2,0,2,2,2,2],
+            [1,1,1,1,0,1,2,1,1,1,1,1,1,2,1,0,1,1,1,1],
+            [2,2,2,1,0,1,2,2,2,2,2,2,2,2,1,0,1,2,2,2],
+            [1,1,1,1,0,1,2,1,1,1,1,1,1,2,1,0,1,1,1,1],
+            [1,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0,1],
+            [1,0,1,1,0,1,1,1,0,1,1,0,1,1,1,0,1,1,0,1],
+            [1,0,0,1,0,0,0,0,0,2,2,0,0,0,0,0,1,0,0,1],
+            [1,1,0,1,0,1,0,1,1,1,1,1,1,0,1,0,1,0,1,1],
+            [1,0,0,0,0,1,0,0,0,1,1,0,0,0,1,0,0,0,0,1],
+            [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
         ];
 
-        let jugador = { x: 9 * TAM_CELDA, y: 16 * TAM_CELDA, dirX: 0, dirY: 0, sigDirX: 0, sigDirY: 0, ovejitasX: 0 };
+        let jugador = { x: 9 * TAM_CELDA, y: 16 * TAM_CELDA, dirX: 0, dirY: 0, sigDirX: 0, sigDirY: 0 };
         
         let aliens = [
             { x: 9 * TAM_CELDA, y: 8 * TAM_CELDA, dirX: 1, dirY: 0, color: ALIEN_COLORS[0], ojoAngulo: 0, factorRnd: 0.1 },
-            { x: 8 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: -1, dirY: 0, color: ALIEN_COLORS[1], ojoAngulo: 0, factorRnd: 0.2 },
+            { x: 8 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: -1, dirY: 0, color: ALIEN_COLORS[1], ojoAngulo: 0, factorRnd: 0.25 },
             { x: 10 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: 0, dirY: -1, color: ALIEN_COLORS[2], ojoAngulo: 0, factorRnd: 0.15 },
-            { x: 9 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: 0, dirY: 1, color: ALIEN_COLORS[3], ojoAngulo: 0, factorRnd: 0.3 }
+            { x: 11 * TAM_CELDA, y: 8 * TAM_CELDA, dirX: 0, dirY: 1, color: ALIEN_COLORS[3], ojoAngulo: 0, factorRnd: 0.3 }
         ];
 
         window.addEventListener('keydown', e => {
@@ -151,7 +176,7 @@
         }
 
         async function guardarRecord() {
-            const nombre = prompt(`¡FIN DE LA MISIÓN!\nHas conseguido ${score} puntos.\n\nIntroduce tu nombre para el Récord Mundial:`);
+            const nombre = prompt(`¡FIN DEL JUEGO!\nConseguiste un total de ${score} puntos.\n\nEscribe tu nombre para la Clasificación Global:`);
             if (nombre && nombre.trim() !== "") {
                 try {
                     await addDoc(collection(db, "scores_arcade"), {
@@ -161,9 +186,9 @@
                         country: "🇪🇸",
                         date: new Date().toISOString()
                     });
-                    alert("¡Puntuación registrada en los Récords Mundiales!");
+                    alert("¡Tu puntuación se ha guardado con éxito!");
                 } catch(e) {
-                    console.error("Error al guardar récord:", e);
+                    console.error(e);
                 }
             }
         }
@@ -189,7 +214,7 @@
                 mapa[centroY][centroX] = 2;
                 score += 10;
                 scoreVal.textContent = score;
-                sonarBip(650, 0.06); // Sonido sutil al comer galleta
+                sonarBip(700, 0.05);
             }
 
             aliens.forEach(alien => {
@@ -230,10 +255,10 @@
                 alien.y += alien.dirY * 1;
                 alien.ojoAngulo += 0.08;
 
-                if (Math.abs(jugador.x - alien.x) < 12 && Math.abs(jugador.y - alien.y) < 12) {
+                if (Math.abs(jugador.x - alien.x) < 15 && Math.abs(jugador.y - alien.y) < 15) {
                     lives--;
                     livesVal.textContent = lives;
-                    sonarExplosion(); // Efecto de impacto
+                    sonarExplosion();
                     if (lives <= 0) {
                         gameOver = true;
                         guardarRecord();
@@ -248,68 +273,70 @@
         function dibujar() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Pintar Laberinto de Neón
+            // Laberinto
             for (let f = 0; f < mapa.length; f++) {
                 for (let c = 0; c < mapa[f].length; c++) {
                     if (mapa[f][c] === 1) {
                         ctx.strokeStyle = '#0284c7';
-                        ctx.lineWidth = 2.5;
-                        ctx.strokeRect(c * TAM_CELDA + 2, f * TAM_CELDA + 2, TAM_CELDA - 4, TAM_CELDA - 4);
+                        ctx.lineWidth = 3;
+                        ctx.strokeRect(c * TAM_CELDA + 3, f * TAM_CELDA + 3, TAM_CELDA - 6, TAM_CELDA - 6);
                     } else if (mapa[f][c] === 0) {
-                        ctx.fillStyle = '#e2e8f0';
-                        ctx.fillRect(c * TAM_CELDA + TAM_CELDA/2 - 1, f * TAM_CELDA + TAM_CELDA/2 - 1, 3, 3);
+                        ctx.fillStyle = '#cbd5e1';
+                        ctx.beginPath();
+                        ctx.arc(c * TAM_CELDA + TAM_CELDA/2, f * TAM_CELDA + TAM_CELDA/2, 2.5, 0, Math.PI*2);
+                        ctx.fill();
                     }
                 }
             }
 
-            // REDISEÑO: Dibujar perrito neón de forma vectorial detallada
+            // Perrito Vectorial de Neón (Jugador) - Escalado proporcional al nuevo tamaño
             let px = jugador.x + TAM_CELDA/2;
             let py = jugador.y + TAM_CELDA/2;
             ctx.save();
-            ctx.shadowBlur = 10;
+            ctx.shadowBlur = 12;
             ctx.shadowColor = '#22d3ee';
             
             // Orejas caídas
             ctx.fillStyle = '#0891b2';
-            ctx.beginPath(); ctx.ellipse(px - 6, py - 3, 3, 5, Math.PI/6, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.ellipse(px + 6, py - 3, 3, 5, -Math.PI/6, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(px - 8, py - 4, 4, 7, Math.PI/6, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(px + 8, py - 4, 4, 7, -Math.PI/6, 0, Math.PI*2); ctx.fill();
             
             // Cabeza principal
             ctx.fillStyle = '#22d3ee';
-            ctx.beginPath(); ctx.arc(px, py + 1, 6.5, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(px, py + 1, 9, 0, Math.PI*2); ctx.fill();
             
-            // Hocico blanco-neón
+            // Hocico
             ctx.fillStyle = '#e0f2fe';
-            ctx.beginPath(); ctx.ellipse(px, py + 3, 3.5, 2.5, 0, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.ellipse(px, py + 4, 4.5, 3.5, 0, 0, Math.PI*2); ctx.fill();
             
-            // Naricita negra
+            // Naricita
             ctx.fillStyle = '#0f172a';
-            ctx.beginPath(); ctx.arc(px, py + 2, 1.2, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(px, py + 2.5, 1.8, 0, Math.PI*2); ctx.fill();
             
-            // Ojos negros brillantes
+            // Ojitos negros
             ctx.fillStyle = '#0f172a';
-            ctx.beginPath(); ctx.arc(px - 2.5, py - 1, 1.2, 0, Math.PI*2); ctx.fill();
-            ctx.beginPath(); ctx.arc(px + 2.5, py - 1, 1.2, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(px - 3.5, py - 1.5, 1.6, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(px + 3.5, py - 1.5, 1.6, 0, Math.PI*2); ctx.fill();
             ctx.restore();
 
-            // Dibujar OVNIs Alienígenas
+            // OVNIs Alienígenas - Escalados proporcionalmente
             aliens.forEach(alien => {
                 let ax = alien.x + TAM_CELDA/2;
                 let ay = alien.y + TAM_CELDA/2;
-                ctx.shadowBlur = 8; ctx.shadowColor = alien.color;
+                ctx.shadowBlur = 10; ctx.shadowColor = alien.color;
 
                 ctx.fillStyle = 'rgba(255,255,255,0.7)';
-                ctx.beginPath(); ctx.arc(ax, ay - 2, 4, Math.PI, 0); ctx.fill();
+                ctx.beginPath(); ctx.arc(ax, ay - 2, 5.5, Math.PI, 0); ctx.fill();
 
                 ctx.fillStyle = alien.color;
-                ctx.beginPath(); ctx.ellipse(ax, ay + 1, 8, 3, 0, 0, Math.PI*2); ctx.fill();
+                ctx.beginPath(); ctx.ellipse(ax, ay + 2, 10.5, 4, 0, 0, Math.PI*2); ctx.fill();
 
                 let parpadeo = Math.sin(alien.ojoAngulo) > 0;
                 ctx.fillStyle = parpadeo ? '#ffffff' : '#000000';
                 ctx.beginPath();
-                ctx.arc(ax - 4, ay + 2, 1, 0, Math.PI*2);
-                ctx.arc(ax, ay + 2, 1, 0, Math.PI*2);
-                ctx.arc(ax + 4, ay + 2, 1, 0, Math.PI*2);
+                ctx.arc(ax - 5.5, ay + 3, 1.2, 0, Math.PI*2);
+                ctx.arc(ax, ay + 3, 1.2, 0, Math.PI*2);
+                ctx.arc(ax + 5.5, ay + 3, 1.2, 0, Math.PI*2);
                 ctx.fill();
                 ctx.shadowBlur = 0;
             });
@@ -318,7 +345,7 @@
                 ctx.fillStyle = 'rgba(2, 6, 23, 0.95)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#ef4444';
-                ctx.font = 'bold 24px monospace';
+                ctx.font = 'bold 30px monospace';
                 ctx.textAlign = 'center';
                 ctx.fillText("MISION FALLIDA", canvas.width/2, canvas.height/2);
             }
