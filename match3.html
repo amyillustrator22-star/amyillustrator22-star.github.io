@@ -36,7 +36,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-fold/firebase-firestore.js";
+        import { getFirestore as firestore, collection as col, addDoc as docAdd } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
@@ -48,7 +49,7 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        const db = firestore(app);
 
         const canvas = document.getElementById('canvas-match3');
         const ctx = canvas.getContext('2d');
@@ -67,6 +68,7 @@
         let efectosExplosion = [];
 
         function iniciarTablero() {
+            let intentos = 0;
             do {
                 tablero = [];
                 for (let f = 0; f < FILAS; f++) {
@@ -78,21 +80,23 @@
                         };
                     }
                 }
-            } while (evaluarMatchInmediato().length > 0 || !verificarMovimientosPosibles());
+                intentos++;
+            } while ((evaluarMatchInmediato().length > 0 || !verificarMovimientosPosibles()) && intentos < 100);
+            gameOver = false;
         }
 
         function evaluarMatchInmediato() {
             let eliminar = [];
             for (let f = 0; f < FILAS; f++) {
                 for (let c = 0; c < COLUMNAS - 2; c++) {
-                    if (tablero[f][c].id === tablero[f][c+1].id && tablero[f][c].id === tablero[f][c+2].id) {
+                    if (tablero[f]?.[c]?.id === tablero[f]?.[c+1]?.id && tablero[f]?.[c]?.id === tablero[f]?.[c+2]?.id) {
                         eliminar.push({f: f, c: c}, {f: f, c: c+1}, {f: f, c: c+2});
                     }
                 }
             }
             for (let c = 0; c < COLUMNAS; c++) {
                 for (let f = 0; f < FILAS - 2; f++) {
-                    if (tablero[f][c].id === tablero[f+1][c].id && tablero[f][c].id === tablero[f+2][c].id) {
+                    if (tablero[f]?.[c]?.id === tablero[f+1]?.[c]?.id && tablero[f]?.[c]?.id === tablero[f+2]?.[c]?.id) {
                         eliminar.push({f: f, c: c}, {f: f+1, c: c}, {f: f+2, c: c});
                     }
                 }
@@ -100,28 +104,25 @@
             return eliminar;
         }
 
-        // 🛠️ LOGiCA NUEVA: Verifica si quedan movimientos válidos en el tablero
         function verificarMovimientosPosibles() {
-            const direcciones = [{f:1, c:0}, {f:0, c:1}];
             for (let f = 0; f < FILAS; f++) {
                 for (let c = 0; c < COLUMNAS; c++) {
+                    let direcciones = [{f:1, c:0}, {f:0, c:1}];
                     for (let d of direcciones) {
                         let nf = f + d.f;
                         let nc = c + d.c;
-                        if (nf < FILAS && nc < COLUMNAS) {
-                            // Intercambio simulado
+                        if (nf < FILAS && nc < COLUMNAS && tablero[f]?.[c] && tablero[nf]?.[nc]) {
                             let temp = tablero[f][c];
                             tablero[f][c] = tablero[nf][nc];
                             tablero[nf][nc] = temp;
 
                             let matches = evaluarMatchInmediato();
 
-                            // Revertir simulación
                             temp = tablero[f][c];
                             tablero[f][c] = tablero[nf][nc];
                             tablero[nf][nc] = temp;
 
-                            if (matches.length > 0) return true; // Hay al menos una combinación posible
+                            if (matches.length > 0) return true;
                         }
                     }
                 }
@@ -130,37 +131,39 @@
         }
 
         async function finalizarPartida() {
+            if (gameOver) return;
             gameOver = true;
-            const nombre = prompt(`¡SE ACABARON LOS MOVIMIENTOS!\nPuntuación total: ${score} puntos.\n\nGuarda tu récord para la Leaderboard:`);
-            if (nombre && nombre.trim() !== "") {
-                try {
-                    await addDoc(collection(db, "scores_arcade"), {
-                        game: "match3",
-                        player: nombre.trim().substring(0, 12),
-                        score: parseInt(score),
-                        country: "🇪🇸",
-                        date: new Date().toISOString()
-                    });
-                    alert("¡Récord guardado con éxito!");
-                } catch(e) {}
-            }
+            setTimeout(async () => {
+                const nombre = prompt(`¡SE ACABARON LAS COMBINACIONES VÁLIDAS!\nPuntuación total: ${score} puntos.\n\nEscribe tu nombre para la Leaderboard:`);
+                if (nombre && nombre.trim() !== "") {
+                    try {
+                        await docAdd(col(db, "scores_arcade"), {
+                            game: "match3",
+                            player: nombre.trim().substring(0, 12),
+                            score: parseInt(score),
+                            country: "🇪🇸",
+                            date: new Date().toISOString()
+                        });
+                        alert("¡Récord enviado!");
+                    } catch(e) { console.error(e); }
+                }
+            }, 500);
         }
 
-        // 🛠️ LOGICA NUEVA: Procesa combinaciones, dobles puntos y explosiones en cruz de neón
         function procesarMatches() {
             let matches = [];
             
-            // Buscar horizontales detectando tamaños
+            // Buscar Horizontales (Soporta 4+ con explosiones especiales)
             for (let f = 0; f < FILAS; f++) {
                 let racha = 1;
                 for (let c = 0; c < COLUMNAS; c++) {
-                    if (c < COLUMNAS - 1 && tablero[f][c].id === tablero[f][c+1].id) {
+                    if (c < COLUMNAS - 1 && tablero[f][c]?.id === tablero[f][c+1]?.id) {
                         racha++;
                     } else {
                         if (racha >= 3) {
-                            let esEspecial = racha >= 4;
+                            let especial = racha >= 4;
                             for (let i = c - racha + 1; i <= c; i++) {
-                                matches.push({f: f, c: i, especial: esEspecial});
+                                matches.push({f: f, c: i, esp: especial});
                             }
                         }
                         racha = 1;
@@ -168,17 +171,17 @@
                 }
             }
 
-            // Buscar verticales detectando tamaños
+            // Buscar Verticales
             for (let c = 0; c < COLUMNAS; c++) {
                 let racha = 1;
                 for (let f = 0; f < FILAS; f++) {
-                    if (f < FILAS - 1 && tablero[f][c].id === tablero[f+1][c].id) {
+                    if (f < FILAS - 1 && tablero[f][c]?.id === tablero[f+1][c]?.id) {
                         racha++;
                     } else {
                         if (racha >= 3) {
-                            let esEspecial = racha >= 4;
+                            let especial = racha >= 4;
                             for (let i = f - racha + 1; i <= f; i++) {
-                                matches.push({f: i, c: c, especial: esEspecial});
+                                matches.push({f: i, c: c, esp: especial});
                             }
                         }
                         racha = 1;
@@ -188,44 +191,34 @@
 
             if (matches.length === 0) {
                 bloqueado = false;
-                // Si ya no se está procesando nada, comprobar si es el fin definitivo de la partida
-                if (!verificarMovimientosPosibles() && !gameOver) {
+                if (!verificarMovimientosPosibles()) {
                     finalizarPartida();
                 }
                 return;
             }
 
             bloqueado = true;
-            let casillasAEliminar = new Set();
-            let filasAExplotar = new Set();
-            let colAExplotar = new Set();
+            let eliminarSet = new Set();
+            let especialActivado = false;
 
             matches.forEach(m => {
-                let key = `${m.f},${m.c}`;
-                casillasAEliminar.add(key);
-                if (m.especial) {
-                    filasAExplotar.add(m.f);
-                    colAExplotar.add(m.c);
-                    tablero[m.f][m.c].brillo = true; // Activa el efecto visual destellante
-                    efectosExplosion.push({x: m.c * TAM_CASILLA + 30, y: m.f * TAM_CASILLA + 30, r: 10, maxR: 90});
+                eliminarSet.add(`${m.f},${m.c}`);
+                if (m.esp) {
+                    especialActivado = true;
+                    if(tablero[m.f]?.[m.c]) tablero[m.f][m.c].brillo = true;
+                    efectosExplosion.push({x: m.c * TAM_CASILLA + 30, y: m.f * TAM_CASILLA + 30, r: 10, maxR: 100});
+                    
+                    // Volar la fila entera y columna entera
+                    for(let i=0; i<COLUMNAS; i++) eliminarSet.add(`${m.f},${i}`);
+                    for(let i=0; i<FILAS; i++) eliminarSet.add(`${i},${m.c}`);
                 }
             });
 
-            // Aplicar las explosiones en Cruz por combinaciones de 4+
-            filasAExplotar.forEach(f => {
-                for(let c=0; c<COLUMNAS; c++) casillasAEliminar.add(`${f},${c}`);
-            });
-            colAExplotar.forEach(c => {
-                for(let f=0; f<FILAS; f++) casillasAEliminar.add(`${f},${c}`);
-            });
-
-            // Calcular puntos (Doble punto si hubo explosiones especiales activadas)
-            let multiplicador = (filasAExplotar.size > 0 || colAExplotar.size > 0) ? 20 : 10;
-            score += casillasAEliminar.size * multiplicador;
+            let ptosPorCasilla = especialActivado ? 20 : 10;
+            score += eliminarSet.size * ptosPorCasilla;
             scoreVal.textContent = score;
 
-            // Eliminar y vaciar casillas
-            casillasAEliminar.forEach(key => {
+            eliminarSet.forEach(key => {
                 let [f, c] = key.split(',').map(Number);
                 tablero[f][c] = null;
             });
@@ -233,8 +226,8 @@
             setTimeout(() => {
                 caerJoyas();
                 rellenarTablero();
-                setTimeout(() => { procesarMatches(); }, 250);
-            }, 300);
+                setTimeout(() => { procesarMatches(); }, 200);
+            }, 250);
         }
 
         function caerJoyas() {
@@ -292,14 +285,13 @@
                         casillaSeleccionada = null;
                         procesarMatches();
                     } else {
-                        // Deshacer si no hace match de 3
                         setTimeout(() => {
-                            let revertir = tablero[casillaSeleccionada.f][casillaSeleccionada.c];
+                            let rev = tablero[casillaSeleccionada.f][casillaSeleccionada.c];
                             tablero[casillaSeleccionada.f][casillaSeleccionada.c] = tablero[f][c];
-                            tablero[f][c] = revertir;
+                            tablero[f][c] = rev;
                             casillaSeleccionada = null;
                             bloqueado = false;
-                        }, 200);
+                        }, 180);
                     }
                 } else {
                     casillaSeleccionada = {f: f, c: c};
@@ -310,27 +302,25 @@
         function dibujar() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Cuadrícula de fondo
             ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1;
             for(let i=0; i<=FILAS; i++) {
                 ctx.beginPath(); ctx.moveTo(0, i*TAM_CASILLA); ctx.lineTo(canvas.width, i*TAM_CASILLA); ctx.stroke();
                 ctx.beginPath(); ctx.moveTo(i*TAM_CASILLA, 0); ctx.lineTo(i*TAM_CASILLA, canvas.height); ctx.stroke();
             }
 
-            // Dibujar joyas
             for (let f = 0; f < FILAS; f++) {
                 for (let c = 0; c < COLUMNAS; c++) {
-                    if (tablero[f][c]) {
+                    if (tablero[f]?.[c]) {
                         let color = COLORES_JOYAS[tablero[f][c].id];
                         let cx = c * TAM_CASILLA + TAM_CASILLA/2;
                         let cy = f * TAM_CASILLA + TAM_CASILLA/2;
 
                         ctx.save();
                         if (tablero[f][c].brillo) {
-                            ctx.shadowBlur = 25; ctx.shadowColor = '#ffffff';
+                            ctx.shadowBlur = 30; ctx.shadowColor = '#ffffff';
                             ctx.fillStyle = '#ffffff';
                         } else {
-                            ctx.shadowBlur = 10; ctx.shadowColor = color;
+                            ctx.shadowBlur = 12; ctx.shadowColor = color;
                             ctx.fillStyle = color;
                         }
 
@@ -342,26 +332,24 @@
                 }
             }
 
-            // Marcar joya seleccionada
             if (casillaSeleccionada) {
                 ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 3;
                 ctx.strokeRect(casillaSeleccionada.c * TAM_CASILLA + 2, casillaSeleccionada.f * TAM_CASILLA + 2, TAM_CASILLA - 4, TAM_CASILLA - 4);
             }
 
-            // Dibujar ondas de choques de neón (explosiones)
-            efectosExplosion.forEach((e, index) => {
+            efectosExplosion.forEach((e, i) => {
                 ctx.save();
                 ctx.strokeStyle = 'rgba(255, 255, 255, '+ (1 - e.r/e.maxR) +')';
                 ctx.lineWidth = 4;
                 ctx.beginPath(); ctx.arc(e.x, e.y, e.r, 0, Math.PI*2); ctx.stroke();
                 ctx.restore();
-                e.r += 4;
-                if(e.r >= e.maxR) efectosExplosion.splice(index, 1);
+                e.r += 5;
+                if(e.r >= e.maxR) efectosExplosion.splice(i, 1);
             });
 
             if (gameOver) {
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.9)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#f472b6'; ctx.font = 'bold 28px monospace'; ctx.textAlign = 'center';
+                ctx.fillStyle = '#f472b6'; ctx.font = 'bold 24px monospace'; ctx.textAlign = 'center';
                 ctx.fillText("SIN MOVIMIENTOS POSIBLES", canvas.width/2, canvas.height/2);
             }
 
