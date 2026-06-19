@@ -1,33 +1,57 @@
-// Estación Synthwave de alta calidad para evitar sonido robótico
-const AUDIO_URL = "https://stream.syntheticfm.com/1";
-let audio = new Audio(AUDIO_URL);
-
+// Lógica de Radio Multi-Emisora
+const dialSelect = document.getElementById("radio-dial");
 const statusDisplay = document.getElementById("radio-status");
 const btnPlay = document.getElementById("btn-play");
 const btnPause = document.getElementById("btn-pause");
 const btnStop = document.getElementById("btn-stop");
 
+// Inicializamos el objeto de Audio con la emisora seleccionada por defecto
+let audio = new Audio(dialSelect.value);
+
 window.addEventListener("DOMContentLoaded", () => {
     const savedState = localStorage.getItem("radioState");
+    const savedDial = localStorage.getItem("radioDial");
+
+    // Recuperar la última emisora elegida si existe
+    if (savedDial && dialSelect) {
+        dialSelect.value = savedDial;
+        audio.src = savedDial;
+    }
 
     if (savedState === "playing") {
         audio.play().then(() => {
-            updateDisplay("SINTONIZANDO RETRO-FM...");
+            actualizarTextoEmisora();
             btnPlay.classList.add("active");
         }).catch(() => {
-            updateDisplay("PULSA PLAY PARA OÍR");
+            if (statusDisplay) statusDisplay.textContent = "PULSA PLAY PARA OÍR";
         });
     }
 });
 
+// Escuchar cuando el usuario cambia de emisora en el desplegable
+dialSelect.addEventListener("change", () => {
+    const estabaSonando = !audio.paused;
+    
+    audio.pause();
+    audio.src = dialSelect.value; // Cambiamos la URL del stream
+    localStorage.setItem("radioDial", dialSelect.value);
+
+    if (estabaSonando) {
+        audio.load();
+        audio.play();
+        actualizarTextoEmisora();
+    } else {
+        if (statusDisplay) statusDisplay.textContent = "DIAL CAMBIADO";
+    }
+});
+
 btnPlay.addEventListener("click", () => {
-    // Si la transmisión se pausó, volvemos a cargar para conectar en vivo sin retrasos
     audio.load();
     audio.play();
     localStorage.setItem("radioState", "playing");
     btnPlay.classList.add("active");
     btnPause.classList.remove("active");
-    updateDisplay("SINTONIZANDO RETRO-FM...");
+    actualizarTextoEmisora();
 });
 
 btnPause.addEventListener("click", () => {
@@ -35,7 +59,7 @@ btnPause.addEventListener("click", () => {
     localStorage.setItem("radioState", "paused");
     btnPause.classList.add("active");
     btnPlay.classList.remove("active");
-    updateDisplay("RADIO EN PAUSA");
+    if (statusDisplay) statusDisplay.textContent = "RADIO EN PAUSA";
 });
 
 btnStop.addEventListener("click", () => {
@@ -43,9 +67,12 @@ btnStop.addEventListener("click", () => {
     localStorage.setItem("radioState", "stopped");
     btnPlay.classList.remove("active");
     btnPause.classList.remove("active");
-    updateDisplay("RADIO APAGADA");
+    if (statusDisplay) statusDisplay.textContent = "RADIO APAGADA";
 });
 
-function updateDisplay(text) {
-    if (statusDisplay) statusDisplay.textContent = text;
+function actualizarTextoEmisora() {
+    if (!statusDisplay) return;
+    const nombreEmisora = dialSelect.options[dialSelect.selectedIndex].text;
+    // Quitamos el emoji del principio para el display de la radio
+    statusDisplay.textContent = "AL AIRE: " + nombreEmisora.replace(/[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDC00-\uDFFF]/g, "").trim();
 }

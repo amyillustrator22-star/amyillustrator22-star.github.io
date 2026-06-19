@@ -45,10 +45,19 @@
         <p id="menu-sub" class="text-white text-lg font-medium bg-black/40 px-4 py-1 rounded-full backdrop-blur-sm">Elige tu entrenamiento mental</p>
     </header>
 
-    <div class="car-radio mb-12">
+   <div class="car-radio mb-12 flex flex-col items-center gap-3">
         <div class="radio-display">
             <div class="display-text" id="radio-status">RADIO APAGADA</div>
         </div>
+        
+        <select id="radio-dial" class="bg-slate-900 text-cyan-400 font-bold px-3 py-1.5 rounded-xl border border-slate-700 text-xs tracking-wide focus:outline-none focus:ring-2 focus:ring-cyan-500 uppercase">
+            <option value="https://kissfm.kissfmstream.com/kissfm.mp3">📻 KISS FM (Clásicos 80s/90s)</option>
+            <option value="https://player.rockfm.fm/icecast/stream">🎸 ROCK FM (Puro Rock)</option>
+            <option value="https://25613.live.streamtheworld.com/LOS40_SC">🎵 LOS 40 (Éxitos Pop)</option>
+            <option value="https://rstream.europafm.com/europafm.mp3">🔥 EUROPA FM (Actualidad)</option>
+            <option value="https://hitfm.kissfmstream.com/hitfm.mp3">⚡ HIT FM (Dance & Hits)</option>
+        </select>
+
         <div class="radio-controls">
             <button class="radio-btn" id="btn-play">PLAY</button>
             <button class="radio-btn" id="btn-pause">PAUSE</button>
