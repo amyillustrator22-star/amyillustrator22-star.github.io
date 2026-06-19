@@ -56,11 +56,14 @@
         </div>
     </div>
 
-    <div class="w-full max-w-4xl glass-card rounded-[2.5rem] p-4 sm:p-6 mb-16 mx-4 flex flex-col items-center">
-        <iframe id="pantalla-juego" src="vibez_fly.html" class="w-full h-[600px] rounded-2xl border-4 border-slate-800 bg-black shadow-inner"></iframe>
+    <div id="contenedor-pantalla" class="w-full max-w-4xl glass-card rounded-[2.5rem] p-4 sm:p-6 mb-16 mx-4 flex flex-col items-center hidden">
+        <button onclick="volverAlMenu()" class="mb-4 bg-red-600/80 hover:bg-red-700 text-white font-bold px-4 py-1.5 rounded-xl border border-red-500 text-xs tracking-wider uppercase transition-all shadow-md self-end">
+            ❌ Cerrar Juego
+        </button>
+        <iframe id="pantalla-juego" src="" class="w-full h-[600px] rounded-2xl border-4 border-slate-800 bg-black shadow-inner"></iframe>
     </div>
 
-    <main class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 px-4">
+    <main id="menu-juegos" class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 px-4">
         
         <button onclick="cargarJuego('vibez_fly.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-pink-500 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
@@ -100,22 +103,22 @@
                     </div>
                     <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">MEMO</h2>
                     <p id="desc-memo" class="text-lg text-gray-700 leading-relaxed font-medium">
-                        Potencia tu memoria fotográfica emparejando elements ocultos. El tablero se expande cada 3 niveles superados.
+                        Potencia tu memoria fotográfica emparejando elementos ocultos. El tablero se expande cada 3 niveles superados.
                     </p>
                 </div>
                 <p class="mt-6 text-base text-pink-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
         </button>
 
-        <button onclick="cargarJuego('block.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-purple-500 rounded-[2.5rem]">
+        <button onclick="cargarJuego('match3.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-purple-500 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-purple-500 to-indigo-600 text-white p-5 rounded-3xl mb-6 shadow-md">
                         <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                     </div>
-                    <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">BLOCK</h2>
+                    <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">NEON MATCH 3</h2>
                     <p id="desc-block" class="text-lg text-gray-700 leading-relaxed font-medium">
-                        Entrena tu visión espacial y lógica encajando fragmentos de datos en un entorno monocromático antiestrés.
+                        Entrena tu visión espacial alineando gemas y sprites de neón modernos y llenos de colorido en este adictivo puzzle.
                     </p>
                 </div>
                 <p class="mt-6 text-base text-purple-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
@@ -169,10 +172,26 @@
     <script>
         function cargarJuego(url) {
             const iframe = document.getElementById('pantalla-juego');
-            if (iframe) {
+            const contenedor = document.getElementById('contenedor-pantalla');
+            const menu = document.getElementById('menu-juegos');
+
+            if (iframe && menu && contenedor) {
                 iframe.src = url;
-                // Hace un scroll suave automático hacia el juego para que el usuario no tenga que bajar a mano
-                iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                contenedor.classList.remove('hidden');
+                menu.classList.add('hidden');
+                contenedor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+
+        function volverAlMenu() {
+            const iframe = document.getElementById('pantalla-juego');
+            const contenedor = document.getElementById('contenedor-pantalla');
+            const menu = document.getElementById('menu-juegos');
+
+            if (iframe && menu && contenedor) {
+                iframe.src = '';
+                contenedor.classList.add('hidden');
+                menu.classList.remove('hidden');
             }
         }
     </script>
@@ -183,7 +202,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, query, where, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // 🌐 TEXTOS TRADUCIDOS PARA LA SALA DE MÁQUINAS
         const TEXTOS_JUEGOS = {
             es: {
                 sub: "Elige tu entrenamiento mental",
@@ -223,7 +241,6 @@
 
         const currentLang = navigator.language.startsWith('es') ? 'es' : 'en';
 
-        // Inyectar traducción estática
         document.getElementById('menu-sub').innerText = TEXTOS_JUEGOS[currentLang].sub;
         document.getElementById('desc-vfly').innerText = TEXTOS_JUEGOS[currentLang].vflyDesc;
         document.getElementById('title-brain').innerText = TEXTOS_JUEGOS[currentLang].brainTitle;
