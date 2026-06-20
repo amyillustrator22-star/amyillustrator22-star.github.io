@@ -5,86 +5,332 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tortuga Logic - Amy Software</title>
     <style>
-        body { background: #0f172a; color: white; font-family: monospace; display: flex; flex-direction: column; align-items: center; min-height: 100dvh; margin: 0; padding-top: max(20px, env(safe-area-inset-top)); box-sizing: border-box; overscroll-behavior: none; }
-        .btn-volver { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171; padding: 6px 16px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 0.9rem; margin-bottom: 10px; }
-        canvas { background: #020617; border: 4px solid #334155; border-radius: 16px; width: 100% !important; max-width: 480px !important; height: auto !important; aspect-ratio: 1 / 1 !important; touch-action: none; cursor: pointer; }
-        .system-validate-field { position: absolute; left: -9999px; }
+        body {
+            background: #0f172a;
+            color: white;
+            font-family: monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100dvh;
+            margin: 0;
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            box-sizing: border-box;
+            overscroll-behavior: none;
+        }
+        .top-bar {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 8px;
+            padding: 0 4px;
+            box-sizing: border-box;
+        }
+        .btn-volver {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #f87171;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .btn-volver:hover { background: rgba(239, 68, 68, 0.4); color: white; }
+        
+        canvas {
+            border: 4px solid #334155;
+            border-radius: 16px;
+            box-shadow: 0 0 30px rgba(0, 255, 102, 0.15);
+            width: 100% !important;
+            max-width: 480px !important;
+            height: auto !important;
+            aspect-ratio: 1 / 1 !important;
+            object-fit: contain;
+            touch-action: none;
+            cursor: pointer;
+        }
+        .system-validate-field { position: absolute; left: -9999px; opacity: 0; }
     </style>
 </head>
 <body>
 
-    <div class="system-validate-field"><input type="text" id="auth_token_verification"></div>
-    <a href="juegos.html" class="btn-volver">⬅ VOLVER AL MENÚ</a>
+    <div class="system-validate-field" aria-hidden="true">
+        <input type="text" id="auth_token_verification" tabindex="-1" autocomplete="off">
+    </div>
+
+    <div class="top-bar">
+        <a href="juegos.html" class="btn-volver">⬅ VOLVER AL MENÚ</a>
+    </div>
+
     <canvas id="canvas-tortuga" width="480" height="480"></canvas>
 
     <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
+            authDomain: "vibezmatch-91c6d.firebaseapp.com",
+            projectId: "vibezmatch-91c6d",
+            storageBucket: "vibezmatch-91c6d.appspot.com",
+            messagingSenderId: "645008717503",
+            appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         const canvas = document.getElementById('canvas-tortuga');
         const ctx = canvas.getContext('2d');
-        
+
         let nivel = 1;
+        let score = 0;
         let cables = [];
-        let tortuga = { x: 0, y: 0, cableIdx: -1, progreso: 0, estado: 'espera' }; 
+        let gameOver = false;
+        let bloqueado = false;
 
-        function generarNivel() {
-            let num = 2 + nivel;
+        let tortuga = {
+            x: 0, y: 0,
+            cableIdx: -1,
+            nodoActual: 0,
+            t: 0,
+            estado: 'espera', // espera, moviendo, error, exito
+            velocidad: 0.05
+        };
+
+        // Cargar tu fondo personalizado
+        const imgFondo = new Image();
+        imgFondo.src = 'fondotortuga.jpg';
+
+        // HONEYPOT SEGURIDAD
+        let securityTriggered = false;
+        window.turtle_secure_val = 0;
+        function checkIntegrity() {
+            if (document.getElementById('auth_token_verification').value !== "" || window.turtle_secure_val !== 0) {
+                securityTriggered = true;
+            }
+        }
+
+        function generarCircuito() {
             cables = [];
-            let correcto = Math.floor(Math.random() * num);
-            
-            for(let i=0; i<num; i++) {
-                let ruta = [];
-                let y = 50 + (i * 380/(num-1));
-                // Generamos cruces: la ruta Y cambia aleatoriamente en 3 puntos
-                ruta.push({x: 50, y: y});
-                ruta.push({x: 240, y: 50 + (Math.random() * 380)});
-                ruta.push({x: 430, y: y});
-                
-                cables.push({ color: i === correcto ? '#22d3ee' : '#475569', esCorrecto: i === correcto, ruta: ruta });
-            }
+            bloqueado = false;
             tortuga.estado = 'espera';
+            tortuga.nodoActual = 0;
+            tortuga.t = 0;
+
+            let numCables = 3; // Nivel inicial fijo con 3 cables según tu dibujo
+            if (nivel > 2) numCables = 4;
+            if (nivel > 5) numCables = 5;
+
+            // Determinar qué entrada (índice inferior) conecta con la salida correcta superior (ej: salida central index 1)
+            let indexSalidaCorrecta = Math.floor(Math.random() * numCables);
+
+            // Generación procedural ortogonal basada estrictamente en tu bosquejo de caminos continuos
+            for (let i = 0; i < numCables; i++) {
+                let nodos = [];
+                let xInicio = 100 + i * (280 / (numCables - 1));
+                
+                // Entrada (Abajo)
+                nodos.push({ x: xInicio, y: 420 });
+                
+                // Cruces y entrelazados ortogonales intermedios estables del mismo color
+                if (i === 0) {
+                    nodos.push({ x: xInicio, y: 320 });
+                    nodos.push({ x: xInicio + 60, y: 320 });
+                    nodos.push({ x: xInicio + 60, y: 200 });
+                    nodos.push({ x: 100 + indexSalidaCorrecta * (280 / (numCables - 1)), y: 200 });
+                } else if (i === 1) {
+                    nodos.push({ x: xInicio, y: 260 });
+                    nodos.push({ x: xInicio - 40, y: 260 });
+                    nodos.push({ x: xInicio - 40, y: 150 });
+                    nodos.push({ x: 100 + ((i+1)%numCables) * (280 / (numCables - 1)), y: 150 });
+                } else {
+                    nodos.push({ x: xInicio, y: 350 });
+                    nodos.push({ x: xInicio - 80, y: 350 });
+                    nodos.push({ x: xInicio - 80, y: 120 });
+                    nodos.push({ x: 100 + ((i-1)%numCables) * (280 / (numCables - 1)), y: 120 });
+                }
+
+                // Salidas (Arriba)
+                let xFin = 100 + i * (280 / (numCables - 1));
+                
+                // Si este cable es el configurado como el camino que conduce a la única salida ganadora
+                let llegaAlDestinoCorrecto = (i === indexSalidaCorrecta);
+                if (!llegaAlDestinoCorrecto) {
+                    // Rompemos el cable justo antes del final o lo desviamos a un callejón sin salida
+                    nodos.push({ x: xFin, y: 160 });
+                    nodos.push({ x: xFin + 20, y: 160 }); // Se queda cortado a la mitad
+                } else {
+                    nodos.push({ x: xFin, y: 60 });
+                }
+
+                cables.push({
+                    id: i,
+                    color: '#00ff66', // Mismo color verde neón para todos los cables según tu instrucción
+                    nodos: nodos,
+                    esGanador: llegaAlDestinoCorrecto
+                });
+            }
         }
 
-        function dibujar() {
-            ctx.clearRect(0,0, 480, 480);
-            
+        async function registrarRecord() {
+            if (securityTriggered) return;
+            const alias = prompt(`🐢 PARTIDA TERMINADA\nPuntuación: ${score} puntos.\nIntroduce tu nombre para el ranking:`);
+            if (alias && alias.trim() !== "") {
+                try {
+                    await addDoc(collection(db, "scores_arcade"), {
+                        game: "tortuga",
+                        player: alias.trim().substring(0, 12),
+                        score: parseInt(score),
+                        country: "🇪🇸",
+                        date: new Date().toISOString()
+                    });
+                } catch (e) { console.error(e); }
+            }
+            window.location.href = "juegos.html";
+        }
+
+        function actualizarMecánicas() {
+            if (gameOver || securityTriggered || tortuga.estado === 'espera') return;
+
+            let cable = cables[tortuga.cableIdx];
+            let p1 = cable.nodos[tortuga.nodoActual];
+            let p2 = cable.nodos[tortuga.nodoActual + 1];
+
+            if (!p2) {
+                // Llegó al final del cable físico construido
+                if (cable.esGanador) {
+                    tortuga.estado = 'exito';
+                    score += 200 * nivel;
+                    nivel++;
+                    setTimeout(generarCircuito, 1200);
+                } else {
+                    tortuga.estado = 'error';
+                    gameOver = true;
+                    setTimeout(registrarRecord, 1500);
+                }
+                return;
+            }
+
+            // Interpolación lineal limpia entre esquinas ortogonales
+            tortuga.x = p1.x + (p2.x - p1.x) * tortuga.t;
+            tortuga.y = p1.y + (p2.y - p1.y) * tortuga.t;
+
+            tortuga.t += tortuga.velocidad;
+
+            if (tortuga.t >= 1) {
+                tortuga.t = 0;
+                tortuga.nodoActual++;
+            }
+        }
+
+        function renderingLoop() {
+            checkIntegrity();
+            if (securityTriggered) {
+                ctx.fillStyle = 'black'; ctx.fillRect(0,0,480,480);
+                ctx.fillStyle = 'red'; ctx.font = '20px monospace'; ctx.fillText("LOCK TRAP ACTIVE", 140, 240);
+                return;
+            }
+
+            // Renderizar fondo renderizado o color de respaldo alternativo
+            if (imgFondo.complete) {
+                ctx.drawImage(imgFondo, 0, 0, 480, 480);
+            } else {
+                ctx.fillStyle = '#020617';
+                ctx.fillRect(0, 0, 480, 480);
+            }
+
+            // Dibujar los cables idénticos
             cables.forEach(c => {
-                ctx.beginPath(); ctx.strokeStyle = c.color; ctx.lineWidth = 6;
-                ctx.moveTo(c.ruta[0].x, c.ruta[0].y);
-                ctx.quadraticCurveTo(c.ruta[1].x, c.ruta[1].y, c.ruta[2].x, c.ruta[2].y);
+                ctx.beginPath();
+                ctx.strokeStyle = c.color;
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                
+                ctx.moveTo(c.nodos[0].x, c.nodos[0].y);
+                for (let n = 1; n < c.nodos.length; n++) {
+                    ctx.lineTo(c.nodos[n].x, c.nodos[n].y);
+                }
                 ctx.stroke();
+
+                // Círculos de entrada (Abajo)
+                ctx.beginPath();
+                ctx.fillStyle = '#00ff66';
+                ctx.arc(c.nodos[0].x, c.nodos[0].y, 10, 0, Math.PI * 2);
+                ctx.fill();
+
+                // Bornes de salida (Arriba)
+                ctx.fillStyle = '#0284c7';
+                ctx.fillRect(c.nodos[c.nodos.length-1].x - 8, 50, 16, 12);
             });
 
-            if(tortuga.estado === 'moviendo') {
-                let c = cables[tortuga.cableIdx];
-                let x = c.ruta[0].x + (c.ruta[2].x - c.ruta[0].x) * tortuga.progreso;
-                let y = c.ruta[0].y + (c.ruta[2].y - c.ruta[0].y) * tortuga.progreso;
-                ctx.font = "30px Arial"; ctx.fillText("🐢", x-15, y+10);
-                tortuga.progreso += 0.005;
-                if(tortuga.progreso >= 1) {
-                    tortuga.estado = c.esCorrecto ? 'fin' : 'gameOver';
-                    if(c.esCorrecto) { nivel++; setTimeout(generarNivel, 1000); }
+            // Dibujar la tortuga viajera
+            if (tortuga.estado === 'moviendo' || tortuga.estado === 'error') {
+                ctx.save();
+                ctx.font = "32px Arial";
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                ctx.fillText("🐢", tortuga.x, tortuga.y);
+                
+                if (tortuga.estado === 'error') {
+                    ctx.fillStyle = '#ef4444';
+                    ctx.font = 'bold 36px monospace';
+                    ctx.fillText("?", tortuga.x, tortuga.y - 32);
                 }
+                ctx.restore();
             }
 
-            if(tortuga.estado === 'gameOver') {
-                ctx.fillStyle = "white"; ctx.font = "bold 40px monospace";
-                ctx.textAlign = "center"; ctx.fillText("❓ GAME OVER", 240, 240);
+            // Capa visual Game Over centrado
+            if (gameOver && tortuga.estado === 'error') {
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#ef4444';
+                ctx.font = 'bold 32px monospace';
+                ctx.textAlign = 'center';
+                ctx.fillText("GAME OVER", 240, 220);
+                ctx.fillStyle = 'white';
+                ctx.font = '16px monospace';
+                ctx.fillText("El cable estaba cortado o sin salida", 240, 260);
             }
-            requestAnimationFrame(dibujar);
+
+            actualizarMecánicas();
+            requestAnimationFrame(renderingLoop);
         }
 
-        canvas.addEventListener('mousedown', e => {
-            if(tortuga.estado !== 'espera') return;
+        // Manejo unificado de clics e interacciones táctiles en los bornes inferiores
+        function interactuar(clientX, clientY) {
+            if (bloqueado || gameOver || tortuga.estado !== 'espera') return;
             const rect = canvas.getBoundingClientRect();
-            const y = (e.clientY - rect.top) * (480/canvas.clientHeight);
-            cables.forEach((c, i) => {
-                if(Math.abs(y - c.ruta[0].y) < 30) {
-                    tortuga.activo = true; tortuga.cableIdx = i; tortuga.progreso = 0; tortuga.estado = 'moviendo';
+            const canvasX = (clientX - rect.left) * (480 / canvas.clientWidth);
+            const canvasY = (clientY - rect.top) * (480 / canvas.clientHeight);
+
+            cables.forEach((c, idx) => {
+                let dist = Math.hypot(canvasX - c.nodos[0].x, canvasY - c.nodos[0].y);
+                if (dist < 25) {
+                    bloqueado = true;
+                    tortuga.cableIdx = idx;
+                    tortuga.nodoActual = 0;
+                    tortuga.t = 0;
+                    tortuga.x = c.nodos[0].x;
+                    tortuga.y = c.nodos[0].y;
+                    tortuga.estado = 'moviendo';
                 }
             });
-        });
+        }
 
-        generarNivel();
-        dibujar();
+        canvas.addEventListener('mousedown', e => interactuar(e.clientX, e.clientY));
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            interactuar(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
+
+        generarCircuito();
+        renderingLoop();
     </script>
 </body>
 </html>
