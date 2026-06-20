@@ -2,31 +2,40 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amy Software | Apps, Games & Global Chat</title>
-
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5491883632835608" crossorigin="anonymous"></script>
-
-    <script data-goatcounter="https://amysoftware.goatcounter.com/count"
-            async src="//gc.zgo.at/count.js"></script>
-        
+    <script data-goatcounter="https://amysoftware.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Amy Software - Arcade Central</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
+
     <style>
         body {
-          background: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)), url('encabezaoAmySoftware.jpg') no-repeat center center fixed;
-          background-size: cover;
-          min-height: 100vh;
+            background: #0f172a;
+            min-height: 100vh;
+            min-height: 100dvh;
+            padding-top: max(3rem, env(safe-area-inset-top)) !important;
+            padding-bottom: max(3rem, env(safe-area-inset-bottom)) !important;
+            padding-left: max(1rem, env(safe-area-inset-left)) !important;
+            padding-right: max(1rem, env(safe-area-inset-right)) !important;
+            box-sizing: border-box;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)), url('encabezaoAmySoftware.jpg') no-repeat center center;
+            background-size: cover;
         }
         .title-nabla {
             font-family: 'Nabla', cursive;
-            font-size: 3.5rem;
-            color: #facc15; 
-            -webkit-text-stroke: 2px black;
-            text-shadow: 3px 3px 0px black;
-            line-height: 1.2;
+            font-size: 3rem;
+            -webkit-text-stroke: 1px black;
+            text-shadow: 2px 2px 0px black;
         }
         .glass-card {
             background: rgba(255, 255, 255, 0.7);
@@ -34,102 +43,129 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
-        
-        .hp-trap {
-            position: absolute;
-            left: -9999px;
-            top: -9999px;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .title-nabla {
-                color: #facc15 !important;
-                -webkit-text-stroke: 2px black !important;
-                text-shadow: 3px 3px 0px black !important;
-            }
-        }
     </style>
 </head>
 <body class="flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8 font-sans text-gray-800">
 
-    <a href="/wp-admin-login-trap" class="hp-trap" rel="nofollow">Admin Access</a>
+    <div class="hidden" aria-hidden="true">
+        <input type="text" id="auth_token_verification" tabindex="-1" autocomplete="off">
+    </div>
 
-    <header class="flex flex-col md:flex-row items-center gap-6 mb-16 mt-8">
-        <div class="w-24 h-24 sm:w-32 sm:h-32 flex-shrink-0 bg-white rounded-2xl shadow-lg p-2 border-2 border-gray-200">
-            <img src="AmySoftwareLogo.jpg" alt="Logo de Amy Software" class="w-full h-full object-cover rounded-xl">
-        </div>
-        <h1 class="title-nabla text-center md:text-left drop-shadow-xl dark:text-amber-400">
-            AMYSOFTWARE
-        </h1>
+    <header class="flex flex-col items-center gap-4 mb-12 mt-8">
+        <h1 class="title-nabla text-center drop-shadow-xl">ARCADE CENTER</h1>
+        <p id="menu-sub" class="text-white text-lg font-medium bg-black/40 px-4 py-1 rounded-full backdrop-blur-sm">Elige tu entrenamiento mental</p>
     </header>
 
-    <main class="w-full max-w-7xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-16 px-4">
+    <!-- ===== NUEVO: Sección de introducción ===== -->
+    <section class="w-full max-w-3xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-12 mx-4 text-center">
+        <p class="text-gray-800 text-base sm:text-lg leading-relaxed font-medium">
+            Bienvenida/o al <strong>Arcade Center</strong> de Amy Software: una colección de minijuegos HTML5 pensada para entrenar tu mente y competir en clasificaciones mundiales, sin descargas ni instalaciones. Elige un juego, supera tu propio récord y compara tu puntuación con el resto de la comunidad.
+        </p>
+    </section>
+    <!-- ===== FIN sección de introducción ===== -->
+
+    <div id="contenedor-pantalla" class="w-full max-w-5xl glass-card rounded-[2.5rem] p-4 sm:p-6 mb-16 mx-4 flex flex-col items-center hidden" style="height: auto !important;">
+        <button onclick="volverAlMenu()" class="mb-4 bg-red-600/80 hover:bg-red-700 text-white font-bold px-4 py-1.5 rounded-xl border border-red-500 text-xs tracking-wider uppercase transition-all shadow-md self-end">
+            ❌ Cerrar Juego
+        </button>
+        <iframe id="pantalla-juego" src="" class="w-full rounded-2xl border-4 border-slate-800 bg-black shadow-inner" style="height: 850px !important; min-height: 850px !important;"></iframe>
+    </div>
+
+    <main id="menu-juegos" class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 px-4">
         
-        <a href="https://play.google.com/store/apps/details?id=com.afy.vibezmatch&hl=es" target="_blank" rel="noopener noreferrer" class="block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-purple-500 rounded-[2.5rem]">
-            <article class="glass-card rounded-[2.5rem] p-10 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
-                <div class="flex flex-col items-center">
-                    <div class="bg-gradient-to-br from-pink-500 to-purple-600 text-white p-5 rounded-3xl mb-8 shadow-md">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
-                    </div>
-                    <h2 class="text-3xl font-extrabold text-gray-900 mb-5 tracking-tight">VibezMatch</h2>
-                    <p id="desc-vibez" class="text-xl text-gray-700 leading-relaxed font-medium">
-                        Tu app de citas inclusiva. Un espacio seguro diseñado para la comunidad <strong>LGTBI</strong>, <strong>personas con discapacidad</strong> y cualquier <strong>neurotipo</strong>.
-                    </p>
-                </div>
-                <p id="btn-vibez" class="mt-8 text-base text-purple-600 font-bold uppercase tracking-wider">Instalar en Google Play</p>
-            </article>
-        </a>
+        <button onclick="window.location.href='vibez_fly.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 rounded-[2.5rem]"><article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto"><div class="flex flex-col items-center"><div class="bg-gradient-to-br from-pink-500 to-red-600 text-white p-5 rounded-3xl mb-6 shadow-md"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg></div><h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Vibez Fly</h2><p id="desc-vfly" class="text-lg text-gray-700 leading-relaxed font-medium">Mantén el vuelo del corazón a base de toques y esquiva los letales cuchillos en este reto de reflejos.</p></div><p class="mt-6 text-base text-pink-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p></article></button>
 
-        <a href="https://play.google.com/store/apps/details?id=com.afy.dietcheck&hl=es" target="_blank" rel="noopener noreferrer" class="block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-green-500 rounded-[2.5rem]">
-            <article class="glass-card rounded-[2.5rem] p-10 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
-                <div class="flex flex-col items-center">
-                    <div class="bg-gradient-to-br from-green-400 to-emerald-600 text-white p-5 rounded-3xl mb-8 shadow-md">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    </div>
-                    <h2 class="text-3xl font-extrabold text-gray-900 mb-5 tracking-tight">DietCheck</h2>
-                    <p id="desc-diet" class="text-xl text-gray-700 leading-relaxed font-medium">
-                        Escanea códigos de barras o códigos QR al instante. Cuenta con una <strong>IA nutricionista integrada</strong> para intolerancias, diabetes o alergias.
-                    </p>
-                </div>
-                <p id="btn-diet" class="mt-8 text-base text-emerald-600 font-bold uppercase tracking-wider">Instalar en Google Play</p>
-            </article>
-        </a>
+        <button onclick="window.location.href='block.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 rounded-[2.5rem]"><article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto"><div class="flex flex-col items-center"><div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-5 rounded-3xl mb-6 shadow-md"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg></div><h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Retro Block</h2><p id="desc-block" class="text-lg text-gray-700 leading-relaxed font-medium">El clásico juego de apilar bloques con tu estética vintage preferida. ¡Pon a prueba tu precisión!</p></div><p class="mt-6 text-base text-green-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p></article></button>
 
-        <a href="juegos.html" class="block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-indigo-500 rounded-[2.5rem]">
-            <article class="glass-card rounded-[2.5rem] p-10 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
-                <div class="flex flex-col items-center">
-                    <div class="bg-gradient-to-br from-purple-500 to-indigo-600 text-white p-5 rounded-3xl mb-8 shadow-md">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13a6 6 0 01-6 6H9a6 6 0 01-6-6V9a6 6 0 016-6h6a6 6 0 016 6v4zM6 11h4M8 9v4m8-2h.01M14 11h.01"></path>
-                        </svg>
-                    </div>
-                    <h2 id="title-games" class="text-3xl font-extrabold text-gray-900 mb-5 tracking-tight">Sección de Juegos</h2>
-                    <p id="desc-games" class="text-xl text-gray-700 leading-relaxed font-medium">
-                        Entra y pon a prueba tu mente con nuestros desarrollos interactivos. Juegos optimizados en <strong>HTML5</strong> listos para disfrutar desde el navegador.
-                    </p>
-                </div>
-                <p id="btn-games" class="mt-8 text-base text-indigo-600 font-bold uppercase tracking-wider">Entrar a jugar</p>
-            </article>
-        </a>
+        <button onclick="window.location.href='mi_juego.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-cyan-500 rounded-[2.5rem]"><article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto"><div class="flex flex-col items-center"><div class="bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-5 rounded-3xl mb-6 shadow-md"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg></div><h2 id="title-brain" class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Brain Training</h2><p id="desc-brain" class="text-lg text-gray-700 leading-relaxed font-medium">Pon a prueba tu velocidad mental ordenando secuencias de burbujas numéricas de menor a mayor.</p></div><p class="mt-6 text-base text-cyan-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p></article></button>
+
+        <button onclick="window.location.href='tortuga.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 rounded-[2.5rem]"><article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto"><div class="flex flex-col items-center"><div class="bg-gradient-to-br from-amber-400 to-orange-600 text-white p-5 rounded-3xl mb-6 shadow-md"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg></div><h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Tortuga Sprint</h2><p id="desc-tortuga" class="text-lg text-gray-700 leading-relaxed font-medium">Sigue el camino correcto entre los cables cruzados antes de que se acabe el tiempo.</p></div><p class="mt-6 text-base text-orange-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p></article></button>
+
+        <button onclick="window.location.href='memo.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 rounded-[2.5rem]"><article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto"><div class="flex flex-col items-center"><div class="bg-gradient-to-br from-pink-400 to-pink-600 text-white p-5 rounded-3xl mb-6 shadow-md"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div><h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">MEMO</h2><p id="desc-memo" class="text-lg text-gray-700 leading-relaxed font-medium">Potencia tu memoria fotográfica emparejando elementos ocultos. El tablero se expande cada 3 niveles superados.</p></div><p class="mt-6 text-base text-pink-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p></article></button>
+
+        <button onclick="window.location.href='match3.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 rounded-[2.5rem]"><article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto"><div class="flex flex-col items-center"><div class="bg-gradient-to-br from-purple-500 to-indigo-600 text-white p-5 rounded-3xl mb-6 shadow-md"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg></div><h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Neon Match 3</h2><p id="desc-block-match3" class="text-lg text-gray-700 leading-relaxed font-medium">Entrena tu visión espacial alineando gemas y sprites de neón modernos y llenos de colorido en este adictivo puzzle.</p></div><p class="mt-6 text-base text-purple-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p></article></button>
+
+        <button onclick="window.location.href='comecocos.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 rounded-[2.5rem]"><article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto"><div class="flex flex-col items-center"><div class="bg-gradient-to-br from-cyan-400 to-blue-600 text-white p-5 rounded-3xl mb-6 shadow-md"><svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div><h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Neon Dog Eater</h2><p id="desc-comecocos" class="text-lg text-gray-700 leading-relaxed font-medium">Guía al tierno perrito de neón para comer todas las galletas con las letras W, A, S, D y huye de los OVNIs alienígenas.</p></div><p class="mt-6 text-base text-cyan-500 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p></article></button>
+
     </main>
 
-    <section class="w-full max-w-3xl glass-card rounded-[2.5rem] p-8 md:p-10 text-center flex flex-col items-center mb-12">
-        <h3 id="chat-title" class="text-2xl font-bold text-gray-800 mb-4">Chat De VibezMatch</h3>
-        <p id="chat-desc" class="text-gray-600 mb-8 max-w-xl text-lg">
-            ¡Únete a nuestro Chat General!
-        </p>
-        <a href="chat.html" target="_blank" rel="noopener noreferrer" id="chat-btn" class="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-gray-900 rounded-2xl hover:bg-gray-800 hover:shadow-lg">
-            <svg class="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 002 2h2v4l.586-.586z"></path></svg>
-            Entrar al Chat General
-        </a>
+    <section class="w-full max-w-2xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-16 mx-4">
+        <h2 id="board-title" class="text-2xl font-extrabold text-center text-gray-900 mb-6 tracking-tight flex items-center justify-center gap-2">
+            🏆 RÉCORDS MUNDIALES 🏆
+        </h2>
+
+        <div class="flex justify-center gap-2 mb-6 bg-black/10 p-1.5 rounded-2xl backdrop-blur-sm flex-wrap">
+            <button id="btn-vibez" onclick="switchLeaderboard('vibez_fly')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-pink-600 text-white shadow-md">Vibez Fly</button>
+            <button id="btn-brain" onclick="switchLeaderboard('brain_training')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">Brain Training</button>
+            <button id="btn-memo" onclick="switchLeaderboard('memo')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">MEMO</button>
+            <button id="btn-match3" onclick="switchLeaderboard('match3')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">MATCH 3</button>
+            <button id="btn-dog" onclick="switchLeaderboard('dog_eater')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">DOG EATER</button>
+            <button id="btn-tortuga" onclick="switchLeaderboard('tortugasprint')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">TORTUGA</button>
+            <button id="btn-block" onclick="switchLeaderboard('block')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">RETRO BLOCK</button>
+        </div>
+
+        <div class="bg-white/50 rounded-2xl overflow-hidden shadow-inner border border-white/30">
+            <div id="leaderboard-header" class="grid grid-cols-3 bg-black/10 px-4 py-3 font-bold text-gray-900 text-sm tracking-wide uppercase">
+                <div>Posición</div>
+                <div>Jugador</div>
+                <div class="text-right">Puntos</div>
+            </div>
+            <div id="leaderboard-rows" class="divide-y divide-black/5 font-medium text-gray-800">
+                <div id="loading-msg" class="grid grid-cols-3 px-4 py-4 items-center text-center text-gray-500 col-span-3">Cargando puntuaciones online...</div>
+            </div>
+        </div>
     </section>
 
-    <section class="w-full max-w-3xl glass-card rounded-[2.5rem] p-8 md:p-10 mb-12 mx-4">
+    <!-- ===== NUEVO: Sección de chat global ===== -->
+    <section id="chat-section" class="w-full max-w-2xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-16 mx-4 text-center">
+        <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight flex items-center justify-center gap-2">
+            💬 CHAT GLOBAL EN VIVO
+        </h2>
+        <p class="text-gray-700 font-medium mb-6 leading-relaxed">
+            Conecta en tiempo real con el resto de la comunidad desde la sala global, sincronizada también con la app móvil para Android. Comparte tus puntuaciones, trucos y consejos con otros jugadores.
+        </p>
+        <a href="chat.html" class="inline-flex items-center justify-center px-6 py-3 font-bold text-white transition-all duration-200 bg-indigo-600 rounded-xl hover:bg-indigo-700 hover:-translate-y-0.5 shadow-md">
+            Entrar al Chat
+        </a>
+    </section>
+    <!-- ===== FIN sección de chat global ===== -->
+
+    <!-- ===== NUEVO: Sección de apps (enlaces a Google Play sin modificar los botones originales) ===== -->
+    <section id="apps-section" class="w-full max-w-4xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-16 mx-4">
+        <h2 class="text-2xl font-extrabold text-center text-gray-900 mb-6 tracking-tight flex items-center justify-center gap-2">
+            📱 NUESTRAS APPS
+        </h2>
+        <p class="text-center text-gray-700 font-medium mb-8 max-w-xl mx-auto">
+            Descubre el resto del ecosistema Amy Software directamente en tu móvil Android.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="bg-white/50 rounded-3xl p-6 flex flex-col items-center text-center shadow-inner border border-white/30">
+                <h3 class="text-lg font-bold text-gray-900 mb-2">VibezMatch</h3>
+                <p class="text-sm text-gray-700 mb-4 leading-relaxed">Tu app de citas inclusiva para la comunidad LGTBI, personas con discapacidad y cualquier neurotipo.</p>
+                <a id="app-link-vibez" href="https://play.google.com/store/apps/details?id=com.afy.vibezmatch&hl=es" target="_blank" rel="noopener noreferrer" class="text-sm text-purple-600 font-bold uppercase tracking-wider hover:underline">Instalar en Google Play</a>
+            </div>
+            <div class="bg-white/50 rounded-3xl p-6 flex flex-col items-center text-center shadow-inner border border-white/30">
+                <h3 class="text-lg font-bold text-gray-900 mb-2">DietCheck</h3>
+                <p class="text-sm text-gray-700 mb-4 leading-relaxed">Escanea códigos de barras o QR al instante con IA nutricionista integrada.</p>
+                <a id="app-link-diet" href="https://play.google.com/store/apps/details?id=com.afy.dietcheck&hl=es" target="_blank" rel="noopener noreferrer" class="text-sm text-emerald-600 font-bold uppercase tracking-wider hover:underline">Instalar en Google Play</a>
+            </div>
+        </div>
+    </section>
+    <!-- ===== FIN sección de apps ===== -->
+
+    <!-- ===== NUEVO: Sección "Sobre nosotros" ===== -->
+    <section id="about-section" class="w-full max-w-2xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-16 mx-4 text-center">
+        <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight flex items-center justify-center gap-2">
+            ℹ️ SOBRE AMY SOFTWARE
+        </h2>
+        <p class="text-gray-700 font-medium leading-relaxed">
+            Somos un pequeño estudio independiente que desarrolla aplicaciones y juegos pensados para entretener, conectar e incluir. Este Arcade Center reúne nuestros minijuegos HTML5 más divertidos, con clasificaciones mundiales en tiempo real para que compitas con jugadores de todo el mundo.
+        </p>
+    </section>
+    <!-- ===== FIN sección "Sobre nosotros" ===== -->
+
+    <!-- ===== PORTADO desde el antiguo index.html: Sugerencias y firmas (no existía en ningún otro sitio) ===== -->
+    <section id="firmas-section" class="w-full max-w-3xl glass-card rounded-[2.5rem] p-8 md:p-10 mb-12 mx-4">
         <h2 id="sug-title" class="text-2xl font-extrabold text-center text-gray-900 mb-2 tracking-tight flex items-center justify-center gap-2">
             ✍️ SUGERENCIAS Y FIRMAS ✍️
         </h2>
@@ -153,11 +189,11 @@
                 <span><span id="txt-connected-as">Conectado como:</span> <span id="user-logged-email"></span></span>
                 <button id="btn-cerrar-sesion" class="text-[10px] bg-red-600 text-white px-2 py-1 rounded-lg font-black uppercase shadow-sm">Salir</button>
             </div>
-            
+
             <div class="space-y-3">
                 <input type="text" id="sug-autor" placeholder="Tu nombre o alias" class="w-full px-4 py-3 rounded-2xl bg-white/60 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-pink-500 font-medium text-sm">
                 <textarea id="sug-mensaje" rows="3" placeholder="Tu sugerencia o firma aquí..." class="w-full px-4 py-3 rounded-2xl bg-white/60 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-pink-500 font-medium text-sm resize-none"></textarea>
-                
+
                 <button id="btn-publicar-sug" class="w-full py-3 font-bold text-white bg-pink-600 rounded-2xl hover:bg-pink-700 transition-all text-sm shadow-md active:scale-95 uppercase tracking-wider">
                     Enviar para Revisión
                 </button>
@@ -174,22 +210,132 @@
     </section>
 
     <section class="w-full max-w-3xl glass-card rounded-[2.5rem] p-8 md:p-10 mb-16 mx-4">
-        <h2 id="board-title" class="text-2xl font-extrabold text-center text-gray-900 mb-6 tracking-tight flex items-center justify-center gap-2">
+        <h2 id="signatures-board-title" class="text-2xl font-extrabold text-center text-gray-900 mb-6 tracking-tight flex items-center justify-center gap-2">
             📝 TABLÓN DE FIRMAS Y SUGERENCIAS 📝
         </h2>
         <div id="muro-sugerencias" class="space-y-3 max-h-96 overflow-y-auto pr-1 font-medium text-sm text-left">
             <div id="board-loading" class="text-center text-gray-500 italic py-2">Cargando comentarios aprobados...</div>
         </div>
     </section>
+    <!-- ===== FIN sugerencias y firmas ===== -->
 
-    <footer class="mt-16 text-center text-gray-500 text-sm pb-8">
-        <p id="footer-rights">&copy; 2026 Amy Software. Todos los derechos reservados.</p>
+    <!-- ===== MODIFICADO: Footer ampliado (se mantiene intacto el botón "Volver al Inicio" original) ===== -->
+    <footer class="mt-6 w-full max-w-2xl flex flex-col items-center gap-4 px-4 text-center">
+        <div class="flex flex-wrap items-center justify-center gap-4 text-sm font-semibold text-white/80">
+            <a href="#chat-section" class="hover:text-white hover:underline">Chat Global</a>
+            <span class="opacity-40">•</span>
+            <a href="#apps-section" class="hover:text-white hover:underline">Nuestras Apps</a>
+            <span class="opacity-40">•</span>
+            <a href="#about-section" class="hover:text-white hover:underline">Sobre Nosotros</a>
+            <span class="opacity-40">•</span>
+            <a href="#firmas-section" class="hover:text-white hover:underline">Firmas y Sugerencias</a>
+        </div>
+        <a href="/" id="btn-back-home" class="inline-flex items-center justify-center px-6 py-3 font-bold text-white transition-all duration-200 bg-gray-900 rounded-xl hover:bg-gray-800 hover:-translate-y-0.5 shadow-md">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>Volver al Inicio
+        </a>
+        <p class="text-xs text-white/60 font-medium">© 2026 Amy Software. Todos los derechos reservados.</p>
     </footer>
+    <!-- ===== FIN footer ===== -->
+
+    <script>
+        function cargarJuego(url) {
+            const iframe = document.getElementById('pantalla-juego');
+            const contenedor = document.getElementById('contenedor-pantalla');
+            const menu = document.getElementById('menu-juegos');
+            if (iframe && menu && contenedor) {
+                iframe.src = url;
+                contenedor.classList.remove('hidden');
+                menu.classList.add('hidden');
+                contenedor.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                setTimeout(() => { iframe.contentWindow.focus(); }, 300);
+            }
+        }
+        function volverAlMenu() {
+            const iframe = document.getElementById('pantalla-juego');
+            const contenedor = document.getElementById('contenedor-pantalla');
+            const menu = document.getElementById('menu-juegos');
+            if (iframe && menu && contenedor) {
+                iframe.src = '';
+                contenedor.classList.add('hidden');
+                menu.classList.remove('hidden');
+            }
+        }
+    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, orderBy, limit, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, orderBy, limit, getDocs, addDoc, onSnapshot, doc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
         import { getAuth, sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        const TEXTOS_JUEGOS = {
+            es: {
+                sub: "Elige tu entrenamiento mental",
+                vflyDesc: "Mantén el vuelo del corazón a base de toques y esquiva los letales cuchillos en este reto de reflejos.",
+                brainTitle: "Brain Training",
+                brainDesc: "Pon a prueba tu velocidad mental ordenando secuencias de burbujas numéricas de menor a mayor.",
+                memoDesc: "Potencia tu memoria fotográfica emparejando elementos ocultos. El tablero se expande cada 3 niveles superados.",
+                blockDesc: "El clásico juego de apilar bloques con tu estética vintage preferida. ¡Pon a prueba tu precisión!",
+                match3Desc: "Entrena tu visión espacial alineando gemas y sprites de neón modernos y llenos de colorido en este adictivo puzzle.",
+                comecocosDesc: "Guía al tierno perrito de neón para comer todas las galletas con las letras W, A, S, D y huye de los OVNIs alienígenas.",
+                playBtn: "Jugar Ahora",
+                boardTitle: "🏆 RÉCORDS MUNDIALES 🏆",
+                headPos: "Posición",
+                headUser: "Jugador",
+                headScore: "Puntos",
+                loading: "Cargando puntuaciones online...",
+                empty: "¡Nadie ha registrado récords aún! Sé el primero.",
+                error: "Error al conectar con los récords mundiales.",
+                btnBack: "Volver al Inicio"
+            },
+            en: {
+                sub: "Choose your mental training",
+                vflyDesc: "Keep the heart airborne with well-timed taps and dodge lethal knives in this reflection challenge.",
+                brainTitle: "Brain Training",
+                brainDesc: "Test your mental processing speed by sorting numerical bubble sequences from lowest to highest.",
+                memoDesc: "Boost your photographic memory by pairing hidden elements. The layout expands every 3 completed levels.",
+                blockDesc: "The classic block-stacking game with your favorite vintage aesthetic. Test your precision!",
+                match3Desc: "Train your spatial awareness and logic by lining up neon gemstones and vibrant blocks in this addictive puzzle.",
+                comecocosDesc: "Guide the cute neon dog to eat all the treats using W, A, S, D keys while escaping from fast alien UFOs.",
+                playBtn: "Play Now",
+                boardTitle: "🏆 WORLD LEADERBOARDS 🏆",
+                headPos: "Rank",
+                headUser: "Player",
+                headScore: "Score",
+                loading: "Loading live scores...",
+                empty: "No highscores registered yet! Be the first one.",
+                error: "Failed to connect to the global leaderboards.",
+                btnBack: "Back to Home"
+            }
+        };
+
+        const currentLang = navigator.language.startsWith('es') ? 'es' : 'en';
+
+        document.getElementById('menu-sub').innerText = TEXTOS_JUEGOS[currentLang].sub;
+        document.getElementById('desc-vfly').innerText = TEXTOS_JUEGOS[currentLang].vflyDesc;
+        document.getElementById('title-brain').innerText = TEXTOS_JUEGOS[currentLang].brainTitle;
+        
+        // ⬇️ AQUÍ ESTABA EL ERROR TIPOGRÁFICO QUE ROMPÍA TODO EL SCRIPT ⬇️
+        document.getElementById('desc-brain').innerText = TEXTOS_JUEGOS[currentLang].brainDesc;
+        
+        document.getElementById('desc-memo').innerText = TEXTOS_JUEGOS[currentLang].memoDesc;
+        
+        const descBlockElements = document.querySelectorAll('#desc-block');
+        if(descBlockElements.length > 0) descBlockElements[0].innerText = TEXTOS_JUEGOS[currentLang].blockDesc;
+        
+        const descMatchElements = document.getElementById('desc-block-match3');
+        if(descMatchElements) descMatchElements.innerText = TEXTOS_JUEGOS[currentLang].match3Desc;
+
+        document.getElementById('desc-comecocos').innerText = TEXTOS_JUEGOS[currentLang].comecocosDesc;
+        document.getElementById('board-title').innerText = TEXTOS_JUEGOS[currentLang].boardTitle;
+        document.getElementById('btn-back-home').lastChild.textContent = " " + TEXTOS_JUEGOS[currentLang].btnBack;
+        
+        document.querySelectorAll('.btn-play-text').forEach(p => { p.innerText = TEXTOS_JUEGOS[currentLang].playBtn; });
+
+        document.getElementById('leaderboard-header').innerHTML = `
+            <div>${TEXTOS_JUEGOS[currentLang].headPos}</div>
+            <div>${TEXTOS_JUEGOS[currentLang].headUser}</div>
+            <div class="text-right">${TEXTOS_JUEGOS[currentLang].headScore}</div>
+        `;
 
         const firebaseConfig = {
             apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
@@ -205,19 +351,74 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
 
-        // 🌐 TEXTOS TRADUCIDOS PARA USA / ESPAÑA
-        const TEXTOS_INDEX = {
+        async function loadLeaderboard(gameId) {
+            const rowsContainer = document.getElementById('leaderboard-rows');
+            rowsContainer.innerHTML = `<div class="grid grid-cols-3 px-4 py-4 items-center text-center text-gray-500 col-span-3">${TEXTOS_JUEGOS[currentLang].loading}</div>`;
+            try {
+                const q = query(collection(db, "scores_arcade"), where("game", "==", gameId), orderBy("score", "desc"), limit(10));
+                const querySnapshot = await getDocs(q);
+                rowsContainer.innerHTML = "";
+                if (querySnapshot.empty) {
+                    rowsContainer.innerHTML = `<div class="grid grid-cols-3 px-4 py-4 items-center text-center text-gray-400 italic col-span-3">${TEXTOS_JUEGOS[currentLang].empty}</div>`;
+                    return;
+                }
+                let position = 1;
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    let medal = `${position}º`;
+                    if (position === 1) medal = "🥇 1º";
+                    if (position === 2) medal = "🥈 2º";
+                    if (position === 3) medal = "🥉 3º";
+                    let flag = data.country ? data.country : "";
+                    rowsContainer.innerHTML += `
+                        <div class="grid grid-cols-3 px-4 py-3 items-center hover:bg-black/5 transition-colors duration-150">
+                            <div class="font-bold ${position <= 3 ? 'text-amber-500' : 'text-gray-500'}">${medal}</div>
+                            <div class="font-semibold text-gray-900 flex items-center gap-2"><span>${data.player}</span><span class="text-base">${flag}</span></div>
+                            <div class="text-right font-extrabold text-gray-900 tracking-wider">${data.score}</div>
+                        </div>`;
+                    position++;
+                });
+            } catch (error) {
+                rowsContainer.innerHTML = `<div class="grid grid-cols-3 px-4 py-4 items-center text-center text-red-500 font-semibold col-span-3">${TEXTOS_JUEGOS[currentLang].error}</div>`;
+            }
+        }
+
+        window.switchLeaderboard = function(gameId) {
+            const btnVibez = document.getElementById('btn-vibez');
+            const btnBrain = document.getElementById('btn-brain');
+            const btnMemo = document.getElementById('btn-memo');
+            const btnMatch3 = document.getElementById('btn-match3');
+            const btnDog = document.getElementById('btn-dog');
+            const btnBlock = document.getElementById('btn-block');
+            const btnTortuga = document.getElementById('btn-tortuga');
+            
+            [btnVibez, btnBrain, btnMemo, btnMatch3, btnDog, btnBlock, btnTortuga].forEach(btn => {
+                if (btn) btn.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40";
+            });
+
+            // ⬇️ AJUSTADA LA LÓGICA DE SELECCIÓN PARA INCLUIR 'tortugasprint' ⬇️
+            const targetBtn = document.getElementById(
+                gameId === 'vibez_fly' ? 'btn-vibez' : 
+                gameId === 'brain_training' ? 'btn-brain' : 
+                gameId === 'memo' ? 'btn-memo' : 
+                gameId === 'match3' ? 'btn-match3' : 
+                gameId === 'block' ? 'btn-block' : 
+                (gameId === 'tortuga' || gameId === 'tortugasprint') ? 'btn-tortuga' : 'btn-dog'
+            );
+            
+            if (targetBtn) {
+                const colorClass = gameId === 'match3' ? 'bg-purple-600' : gameId === 'dog_eater' ? 'bg-cyan-600' : (gameId === 'tortuga' || gameId === 'tortugasprint') ? 'bg-orange-600' : 'bg-pink-600';
+                targetBtn.className = `px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 ${colorClass} text-white shadow-md`;
+            }
+            loadLeaderboard(gameId);
+        }
+
+        window.switchLeaderboard('vibez_fly');
+
+        // ===== PORTADO desde el antiguo index.html: lógica de Sugerencias y Firmas =====
+        // Reutiliza la misma instancia 'app'/'db' ya creada arriba (no se debe llamar initializeApp dos veces).
+        const TEXTOS_FIRMAS = {
             es: {
-                vibezDesc: "Tu app de citas inclusiva. Un espacio seguro diseñado para la comunidad <strong>LGTBI</strong>, <strong>personas con discapacidad</strong> y cualquier <strong>neurotipo</strong>.",
-                vibezBtn: "Instalar en Google Play",
-                dietDesc: "Escanea códigos de barras o códigos QR al instante. Cuenta con una <strong>IA nutricionista integrada</strong> para intolerancias, diabetes o alergias.",
-                dietBtn: "Instalar en Google Play",
-                gamesTitle: "Sección de Juegos",
-                gamesDesc: "Entra y pon a prueba tu mente con nuestros desarrollos interactivos. Juegos optimizados en <strong>HTML5</strong> listos para disfrutar desde el navegador.",
-                gamesBtn: "Entrar a jugar",
-                chatTitle: "Chat De VibezMatch",
-                chatDesc: "¡Únete a nuestro Chat General!",
-                chatBtn: "Entrar al Chat General",
                 sugTitle: "✍️ SUGERENCIAS Y FIRMAS ✍️",
                 sugSub: "Déjame tu opinión (Sujeta a moderación previa)",
                 authLabel: "Autentica tu correo para poder enviar comentarios:",
@@ -235,7 +436,6 @@
                 boardLoading: "Cargando comentarios aprobados...",
                 boardEmpty: "Aún no hay firmas aprobadas en el libro.",
                 verified: "✓ Verificado",
-                footer: "© 2026 Amy Software. Todos los derechos reservados.",
                 alertEmail: "Por favor, introduce un correo válido.",
                 alertErrorLink: "Error al enviar el enlace de acceso.",
                 alertPromptEmail: "Por favor, introduce tu correo de nuevo para confirmar la sesión:",
@@ -249,16 +449,6 @@
                 modDeleteBtn: "Eliminar"
             },
             en: {
-                vibezDesc: "Your inclusive dating app. A safe space designed for the <strong>LGTBI</strong> community, <strong>people with disabilities</strong>, and any <strong>neurotype</strong>.",
-                vibezBtn: "Install on Google Play",
-                dietDesc: "Scan barcodes or QR codes instantly. Features an <strong>integrated AI nutritionist</strong> for intolerances, diabetes, or allergies.",
-                dietBtn: "Install on Google Play",
-                gamesTitle: "Games Section",
-                gamesDesc: "Step in and test your mind with our interactive developments. <strong>HTML5</strong> optimized games ready to play straight from your browser.",
-                gamesBtn: "Enter and Play",
-                chatTitle: "VibezMatch Chat",
-                chatDesc: "Join our Global Chatroom!",
-                chatBtn: "Enter Global Chat",
                 sugTitle: "✍️ FEEDBACK & GUESTBOOK ✍️",
                 sugSub: "Leave your feedback (Subject to review before publishing)",
                 authLabel: "Authenticate your email address to submit a comment:",
@@ -276,7 +466,6 @@
                 boardLoading: "Loading approved comments...",
                 boardEmpty: "No approved signatures on the guestbook yet.",
                 verified: "✓ Verified",
-                footer: "© 2026 Amy Software. All rights reserved.",
                 alertEmail: "Please enter a valid email address.",
                 alertErrorLink: "Error sending the access link.",
                 alertPromptEmail: "Please enter your email again to confirm your session:",
@@ -291,42 +480,28 @@
             }
         };
 
-        const currentLang = navigator.language.startsWith('es') ? 'es' : 'en';
+        document.getElementById('sug-title').innerText = TEXTOS_FIRMAS[currentLang].sugTitle;
+        document.getElementById('sug-sub').innerText = TEXTOS_FIRMAS[currentLang].sugSub;
+        document.getElementById('auth-label').innerText = TEXTOS_FIRMAS[currentLang].authLabel;
+        document.getElementById('btn-enviar-enlace').innerText = TEXTOS_FIRMAS[currentLang].authBtn;
+        document.getElementById('txt-connected-as').innerText = TEXTOS_FIRMAS[currentLang].connectedAs;
+        document.getElementById('btn-cerrar-sesion').innerText = TEXTOS_FIRMAS[currentLang].logOut;
+        document.getElementById('sug-autor').placeholder = TEXTOS_FIRMAS[currentLang].inputAutor;
+        document.getElementById('sug-mensaje').placeholder = TEXTOS_FIRMAS[currentLang].inputMsg;
+        document.getElementById('btn-publicar-sug').innerText = TEXTOS_FIRMAS[currentLang].btnSubmit;
+        document.getElementById('msg-envio-exito').innerText = TEXTOS_FIRMAS[currentLang].submitSuccess;
+        document.getElementById('signatures-board-title').innerText = TEXTOS_FIRMAS[currentLang].boardTitle;
+        document.getElementById('board-loading').innerText = TEXTOS_FIRMAS[currentLang].boardLoading;
 
-        // TRADUCCIÓN E INYECCIÓN DINÁMICA DE LA INTERFAZ
-        document.getElementById('desc-vibez').innerHTML = TEXTOS_INDEX[currentLang].vibezDesc;
-        document.getElementById('btn-vibez').innerText = TEXTOS_INDEX[currentLang].vibezBtn;
-        document.getElementById('desc-diet').innerHTML = TEXTOS_INDEX[currentLang].dietDesc;
-        document.getElementById('btn-diet').innerText = TEXTOS_INDEX[currentLang].dietBtn;
-        document.getElementById('title-games').innerText = TEXTOS_INDEX[currentLang].gamesTitle;
-        document.getElementById('desc-games').innerHTML = TEXTOS_INDEX[currentLang].gamesDesc;
-        document.getElementById('btn-games').innerText = TEXTOS_INDEX[currentLang].gamesBtn;
-        document.getElementById('chat-title').innerText = TEXTOS_INDEX[currentLang].chatTitle;
-        document.getElementById('chat-desc').innerText = TEXTOS_INDEX[currentLang].chatDesc;
-        document.getElementById('chat-btn').lastChild.textContent = " " + TEXTOS_INDEX[currentLang].chatBtn;
-        document.getElementById('sug-title').innerText = TEXTOS_INDEX[currentLang].sugTitle;
-        document.getElementById('sug-sub').innerText = TEXTOS_INDEX[currentLang].sugSub;
-        document.getElementById('auth-label').innerText = TEXTOS_INDEX[currentLang].authLabel;
-        document.getElementById('btn-enviar-enlace').innerText = TEXTOS_INDEX[currentLang].authBtn;
-        document.getElementById('txt-connected-as').innerText = TEXTOS_INDEX[currentLang].connectedAs;
-        document.getElementById('btn-cerrar-sesion').innerText = TEXTOS_INDEX[currentLang].logOut;
-        document.getElementById('sug-autor').placeholder = TEXTOS_INDEX[currentLang].inputAutor;
-        document.getElementById('sug-mensaje').placeholder = TEXTOS_INDEX[currentLang].inputMsg;
-        document.getElementById('btn-publicar-sug').innerText = TEXTOS_INDEX[currentLang].btnSubmit;
-        document.getElementById('msg-envio-exito').innerText = TEXTOS_INDEX[currentLang].submitSuccess;
-        document.getElementById('board-title').innerText = TEXTOS_INDEX[currentLang].boardTitle;
-        document.getElementById('board-loading').innerText = TEXTOS_INDEX[currentLang].boardLoading;
-        document.getElementById('footer-rights').innerHTML = TEXTOS_INDEX[currentLang].footer;
+        const ADMIN_EMAIL = "amyillustrator22@gmail.com";
 
-        const ADMIN_EMAIL = "amyillustrator22@gmail.com"; 
-
-        const authContainer = document.getElementById('auth-container');
-        const formContainer = document.getElementById('form-sugerencia-container');
-        const adminPanel = document.getElementById('admin-panel');
-        const userEmailSpan = document.getElementById('user-logged-email');
-        const authMsg = document.getElementById('auth-msg');
-        const hpTrap = document.getElementById('sys_security_feedback_hp');
-        const msgExito = document.getElementById('msg-envio-exito');
+        const firmasAuthContainer = document.getElementById('auth-container');
+        const firmasFormContainer = document.getElementById('form-sugerencia-container');
+        const firmasAdminPanel = document.getElementById('admin-panel');
+        const firmasUserEmailSpan = document.getElementById('user-logged-email');
+        const firmasAuthMsg = document.getElementById('auth-msg');
+        const firmasHpTrap = document.getElementById('sys_security_feedback_hp');
+        const firmasMsgExito = document.getElementById('msg-envio-exito');
 
         const actionCodeSettings = {
             url: window.location.href,
@@ -335,31 +510,31 @@
 
         document.getElementById('btn-enviar-enlace').addEventListener('click', async () => {
             const email = document.getElementById('auth-email').value.trim();
-            if (!email) return alert(TEXTOS_INDEX[currentLang].alertEmail);
+            if (!email) return alert(TEXTOS_FIRMAS[currentLang].alertEmail);
 
             try {
                 await sendSignInLinkToEmail(auth, email, actionCodeSettings);
                 window.localStorage.setItem('emailForSignIn', email);
-                authMsg.className = "text-xs text-center font-bold text-green-600 block mt-2";
-                authMsg.innerText = TEXTOS_INDEX[currentLang].authSent;
+                firmasAuthMsg.className = "text-xs text-center font-bold text-green-600 block mt-2";
+                firmasAuthMsg.innerText = TEXTOS_FIRMAS[currentLang].authSent;
             } catch (error) {
                 console.error(error);
-                alert(TEXTOS_INDEX[currentLang].alertErrorLink);
+                alert(TEXTOS_FIRMAS[currentLang].alertErrorLink);
             }
         });
 
         if (isSignInWithEmailLink(auth, window.location.href)) {
-            let email = window.localStorage.getItem('emailForSignIn');
-            if (!email) {
-                email = prompt(TEXTOS_INDEX[currentLang].alertPromptEmail);
+            let emailParaFirma = window.localStorage.getItem('emailForSignIn');
+            if (!emailParaFirma) {
+                emailParaFirma = prompt(TEXTOS_FIRMAS[currentLang].alertPromptEmail);
             }
-            if (email) {
-                signInWithEmailLink(auth, email, window.location.href)
+            if (emailParaFirma) {
+                signInWithEmailLink(auth, emailParaFirma, window.location.href)
                     .then(() => {
                         window.localStorage.removeItem('emailForSignIn');
                         window.history.replaceState({}, document.title, window.location.pathname);
                     })
-                    .catch((error) => alert(TEXTOS_INDEX[currentLang].alertExpired));
+                    .catch((error) => alert(TEXTOS_FIRMAS[currentLang].alertExpired));
             }
         }
 
@@ -367,20 +542,20 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user) {
-                authContainer.classList.add('hidden');
-                formContainer.classList.remove('hidden');
-                userEmailSpan.innerText = user.email;
+                firmasAuthContainer.classList.add('hidden');
+                firmasFormContainer.classList.remove('hidden');
+                firmasUserEmailSpan.innerText = user.email;
 
                 if (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
-                    adminPanel.classList.remove('hidden');
+                    firmasAdminPanel.classList.remove('hidden');
                     activarMuroModeracion();
                 } else {
-                    adminPanel.classList.add('hidden');
+                    firmasAdminPanel.classList.add('hidden');
                 }
             } else {
-                authContainer.classList.remove('hidden');
-                formContainer.classList.add('hidden');
-                adminPanel.classList.add('hidden');
+                firmasAuthContainer.classList.remove('hidden');
+                firmasFormContainer.classList.add('hidden');
+                firmasAdminPanel.classList.add('hidden');
                 if (unsubsPending) unsubsPending();
             }
         });
@@ -388,14 +563,14 @@
         document.getElementById('btn-cerrar-sesion').addEventListener('click', () => signOut(auth));
 
         document.getElementById('btn-publicar-sug').addEventListener('click', async () => {
-            if (hpTrap.value) return; 
+            if (firmasHpTrap.value) return;
 
             const autor = document.getElementById('sug-autor').value.trim();
             const mensaje = document.getElementById('sug-mensaje').value.trim();
             const currentUser = auth.currentUser;
 
-            if (!autor || !mensaje) return alert(TEXTOS_INDEX[currentLang].alertFillFields);
-            if (!currentUser) return alert(TEXTOS_INDEX[currentLang].alertVerifyFirst);
+            if (!autor || !mensaje) return alert(TEXTOS_FIRMAS[currentLang].alertFillFields);
+            if (!currentUser) return alert(TEXTOS_FIRMAS[currentLang].alertVerifyFirst);
 
             try {
                 await addDoc(collection(db, "sugerencias"), {
@@ -403,15 +578,15 @@
                     text: mensaje,
                     email: currentUser.email,
                     timestamp: Date.now(),
-                    approved: false 
+                    approved: false
                 });
                 document.getElementById('sug-autor').value = "";
                 document.getElementById('sug-mensaje').value = "";
-                msgExito.classList.remove('hidden');
-                setTimeout(() => msgExito.classList.add('hidden'), 6000);
+                firmasMsgExito.classList.remove('hidden');
+                setTimeout(() => firmasMsgExito.classList.add('hidden'), 6000);
             } catch (error) {
                 console.error(error);
-                alert(TEXTOS_INDEX[currentLang].alertErrorSubmit);
+                alert(TEXTOS_FIRMAS[currentLang].alertErrorSubmit);
             }
         });
 
@@ -421,12 +596,12 @@
             muro.innerHTML = "";
 
             if (snapshot.empty) {
-                muro.innerHTML = `<div class="text-center text-gray-400 italic py-2 text-xs">${TEXTOS_INDEX[currentLang].boardEmpty}</div>`;
+                muro.innerHTML = `<div class="text-center text-gray-400 italic py-2 text-xs">${TEXTOS_FIRMAS[currentLang].boardEmpty}</div>`;
                 return;
             }
 
-            snapshot.forEach((doc) => {
-                const data = doc.data();
+            snapshot.forEach((docSnap) => {
+                const data = docSnap.data();
                 const safeAuthor = data.author.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 const safeText = data.text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -434,7 +609,7 @@
                     <div class="bg-white/40 border border-white/40 p-4 rounded-2xl shadow-sm text-left">
                         <div class="flex justify-between items-center mb-1">
                             <span class="font-extrabold text-gray-900">${safeAuthor}</span>
-                            <span class="text-[10px] text-green-700 font-bold bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">${TEXTOS_INDEX[currentLang].verified}</span>
+                            <span class="text-[10px] text-green-700 font-bold bg-green-500/10 px-2 py-0.5 rounded-full border border-green-500/20">${TEXTOS_FIRMAS[currentLang].verified}</span>
                         </div>
                         <p class="text-gray-700 leading-relaxed font-medium">${safeText}</p>
                     </div>
@@ -444,15 +619,15 @@
 
         function activarMuroModeracion() {
             const qPendientes = query(collection(db, "sugerencias"), where("approved", "==", false), orderBy("timestamp", "asc"));
-            
+
             unsubsPending = onSnapshot(qPendientes, (snapshot) => {
                 const muroMod = document.getElementById('muro-moderacion');
                 muroMod.innerHTML = "";
 
-                document.getElementById('mod-panel-title').innerText = TEXTOS_INDEX[currentLang].modTitle;
+                document.getElementById('mod-panel-title').innerText = TEXTOS_FIRMAS[currentLang].modTitle;
 
                 if (snapshot.empty) {
-                    muroMod.innerHTML = `<div class="text-center text-slate-500 italic text-xs py-2">${TEXTOS_INDEX[currentLang].modNoComments}</div>`;
+                    muroMod.innerHTML = `<div class="text-center text-slate-500 italic text-xs py-2">${TEXTOS_FIRMAS[currentLang].modNoComments}</div>`;
                     return;
                 }
 
@@ -466,12 +641,12 @@
                     card.className = "bg-white/90 border border-pink-300 p-3 rounded-xl shadow-sm flex flex-col gap-2 text-xs";
                     card.innerHTML = `
                         <div>
-                            <p class="font-bold text-gray-900">${TEXTOS_INDEX[currentLang].modAuthor}${safeAuthor} (${data.email})</p>
+                            <p class="font-bold text-gray-900">${TEXTOS_FIRMAS[currentLang].modAuthor}${safeAuthor} (${data.email})</p>
                             <p class="text-gray-700 mt-1 italic">"${safeText}"</p>
                         </div>
                         <div class="flex gap-2 justify-end">
-                            <button data-id="${docId}" class="btn-aprobar bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded font-bold shadow-sm transition-colors">${TEXTOS_INDEX[currentLang].modApproveBtn}</button>
-                            <button data-id="${docId}" class="btn-eliminar bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded font-bold shadow-sm transition-colors">${TEXTOS_INDEX[currentLang].modDeleteBtn}</button>
+                            <button data-id="${docId}" class="btn-aprobar bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded font-bold shadow-sm transition-colors">${TEXTOS_FIRMAS[currentLang].modApproveBtn}</button>
+                            <button data-id="${docId}" class="btn-eliminar bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded font-bold shadow-sm transition-colors">${TEXTOS_FIRMAS[currentLang].modDeleteBtn}</button>
                         </div>
                     `;
                     muroMod.appendChild(card);
@@ -487,7 +662,7 @@
                 document.querySelectorAll('.btn-eliminar').forEach(btn => {
                     btn.addEventListener('click', async (e) => {
                         const id = e.target.getAttribute('data-id');
-                        if(confirm(TEXTOS_INDEX[currentLang].confirmDelete)) {
+                        if (confirm(TEXTOS_FIRMAS[currentLang].confirmDelete)) {
                             await deleteDoc(doc(db, "sugerencias", id));
                         }
                     });
