@@ -6,7 +6,7 @@
 
     <script data-goatcounter="https://amysoftware.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Amy Software - Arcade Central</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,9 +16,22 @@
 
     <style>
         body {
-            background: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)), url('encabezaoAmySoftware.jpg') no-repeat center center fixed;
-            background-size: cover;
+            background: #0f172a;
             min-height: 100vh;
+            min-height: 100dvh;
+            padding-top: max(3rem, env(safe-area-inset-top)) !important;
+            padding-bottom: max(3rem, env(safe-area-inset-bottom)) !important;
+            padding-left: max(1rem, env(safe-area-inset-left)) !important;
+            padding-right: max(1rem, env(safe-area-inset-right)) !important;
+            box-sizing: border-box;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)), url('encabezaoAmySoftware.jpg') no-repeat center center;
+            background-size: cover;
         }
         .title-nabla {
             font-family: 'Nabla', cursive;

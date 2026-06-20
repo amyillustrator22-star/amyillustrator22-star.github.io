@@ -6,7 +6,7 @@
 
     <script data-goatcounter="https://amysoftware.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Amy Software - MEMO</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,16 +16,27 @@
     
     <style>
         /* 🌌 VINCULACIÓN DIRECTA DE TU ARCHIVO JPG AL FONDO GLOBAL */
+        html {
+            height: 100%;
+        }
         #super-fondo-arcade {
             position: fixed;
             inset: 0;
-            width: 100vw;
-            height: 100vh;
             z-index: -2;
             background-image: url('fondomemo.jpg') !important;
             background-size: cover !important;
             background-position: center center !important;
             background-repeat: no-repeat !important;
+        }
+        body {
+            min-height: 100vh !important;
+            min-height: 100dvh !important;
+            padding-top: max(1rem, env(safe-area-inset-top)) !important;
+            padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
+            padding-left: max(1rem, env(safe-area-inset-left)) !important;
+            padding-right: max(1rem, env(safe-area-inset-right)) !important;
+            box-sizing: border-box !important;
+            overscroll-behavior: none;
         }
 
         .title-nabla {
@@ -71,7 +82,7 @@
         }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center p-4 font-sans text-gray-800 relative" style="background: transparent !important; min-height: 100vh; margin: 0;">
+<body class="flex flex-col items-center justify-center font-sans text-gray-800 relative" style="background: transparent !important; margin: 0;">
 
     <div id="super-fondo-arcade"></div>
 

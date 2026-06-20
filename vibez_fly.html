@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5491883632835608" crossorigin="anonymous"></script>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Amy Software - Vibez Fly</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,11 +14,25 @@
     
     <style>
         body {
-            background: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)), url('encabezaoAmySoftware.jpg') no-repeat center center fixed;
-            background-size: cover;
+            background: #0f172a;
             min-height: 100vh;
+            min-height: 100dvh;
             user-select: none;
             touch-action: manipulation;
+            padding-top: max(1rem, env(safe-area-inset-top)) !important;
+            padding-bottom: max(1rem, env(safe-area-inset-bottom)) !important;
+            padding-left: max(1rem, env(safe-area-inset-left)) !important;
+            padding-right: max(1rem, env(safe-area-inset-right)) !important;
+            box-sizing: border-box;
+            overscroll-behavior: none;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            background: linear-gradient(rgba(15, 23, 42, 0.45), rgba(15, 23, 42, 0.45)), url('encabezaoAmySoftware.jpg') no-repeat center center;
+            background-size: cover;
         }
         .title-nabla {
             font-family: 'Nabla', cursive;
@@ -30,6 +44,7 @@
             width: 100%;
             max-width: 430px;
             height: 70vh;
+            height: 70svh;
             max-height: 700px;
             background-image: url('fondocorazon.jpg');
             background-size: cover;
