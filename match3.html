@@ -517,18 +517,36 @@
             }
         }, {passive: false});
 
+        // textBaseline "middle" assumes every glyph shares the same ascent/descent.
+        // The ❤️ emoji needs a variation selector to render in color, so its actual
+        // ink box differs from the other pool emojis on iOS Safari and Firefox,
+        // making it appear off-center. Measuring each glyph's real bounding box
+        // once and offsetting by it centers every emoji precisely, on any screen size.
+        function calcularOffsetsEmojis(ctx) {
+            ctx.font = "36px Arial";
+            ctx.textAlign = "left";
+            ctx.textBaseline = "alphabetic";
+            return POOL_EMOJIS.map(emoji => {
+                const m = ctx.measureText(emoji);
+                const left = m.actualBoundingBoxLeft || 0;
+                const right = m.actualBoundingBoxRight || 0;
+                const asc = m.actualBoundingBoxAscent || 18;
+                const desc = m.actualBoundingBoxDescent || 18;
+                return { x: (right - left) / 2, y: (asc - desc) / 2 };
+            });
+        }
+        const emojiOffsets = calcularOffsetsEmojis(ctx);
+
         function dibujarJoyaEmoji(ctx, cx, cy, id, brillo) {
             ctx.save();
             let emoji = POOL_EMOJIS[id];
+            let off = emojiOffsets[id];
             ctx.shadowBlur = brillo ? 30 : 8;
             ctx.shadowColor = brillo ? '#ffffff' : 'rgba(168, 85, 247, 0.3)';
             ctx.font = "36px Arial";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            // No manual +2 offset: textBaseline "middle" already centres the glyph.
-            // The old +2 caused the ❤️ emoji to render ~4–6 px too low on iOS Safari
-            // (Apple Color Emoji has different vertical metrics than desktop fonts).
-            ctx.fillText(emoji, cx, cy);
+            ctx.textAlign = "left";
+            ctx.textBaseline = "alphabetic";
+            ctx.fillText(emoji, cx - off.x, cy + off.y);
             ctx.restore();
         }
 
