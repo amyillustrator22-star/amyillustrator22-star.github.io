@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Tortuga Cables - Amy Software</title>
+    <title>Tortuga Logic - Amy Software</title>
     <style>
         body { background: #0f172a; color: white; font-family: monospace; display: flex; flex-direction: column; align-items: center; min-height: 100dvh; margin: 0; padding-top: max(20px, env(safe-area-inset-top)); box-sizing: border-box; overscroll-behavior: none; }
         .btn-volver { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171; padding: 6px 16px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 0.9rem; margin-bottom: 10px; }
-        canvas { background: #020617; border: 4px solid #334155; border-radius: 16px; width: 100% !important; max-width: 480px !important; height: auto !important; aspect-ratio: 1 / 1 !important; touch-action: none; }
+        canvas { background: #020617; border: 4px solid #334155; border-radius: 16px; width: 100% !important; max-width: 480px !important; height: auto !important; aspect-ratio: 1 / 1 !important; touch-action: none; cursor: pointer; }
         .system-validate-field { position: absolute; left: -9999px; }
     </style>
 </head>
@@ -23,57 +23,53 @@
         
         let nivel = 1;
         let cables = [];
-        let tortuga = { x: 0, y: 0, activo: false, cableIndex: -1, progreso: 0, estado: 'espera' }; // espera, moviendo, gameOver, fin
-        
+        let tortuga = { x: 0, y: 0, cableIdx: -1, progreso: 0, estado: 'espera' }; 
+
         function generarNivel() {
-            cables = [];
             let num = 2 + nivel;
-            let salidaCorrecta = Math.floor(Math.random() * num);
+            cables = [];
+            let correcto = Math.floor(Math.random() * num);
+            
             for(let i=0; i<num; i++) {
-                cables.push({
-                    id: i,
-                    color: i === salidaCorrecta ? '#22d3ee' : '#475569',
-                    esCorrecto: i === salidaCorrecta,
-                    cp1: { x: 240, y: 50 + (i * 400/num) },
-                    cp2: { x: 240, y: 50 + (i * 400/num) }
-                });
+                let ruta = [];
+                let y = 50 + (i * 380/(num-1));
+                // Generamos cruces: la ruta Y cambia aleatoriamente en 3 puntos
+                ruta.push({x: 50, y: y});
+                ruta.push({x: 240, y: 50 + (Math.random() * 380)});
+                ruta.push({x: 430, y: y});
+                
+                cables.push({ color: i === correcto ? '#22d3ee' : '#475569', esCorrecto: i === correcto, ruta: ruta });
             }
             tortuga.estado = 'espera';
         }
 
-        function dibujarCurva(c, idx) {
-            ctx.beginPath();
-            ctx.strokeStyle = c.color;
-            ctx.lineWidth = 6;
-            ctx.moveTo(40, 50 + (idx * 400/(cables.length)));
-            ctx.bezierCurveTo(c.cp1.x, c.cp1.y, c.cp2.x, c.cp2.y, 440, 50 + (idx * 400/(cables.length)));
-            ctx.stroke();
-        }
-
-        function animar() {
+        function dibujar() {
             ctx.clearRect(0,0, 480, 480);
-            cables.forEach((c, i) => dibujarCurva(c, i));
+            
+            cables.forEach(c => {
+                ctx.beginPath(); ctx.strokeStyle = c.color; ctx.lineWidth = 6;
+                ctx.moveTo(c.ruta[0].x, c.ruta[0].y);
+                ctx.quadraticCurveTo(c.ruta[1].x, c.ruta[1].y, c.ruta[2].x, c.ruta[2].y);
+                ctx.stroke();
+            });
 
-            if(tortuga.activo) {
-                let c = cables[tortuga.cableIndex];
-                let y_base = 50 + (tortuga.cableIndex * 400/cables.length);
-                // Dibujar tortuga
-                ctx.font = "30px Arial";
-                ctx.fillText("🐢", 40 + tortuga.progreso * 400, y_base);
-                
-                tortuga.progreso += 0.01;
+            if(tortuga.estado === 'moviendo') {
+                let c = cables[tortuga.cableIdx];
+                let x = c.ruta[0].x + (c.ruta[2].x - c.ruta[0].x) * tortuga.progreso;
+                let y = c.ruta[0].y + (c.ruta[2].y - c.ruta[0].y) * tortuga.progreso;
+                ctx.font = "30px Arial"; ctx.fillText("🐢", x-15, y+10);
+                tortuga.progreso += 0.005;
                 if(tortuga.progreso >= 1) {
-                    if(c.esCorrecto) { tortuga.estado = 'fin'; nivel++; setTimeout(generarNivel, 1000); }
-                    else { tortuga.estado = 'gameOver'; }
+                    tortuga.estado = c.esCorrecto ? 'fin' : 'gameOver';
+                    if(c.esCorrecto) { nivel++; setTimeout(generarNivel, 1000); }
                 }
             }
 
             if(tortuga.estado === 'gameOver') {
                 ctx.fillStyle = "white"; ctx.font = "bold 40px monospace";
-                ctx.fillText("?", 40 + tortuga.progreso * 400, 50 + (tortuga.cableIndex * 400/cables.length) - 20);
-                ctx.fillText("GAME OVER", 240, 240);
+                ctx.textAlign = "center"; ctx.fillText("❓ GAME OVER", 240, 240);
             }
-            requestAnimationFrame(animar);
+            requestAnimationFrame(dibujar);
         }
 
         canvas.addEventListener('mousedown', e => {
@@ -81,15 +77,14 @@
             const rect = canvas.getBoundingClientRect();
             const y = (e.clientY - rect.top) * (480/canvas.clientHeight);
             cables.forEach((c, i) => {
-                let cableY = 50 + (i * 400/cables.length);
-                if(Math.abs(y - cableY) < 30) {
-                    tortuga.activo = true; tortuga.cableIndex = i; tortuga.progreso = 0;
+                if(Math.abs(y - c.ruta[0].y) < 30) {
+                    tortuga.activo = true; tortuga.cableIdx = i; tortuga.progreso = 0; tortuga.estado = 'moviendo';
                 }
             });
         });
 
         generarNivel();
-        animar();
+        dibujar();
     </script>
 </body>
 </html>
