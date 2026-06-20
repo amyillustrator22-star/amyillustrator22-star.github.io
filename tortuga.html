@@ -180,7 +180,7 @@
             const alias = prompt(`💀 JUEGO TERMINADO\nPuntuación: ${score} pts.\nIntroduce tu nombre para la clasificación:`);
             if (alias && alias.trim() !== "") {
                 try {
-                    await addDoc(collection(db, "scores_arcade"), { game: "tortuga", player: alias.trim().substring(0, 12), score: parseInt(score), country: "🇪🇸", date: new Date().toISOString() });
+                    await addDoc(collection(db, "scores_arcade"), { game: "tortugasprint", player: alias.trim().substring(0, 12), score: parseInt(score), country: "🇪🇸", date: new Date().toISOString() });
                 } catch (e) { console.error(e); }
             }
             window.location.href = "juegos.html";
@@ -248,6 +248,7 @@
                 return;
             }
 
+            // DIBUJAR CUADRÍCULA ESTÁTICA Y LIMPIA (Cero Chivatos)
             ctx.beginPath();
             ctx.strokeStyle = '#00ff66';
             ctx.lineWidth = 5;
@@ -267,18 +268,16 @@
             ctx.stroke();
             ctx.shadowBlur = 0; 
 
+            // DIBUJAR BORNES NEUTROS ARRIBA Y ABAJO (Sin cuadrados ni emojis)
             for (let i = 0; i < numLineas; i++) {
-                ctx.fillStyle = '#cbd5e1'; 
-                ctx.fillRect(xStart[i] - 12, 58, 24, 24);
+                ctx.fillStyle = '#00ff66'; 
+                // Punto de inicio
+                ctx.beginPath(); ctx.arc(xStart[i], 70, 8, 0, Math.PI * 2); ctx.fill();
+                // Punto final
+                ctx.beginPath(); ctx.arc(xStart[i], 410, 8, 0, Math.PI * 2); ctx.fill();
             }
 
-            for (let i = 0; i < numLineas; i++) {
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.8)';
-                ctx.beginPath(); ctx.arc(xStart[i], 410, 16, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = 'white'; ctx.font = '14px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText(i === indexGanadorAbajo ? "🏆" : "❌", xStart[i], 410);
-            }
-
+            // Dibujar a la Tortuga
             if (tortuga.estado === 'moviendo' || tortuga.estado === 'error') {
                 ctx.font = "30px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
                 ctx.fillText("🐢", tortuga.x, tortuga.y);
