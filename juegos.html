@@ -6,7 +6,7 @@
 
     <script data-goatcounter="https://amysoftware.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Amy Software - Arcade Central</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -52,7 +52,7 @@
 
     <main id="menu-juegos" class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 px-4">
         
-        <button onclick="cargarJuego('vibez_fly.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-pink-500 rounded-[2.5rem]">
+        <button onclick="window.location.href='vibez_fly.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-pink-500 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-pink-500 to-red-600 text-white p-5 rounded-3xl mb-6 shadow-md">
@@ -66,7 +66,8 @@
                 <p class="mt-6 text-base text-pink-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
         </button>
-<button onclick="cargarJuego('block.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-green-500 rounded-[2.5rem]">
+
+        <button onclick="window.location.href='block.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-green-500 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-5 rounded-3xl mb-6 shadow-md">
@@ -81,7 +82,7 @@
             </article>
         </button>
 
-        <button onclick="cargarJuego('mi_juego.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-cyan-500 rounded-[2.5rem]">
+        <button onclick="window.location.href='mi_juego.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-cyan-500 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-5 rounded-3xl mb-6 shadow-md">
@@ -96,7 +97,7 @@
             </article>
         </button>
 
-        <button onclick="cargarJuego('memo.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-pink-500 rounded-[2.5rem]">
+        <button onclick="window.location.href='memo.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-pink-500 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-pink-400 to-pink-600 text-white p-5 rounded-3xl mb-6 shadow-md">
@@ -111,14 +112,14 @@
             </article>
         </button>
 
-        <button onclick="cargarJuego('match3.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-purple-500 rounded-[2.5rem]">
+        <button onclick="window.location.href='match3.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-purple-500 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-purple-500 to-indigo-600 text-white p-5 rounded-3xl mb-6 shadow-md">
                         <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                     </div>
                     <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Neon Match 3</h2>
-                    <p id="desc-block" class="text-lg text-gray-700 leading-relaxed font-medium">
+                    <p id="desc-block-match3" class="text-lg text-gray-700 leading-relaxed font-medium">
                         Entrena tu visión espacial alineando gemas y sprites de neón modernos y llenos de colorido en este adictivo puzzle.
                     </p>
                 </div>
@@ -126,7 +127,7 @@
             </article>
         </button>
 
-        <button onclick="cargarJuego('comecocos.html')" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-cyan-400 rounded-[2.5rem]">
+        <button onclick="window.location.href='comecocos.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-cyan-400 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-cyan-400 to-blue-600 text-white p-5 rounded-3xl mb-6 shadow-md">
@@ -164,9 +165,9 @@
             <button id="btn-dog" onclick="switchLeaderboard('dog_eater')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">
                 DOG EATER
             </button>
-<button id="btn-block" onclick="switchLeaderboard('block')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">
-    RETRO BLOCK
-</button>
+            <button id="btn-block" onclick="switchLeaderboard('block')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">
+                RETRO BLOCK
+            </button>
         </div>
 
         <div class="bg-white/50 rounded-2xl overflow-hidden shadow-inner border border-white/30">
@@ -233,7 +234,8 @@
                 brainTitle: "Brain Training",
                 brainDesc: "Pon a prueba tu velocidad mental ordenando secuencias de burbujas numéricas de menor a mayor.",
                 memoDesc: "Potencia tu memoria fotográfica emparejando elementos ocultos. El tablero se expande cada 3 niveles superados.",
-                blockDesc: "Entrena tu visión espacial alineando gemas y sprites de neón modernos y llenos de colorido en este adictivo puzzle.",
+                blockDesc: "El clásico juego de apilar bloques con tu estética vintage preferida. ¡Pon a prueba tu precisión!",
+                match3Desc: "Entrena tu visión espacial alineando gemas y sprites de neón modernos y llenos de colorido en este adictivo puzzle.",
                 comecocosDesc: "Guía al tierno perrito de neón para comer todas las galletas con las letras W, A, S, D y huye de los OVNIs alienígenas.",
                 playBtn: "Jugar Ahora",
                 boardTitle: "🏆 RÉCORDS MUNDIALES 🏆",
@@ -251,7 +253,8 @@
                 brainTitle: "Brain Training",
                 brainDesc: "Test your mental processing speed by sorting numerical bubble sequences from lowest to highest.",
                 memoDesc: "Boost your photographic memory by pairing hidden elements. The layout expands every 3 completed levels.",
-                blockDesc: "Train your spatial awareness and logic by lining up neon gemstones and vibrant blocks in this addictive puzzle.",
+                blockDesc: "The classic block-stacking game with your favorite vintage aesthetic. Test your precision!",
+                match3Desc: "Train your spatial awareness and logic by lining up neon gemstones and vibrant blocks in this addictive puzzle.",
                 comecocosDesc: "Guide the cute neon dog to eat all the treats using W, A, S, D keys while escaping from fast alien UFOs.",
                 playBtn: "Play Now",
                 boardTitle: "🏆 WORLD LEADERBOARDS 🏆",
@@ -272,7 +275,14 @@
         document.getElementById('title-brain').innerText = TEXTOS_JUEGOS[currentLang].brainTitle;
         document.getElementById('desc-brain').innerText = TEXTOS_JUEGOS[currentLang].brainDesc;
         document.getElementById('desc-memo').innerText = TEXTOS_JUEGOS[currentLang].memoDesc;
-        document.getElementById('desc-block').innerText = TEXTOS_JUEGOS[currentLang].blockDesc;
+        
+        // Asignamos las descripciones correctas a cada juego sin mezclarlas
+        const descBlockElements = document.querySelectorAll('#desc-block');
+        if(descBlockElements.length > 0) descBlockElements[0].innerText = TEXTOS_JUEGOS[currentLang].blockDesc;
+        
+        const descMatchElements = document.getElementById('desc-block-match3');
+        if(descMatchElements) descMatchElements.innerText = TEXTOS_JUEGOS[currentLang].match3Desc;
+
         document.getElementById('desc-comecocos').innerText = TEXTOS_JUEGOS[currentLang].comecocosDesc;
         document.getElementById('board-title').innerText = TEXTOS_JUEGOS[currentLang].boardTitle;
         document.getElementById('btn-back-home').lastChild.textContent = " " + TEXTOS_JUEGOS[currentLang].btnBack;
@@ -367,12 +377,20 @@
             const btnMemo = document.getElementById('btn-memo');
             const btnMatch3 = document.getElementById('btn-match3');
             const btnDog = document.getElementById('btn-dog');
+            const btnBlock = document.getElementById('btn-block');
             
-            [btnVibez, btnBrain, btnMemo, btnMatch3, btnDog].forEach(btn => {
+            [btnVibez, btnBrain, btnMemo, btnMatch3, btnDog, btnBlock].forEach(btn => {
                 if (btn) btn.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40";
             });
 
-            const targetBtn = document.getElementById(gameId === 'vibez_fly' ? 'btn-vibez' : gameId === 'brain_training' ? 'btn-brain' : gameId === 'memo' ? 'btn-memo' : gameId === 'match3' ? 'btn-match3' : 'btn-dog');
+            const targetBtn = document.getElementById(
+                gameId === 'vibez_fly' ? 'btn-vibez' : 
+                gameId === 'brain_training' ? 'btn-brain' : 
+                gameId === 'memo' ? 'btn-memo' : 
+                gameId === 'match3' ? 'btn-match3' : 
+                gameId === 'block' ? 'btn-block' : 'btn-dog'
+            );
+
             if (targetBtn) {
                 const colorClass = gameId === 'match3' ? 'bg-purple-600' : gameId === 'dog_eater' ? 'bg-cyan-600' : 'bg-pink-600';
                 targetBtn.className = `px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 ${colorClass} text-white shadow-md`;
