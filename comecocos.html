@@ -18,6 +18,33 @@
             padding-top: 15px;
             padding-bottom: 30px;
         }
+        
+        /* 🛠️ BOTÓN DE VOLVER AL MENÚ */
+        .top-bar {
+            width: 100%;
+            max-width: 520px;
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 10px;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+        .btn-volver {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #f87171;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .btn-volver:hover {
+            background: rgba(239, 68, 68, 0.4);
+            color: white;
+        }
+
         .header { text-align: center; margin-bottom: 5px; }
         .title { font-size: 2rem; font-weight: bold; color: #22d3ee; text-shadow: 0 0 10px #22d3ee; letter-spacing: 1px; }
         .stats { background: #1e293b; padding: 6px 20px; border-radius: 9999px; border: 1px solid #334155; display: flex; gap: 20px; font-weight: bold; margin-top: 5px; font-size: 1.1rem; justify-content: center; }
@@ -63,6 +90,10 @@
         <input type="text" id="auth_token_verification" tabindex="-1" autocomplete="off">
     </div>
 
+    <div class="top-bar">
+        <a href="juegos.html" class="btn-volver">⬅ VOLVER AL MENÚ</a>
+    </div>
+
     <div class="header">
         <div class="title">NEON DOG EATER</div>
         <div class="stats">
@@ -73,7 +104,7 @@
     </div>
 
     <div class="ayuda-barra">
-        🎮 PC: TECLAS W,A,S,D | 📱 MÓVIL: DESLIZA EL DEDO (SWIPE)<br>
+        🎮 PC: TECLAS W,A,S,D | 📱 MÓVIL: DESLIZA EL DEDO<br>
         <span style="color: #eab308;">¡LIMPIA EL TABLERO Y ESQUIVA LOS OVNIS!</span>
     </div>
 
@@ -182,7 +213,7 @@
             setTimeout(() => sonarBip(1046.50, 0.3), 300);
         }
 
-        // 🌟 TRES MAPAS DISTINTOS PARA ROTAR DE FORMA ALEATORIA CADA NIVEL
+        // 🌟 MAPAS CORREGIDOS: Ninguno tiene paredes donde nace el perro.
         const MAPAS_PLANTILLAS = [
             [ // Mapa 1 Clásico
                 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
@@ -228,7 +259,7 @@
                 [1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1],
                 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
             ],
-            [ // Mapa 3 Cruce Peligroso
+            [ // Mapa 3 Cruce Peligroso (Despejado)
                 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
                 [1,3,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,3,1],
                 [1,0,1,1,1,1,1,1,0,1,1,0,1,1,1,1,1,1,0,1],
@@ -247,7 +278,7 @@
                 [1,0,1,1,0,1,1,0,1,1,1,1,0,1,1,0,1,1,0,1],
                 [1,0,1,1,0,1,1,0,0,0,0,0,0,1,1,0,1,1,0,1],
                 [1,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,1],
-                [1,3,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1,3,1],
+                [1,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1],
                 [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1]
             ]
         ];
@@ -256,26 +287,30 @@
         let jugador = { x: 0, y: 0, dirX: 0, dirY: 0, sigDirX: 0, sigDirY: 0 };
         let aliens = [];
 
-        function generarNuevoNivel() {
-            transicionNivel = true;
-            sonarNivelSuperado();
+        // 🛠️ Función corregida: Recibe un parámetro para saber si es el inicio absoluto
+        function generarNuevoNivel(esInicioFrio = false) {
+            if (!esInicioFrio) {
+                transicionNivel = true;
+                sonarNivelSuperado();
+            }
+
+            // Si es el inicio, no hay tiempo de espera (carga instantánea). Si es cambio de nivel, espera 1.5s
+            let retraso = esInicioFrio ? 0 : 1500;
 
             setTimeout(() => {
-                // Clonamos un mapa aleatorio para no alterar las plantillas originales
                 const indiceAleatorio = Math.floor(Math.random() * MAPAS_PLANTILLAS.length);
                 mapa = JSON.parse(JSON.stringify(MAPAS_PLANTILLAS[indiceAleatorio]));
                 
-                // Reseteamos jugador y posición de aliens
                 jugador.x = 9 * TAM_CELDA; 
                 jugador.y = 18 * TAM_CELDA; 
                 jugador.dirX = 0; jugador.dirY = 0; 
                 jugador.sigDirX = 0; jugador.sigDirY = 0;
                 
                 aliens = [
-                    { x: 9 * TAM_CELDA, y: 8 * TAM_CELDA, dirX: 1, dirY: 0, color: ALIEN_COLORS[0], ojoAngulo: 0, factorRnd: 0.1, comido: false },
-                    { x: 8 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: -1, dirY: 0, color: ALIEN_COLORS[1], ojoAngulo: 0, factorRnd: 0.25, comido: false },
-                    { x: 10 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: 0, dirY: -1, color: ALIEN_COLORS[2], ojoAngulo: 0, factorRnd: 0.15, comido: false },
-                    { x: 11 * TAM_CELDA, y: 8 * TAM_CELDA, dirX: 0, dirY: 1, color: ALIEN_COLORS[3], ojoAngulo: 0, factorRnd: 0.3, comido: false }
+                    { x: 9 * TAM_CELDA, y: 8 * TAM_CELDA, dirX: 1, dirY: 0, color: ALIEN_COLORS[0], ojoAngulo: 0, comido: false },
+                    { x: 8 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: -1, dirY: 0, color: ALIEN_COLORS[1], ojoAngulo: 0, comido: false },
+                    { x: 10 * TAM_CELDA, y: 10 * TAM_CELDA, dirX: 0, dirY: -1, color: ALIEN_COLORS[2], ojoAngulo: 0, comido: false },
+                    { x: 11 * TAM_CELDA, y: 8 * TAM_CELDA, dirX: 0, dirY: 1, color: ALIEN_COLORS[3], ojoAngulo: 0, comido: false }
                 ];
 
                 modoAsustado = false;
@@ -283,11 +318,11 @@
                 carneX = -1; carneY = -1; tiempoCarne = 0;
                 
                 transicionNivel = false;
-            }, 1500);
+            }, retraso);
         }
 
-        // Arrancamos el juego con el primer nivel
-        generarNuevoNivel();
+        // Arrancamos el juego marcándolo como inicio en frío (true) para que no salga el cartel
+        generarNuevoNivel(true);
 
         window.addEventListener('keydown', e => {
             iniciarAudio();
@@ -301,7 +336,6 @@
             if (tecla === 'd' || tecla === 'arrowright') { jugador.sigDirX = 1; jugador.sigDirY = 0; }
         });
 
-        // 📱 DETECTOR DE DESLIZAMIENTO TÁCTIL (SWIPE) RESPONSIVO PARA MÓVIL
         let touchStartX = 0;
         let touchStartY = 0;
 
@@ -363,7 +397,6 @@
         function actualizar() {
             if (gameOver || securityTriggered || transicionNivel || mapa.length === 0) return;
 
-            // COMPROBAMOS SI HEMOS COMIDO TODAS LAS GALLETAS PARA PASAR DE NIVEL
             let galletasRestantes = 0;
             for (let f = 0; f < mapa.length; f++) {
                 for (let c = 0; c < mapa[f].length; c++) {
@@ -374,8 +407,8 @@
             if (galletasRestantes === 0) {
                 nivel++;
                 levelVal.textContent = nivel;
-                generarNuevoNivel();
-                return; // Cortamos el bucle hasta que cargue el nuevo mapa
+                generarNuevoNivel(false);
+                return; 
             }
 
             if (modoAsustado) {
@@ -393,6 +426,7 @@
                 tiempoCarne = 400; 
             }
 
+            // 🌟 El Perro siempre se mueve de 2 en 2 (Divisor perfecto de 26)
             if (jugador.x + jugador.dirX * 2 < -TAM_CELDA / 2) {
                 jugador.x = canvas.width - TAM_CELDA / 2;
             } else if (jugador.x + jugador.dirX * 2 > canvas.width - TAM_CELDA / 2) {
@@ -454,7 +488,7 @@
                         if (modoAsustado) {
                             let elegir = dirsValidas[Math.floor(Math.random() * dirsValidas.length)];
                             alien.dirX = elegir[0]; alien.dirY = elegir[1];
-                        } else if (Math.random() > alien.factorRnd) {
+                        } else if (Math.random() > 0.15) {
                             let mejorDir = dirsValidas[0]; let distMinima = Infinity;
                             dirsValidas.forEach(d => {
                                 let sigX = alien.x + d[0] * TAM_CELDA; let sigY = alien.y + d[1] * TAM_CELDA;
@@ -469,12 +503,14 @@
                     } else { alien.dirX *= -1; alien.dirY *= -1; }
                 }
 
-                // 🌟 INCREMENTO DE VELOCIDAD POR NIVEL (Más difícil cuanto más avanzas)
-                let multiVelocidadNivel = Math.min(2.5, 1 + (nivel * 0.1));
-                let velocidad = modoAsustado ? 0.5 : (1 * multiVelocidadNivel);
+                // 🌟 CORRECCIÓN MATEMÁTICA CRÍTICA PARA QUE LOS OVNIS NO DESAPAREZCAN:
+                // La velocidad DEBE ser un divisor perfecto del tamaño de celda (26). 
+                // Divisores de 26 son: 1, 2, 13, 26. (El 0.5 también sirve porque 0.5*52 = 26).
+                // Nivel 1 y 2 = velocidad 1. Nivel 3+ = velocidad 2 (el doble de rápidos).
+                let velocidadAlien = modoAsustado ? 0.5 : (nivel >= 3 ? 2 : 1);
                 
-                alien.x += alien.dirX * velocidad;
-                alien.y += alien.dirY * velocidad;
+                alien.x += alien.dirX * velocidadAlien;
+                alien.y += alien.dirY * velocidadAlien;
                 alien.ojoAngulo += 0.08;
 
                 if (Math.abs(jugador.x - alien.x) < 15 && Math.abs(jugador.y - alien.y) < 15) {
