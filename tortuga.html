@@ -2,33 +2,93 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5491883632835608" crossorigin="anonymous"></script>
-    <script data-goatcounter="https://amysoftware.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tortuga Logic Amidakuji - Amy Software</title>
     <style>
-        body { background: #0f172a; color: white; font-family: monospace; display: flex; flex-direction: column; align-items: center; min-height: 100dvh; margin: 0; padding-top: max(20px, env(safe-area-inset-top)); box-sizing: border-box; overscroll-behavior: none; }
-        .top-bar { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 10px; box-sizing: border-box; }
-        .btn-volver { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171; padding: 6px 16px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 0.9rem; }
-        .score-info { font-size: 1.1rem; font-weight: bold; color: #22d3ee; background: rgba(30, 41, 59, 0.8); padding: 4px 12px; border-radius: 8px; border: 1px solid #334155; }
-        canvas { border: 4px solid #334155; border-radius: 16px; width: 100% !important; max-width: 480px !important; height: auto !important; aspect-ratio: 1 / 1 !important; touch-action: none; cursor: pointer; }
-        .system-validate-field { position: absolute; left: -9999px; }
+        body {
+            background: #0f172a;
+            color: white;
+            font-family: monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100dvh;
+            margin: 0;
+            padding-top: max(20px, env(safe-area-inset-top));
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            box-sizing: border-box;
+            overscroll-behavior: none;
+        }
+        .top-bar {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            padding: 0 10px;
+            box-sizing: border-box;
+        }
+        .btn-volver {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #f87171;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .score-info {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #22d3ee;
+            background: rgba(30, 41, 59, 0.8);
+            padding: 4px 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+        canvas {
+            border: 4px solid #334155;
+            border-radius: 16px;
+            box-shadow: 0 0 30px rgba(0, 255, 102, 0.15);
+            width: 100% !important;
+            max-width: 480px !important;
+            height: auto !important;
+            aspect-ratio: 1 / 1 !important;
+            object-fit: contain;
+            touch-action: none;
+            cursor: pointer;
+        }
+        .system-validate-field { position: absolute; left: -9999px; opacity: 0; }
     </style>
 </head>
 <body>
 
-    <div class="system-validate-field"><input type="text" id="auth_token_verification"></div>
+    <div class="system-validate-field" aria-hidden="true">
+        <input type="text" id="auth_token_verification" tabindex="-1" autocomplete="off">
+    </div>
+
     <div class="top-bar">
-        <a href="juegos.html" class="btn-volver">⬅ VOLVER al MENÚ</a>
+        <a href="juegos.html" class="btn-volver">⬅ VOLVER</a>
         <div class="score-info">Nivel: <span id="txt-nivel" style="color: #eab308;">1</span> | Pts: <span id="txt-score">0</span></div>
     </div>
+
     <canvas id="canvas-tortuga" width="480" height="480"></canvas>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        const firebaseConfig = { apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA", authDomain: "vibezmatch-91c6d.firebaseapp.com", projectId: "vibezmatch-91c6d", storageBucket: "vibezmatch-91c6d.appspot.com", messagingSenderId: "645008717503", appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a" };
+        const firebaseConfig = {
+            apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
+            authDomain: "vibezmatch-91c6d.firebaseapp.com",
+            projectId: "vibezmatch-91c6d",
+            storageBucket: "vibezmatch-91c6d.appspot.com",
+            messagingSenderId: "645008717503",
+            appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a"
+        };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
@@ -37,30 +97,28 @@
         const txtNivel = document.getElementById('txt-nivel');
         const txtScore = document.getElementById('txt-score');
 
-        // 👇 CARGA BLINDADA DEL FONDO EN JAVASCRIPT 👇
         const imgFondo = new Image();
         imgFondo.src = 'fondotortuga.jpg';
         let fondoCargado = false;
         imgFondo.onload = () => { fondoCargado = true; };
-        imgFondo.onerror = () => { console.error("ERROR: No se encontró fondotortuga.jpg. Revisa el nombre y la extensión en Linux."); };
+        imgFondo.onerror = () => { fondoCargado = false; };
 
         let nivel = 1;
         let score = 0;
-        let circuitBoard = []; // Estructura Amidakuji
-        let numLineas = 3; 
-        let indexGanador = 0;
-        let metaX = 0;
+        let circuitBoard = [];
+        let numLineas = 4;
+        let indexGanadorAbajo = 0;
         let gameOver = false;
         let bloqueado = false;
-        let transicionNivel = false;
 
-        let tortuga = { x: 0, y: 0, cableIdx: -1, nodoActual: 0, t: 0, estado: 'espera', velocidad: 0.08 };
+        let tortuga = { x: 0, y: 0, cableIdx: -1, nodoActual: 0, t: 0, estado: 'espera', velocidad: 0.07 };
 
         let securityTriggered = false;
         window.turtle_secure_val = 0;
-        function checkIntegrity() { if (document.getElementById('auth_token_verification').value !== "" || window.turtle_secure_val !== 0) securityTriggered = true; }
+        function checkIntegrity() {
+            if (document.getElementById('auth_token_verification').value !== "" || window.turtle_secure_val !== 0) securityTriggered = true;
+        }
 
-        // --- LÓGICA AMIDAKUJI (GHOST LEG) ---
         function generarAmidakuji() {
             circuitBoard = [];
             bloqueado = false;
@@ -69,36 +127,29 @@
             tortuga.nodoActual = 0;
             tortuga.t = 0;
 
-            numLineas = Math.min(3 + Math.floor((nivel - 1) / 3), 5); 
-            let espaciado = 360 / (numLineas - 1);
+            numLineas = Math.min(3 + Math.floor((nivel - 1) / 2), 6);
+            let espaciado = 340 / (numLineas - 1);
             let xStart = [];
-            for (let i = 0; i < numLineas; i++) xStart.push(60 + i * espaciado);
+            for (let i = 0; i < numLineas; i++) xStart.push(70 + i * espaciado);
 
-            // Generar puentes horizontales aleatorios
-            let ranurasY = [];
-            for (let y = 380; y >= 140; y -= 40) ranurasY.push(y); // Espacios donde pueden cruzarse
-            ranurasY.sort(() => Math.random() - 0.5); // Desordenar espacios
-
+            let ySlots = [120, 170, 220, 270, 320, 370];
             let puentes = [];
-            let numPuentes = numLineas * 2 + Math.floor(nivel / 2);
-            for (let i = 0; i < Math.min(ranurasY.length, numPuentes); i++) {
-                puentes.push({
-                    y: ranurasY[i],
-                    col: Math.floor(Math.random() * (numLineas - 1)) // Une columna 'col' con 'col+1'
-                });
-            }
-            puentes.sort((a, b) => b.y - a.y); // Ordenar de abajo hacia arriba
+            ySlots.forEach(y => {
+                if (Math.random() > 0.25) {
+                    let col = Math.floor(Math.random() * (numLineas - 1));
+                    puentes.push({ y: y, col: col });
+                }
+            });
+            puentes.sort((a, b) => a.y - b.y);
 
-            indexGanador = Math.floor(Math.random() * numLineas);
+            indexGanadorAbajo = Math.floor(Math.random() * numLineas);
 
-            // Trazar el camino exacto para cada cable (esquinas ortogonales)
+            // Generar caminos perfectos de arriba hacia abajo (Estructura Amidakuji Real)
             for (let i = 0; i < numLineas; i++) {
-                let nodos = [];
-                let xIn = xStart[i];
-                nodos.push({ x: xIn, y: 440 }); // Inicio abajo
-
+                let nodos = [{ x: xStart[i], y: 70 }];
                 let colActual = i;
-                for (let p of puentes) {
+
+                puentes.forEach(p => {
                     if (p.col === colActual) {
                         nodos.push({ x: xStart[colActual], y: p.y });
                         colActual++;
@@ -108,25 +159,23 @@
                         colActual--;
                         nodos.push({ x: xStart[colActual], y: p.y });
                     }
-                }
+                });
 
-                // El cable ganador llega hasta arriba. Los demás se cortan ciegos.
-                let esGanador = (i === indexGanador);
-                if (esGanador) {
-                    nodos.push({ x: xStart[colActual], y: 50 }); // Final limpio arriba
-                    metaX = xStart[colActual]; // Guardamos la meta
-                } else {
-                    nodos.push({ x: xStart[colActual], y: 120 });
-                    nodos.push({ x: xStart[colActual] + (Math.random() > 0.5 ? 20 : -20), y: 120 });
-                }
+                nodos.push({ x: xStart[colActual], y: 410 });
+                let llegaAMeta = (colActual === indexGanadorAbajo);
 
-                circuitBoard.push({ color: '#00ff66', nodos: nodos, esCorrecto: esGanador });
+                circuitBoard.push({
+                    color: '#00ff66',
+                    nodos: nodos,
+                    esGanador: llegaAMeta,
+                    startX: xStart[i]
+                });
             }
         }
 
         async function registrarRecord() {
             if (securityTriggered) return;
-            const alias = prompt(`💀 JUEGO TERMINADO\nPuntuación: ${score} pts.\n\nIntroduce tu nombre para la clasificación:`);
+            const alias = prompt(`💀 JUEGO TERMINADO\nPuntuación: ${score} pts.\nIntroduce tu nombre para la clasificación:`);
             if (alias && alias.trim() !== "") {
                 try {
                     await addDoc(collection(db, "scores_arcade"), { game: "tortuga", player: alias.trim().substring(0, 12), score: parseInt(score), country: "🇪🇸", date: new Date().toISOString() });
@@ -136,25 +185,20 @@
         }
 
         function actualizar() {
-            if (gameOver || securityTriggered || tortuga.estado !== 'espera' || transicionNivel) return;
+            if (gameOver || securityTriggered || tortuga.estado !== 'moviendo') return;
 
             let cable = circuitBoard[tortuga.cableIdx];
             let p1 = cable.nodos[tortuga.nodoActual];
             let p2 = cable.nodos[tortuga.nodoActual + 1];
 
             if (!p2) {
-                // Llegó al final del cable
-                if (cable.esCorrecto) {
-                    tortuga.estado = 'exito';
-                    score += 10; 
+                if (cable.esGanador) {
+                    tortuga.estado = 'espera';
+                    score += 10;
+                    nivel++;
+                    txtNivel.innerText = nivel;
                     txtScore.innerText = score;
-                    transicionNivel = true;
-                    setTimeout(() => {
-                        nivel++;
-                        txtNivel.innerText = nivel;
-                        generarAmidakuji();
-                        transicionNivel = false;
-                    }, 1200);
+                    generarAmidakuji();
                 } else {
                     tortuga.estado = 'error';
                     gameOver = true;
@@ -163,19 +207,17 @@
                 return;
             }
 
-            // Interpolación para moverse perfectamente por las líneas rectas
             tortuga.x = p1.x + (p2.x - p1.x) * tortuga.t;
             tortuga.y = p1.y + (p2.y - p1.y) * tortuga.t;
 
-            // Avanza basado en la distancia para que vaya fluido en codos largos o cortos
             let dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-            tortuga.t += (tortuga.velocidad * 100) / dist; 
+            tortuga.t += (tortuga.velocidad * 100) / dist;
 
             if (tortuga.t >= 1) {
                 tortuga.t = 0;
                 tortuga.nodoActual++;
-                // Asegurar que quede exactamente en la esquina al girar
-                tortuga.x = p2.x; tortuga.y = p2.y;
+                tortuga.x = p2.x;
+                tortuga.y = p2.y;
             }
         }
 
@@ -183,69 +225,62 @@
             checkIntegrity();
             if (securityTriggered) return;
 
-            //👇 DIBUJAMOS LA IMAGEN DE FONDO DIRECTAMENTE EN EL CANVAS 👇
+            ctx.clearRect(0, 0, 480, 480);
+
+            // Capa de fondo segura
             if (fondoCargado) {
-                ctx.drawImage(imgFondo, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(imgFondo, 0, 0, 480, 480);
             } else {
-                ctx.fillStyle = '#020617'; ctx.fillRect(0, 0, 480, 480);
+                ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 0, 480, 480);
             }
 
-            if (transicionNivel) {
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.9)'; ctx.fillRect(0, 0, 480, 480);
-                ctx.fillStyle = '#00ff66'; ctx.font = 'bold 24px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText("¡CAMINO CORRECTO! 🐢", 240, 210);
-                return;
+            // Dibujar salidas abajo (Una es la ganadora)
+            let espaciado = 340 / (numLineas - 1);
+            for (let i = 0; i < numLineas; i++) {
+                let xOut = 70 + i * espaciado;
+                ctx.fillStyle = (i === indexGanadorAbajo) ? 'rgba(34, 211, 238, 0.4)' : 'rgba(239, 68, 68, 0.2)';
+                ctx.beginPath(); ctx.arc(xOut, 410, 16, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = 'white'; ctx.font = '14px Arial'; ctx.fillText(i === indexGanadorAbajo ? "🏆" : "❌", xOut - 7, 415);
             }
 
-            // Dibujar Meta
-            ctx.fillStyle = 'rgba(34, 211, 238, 0.4)'; ctx.shadowBlur = 15; ctx.shadowColor = '#22d3ee';
-            ctx.beginPath(); ctx.arc(metaX, 50, 22, 0, Math.PI * 2); ctx.fill();
-            ctx.shadowBlur = 0; ctx.fillStyle = 'white'; ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("🏆", metaX, 50);
-
-            // Dibujar los cables Amidakuji
+            // Dibujar las líneas y puentes fijos
             circuitBoard.forEach(c => {
-                ctx.beginPath(); ctx.strokeStyle = c.color; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-                ctx.shadowBlur = 10; ctx.shadowColor = '#00ff66';
-                
+                ctx.beginPath(); ctx.strokeStyle = c.color; ctx.lineWidth = 5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+                ctx.shadowBlur = 8; ctx.shadowColor = '#00ff66';
                 ctx.moveTo(c.nodos[0].x, c.nodos[0].y);
                 for (let n = 1; n < c.nodos.length; n++) ctx.lineTo(c.nodos[n].x, c.nodos[n].y);
                 ctx.stroke(); ctx.shadowBlur = 0;
 
-                // Círculos de entrada (Abajo)
-                ctx.beginPath(); ctx.fillStyle = c.color; ctx.arc(c.nodos[0].x, c.nodos[0].y, 14, 0, Math.PI * 2); ctx.fill();
+                // Botones interactivos arriba
+                ctx.beginPath(); ctx.fillStyle = '#22d3ee'; ctx.arc(c.startX, 70, 12, 0, Math.PI * 2); ctx.fill();
             });
 
-            // Dibujar la tortuga
-            if (tortuga.estado === 'moviendo' || tortuga.estado === 'error' || tortuga.estado === 'exito') {
-                ctx.font = "32px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-                ctx.fillText("🐢", tortuga.x, tortuga.y);
+            // Dibujar Tortuga
+            if (tortuga.estado === 'moviendo' || tortuga.estado === 'error') {
+                ctx.font = "30px Arial"; ctx.fillText("🐢", tortuga.x - 15, tortuga.y + 10);
                 if (tortuga.estado === 'error') {
-                    ctx.fillStyle = '#ef4444'; ctx.font = 'bold 36px monospace'; ctx.shadowBlur = 10; ctx.shadowColor = '#ef4444';
-                    ctx.fillText("?", tortuga.x, tortuga.y - 30); ctx.shadowBlur = 0;
+                    ctx.fillStyle = '#ef4444'; ctx.font = 'bold 32px monospace'; ctx.fillText("?", tortuga.x - 5, tortuga.y - 25);
                 }
             }
 
-            // Game Over
             if (gameOver) {
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.85)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#ef4444'; ctx.font = 'bold 36px monospace'; ctx.textAlign = 'center'; ctx.fillText("CORRIENTE CORTADA", 240, 220);
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.85)'; ctx.fillRect(0, 0, 480, 480);
+                ctx.fillStyle = '#ef4444'; ctx.font = 'bold 36px monospace'; ctx.textAlign = 'center'; ctx.fillText("GAME OVER", 240, 240);
             }
 
             actualizar();
             requestAnimationFrame(renderingLoop);
         }
 
-        // Manejo de toques y clics
-        function intentodesplazar(clientX, clientY) {
-            if (bloqueado || gameOver || tortuga.estado !== 'espera' || transicionNivel) return;
+        function interactuar(clientX, clientY) {
+            if (bloqueado || gameOver || tortuga.estado !== 'espera') return;
             const rect = canvas.getBoundingClientRect();
             const canvasX = (clientX - rect.left) * (480 / canvas.clientWidth);
             const canvasY = (clientY - rect.top) * (480 / canvas.clientHeight);
 
             circuitBoard.forEach((c, idx) => {
-                // Comprobamos si ha tocado el círculo inicial (Y=440)
-                let dist = Math.hypot(canvasX - c.nodos[0].x, canvasY - c.nodos[0].y);
-                if (dist < 32) {
+                let dist = Math.hypot(canvasX - c.startX, canvasY - 70);
+                if (dist < 25) {
                     bloqueado = true;
                     tortuga.cableIdx = idx; tortuga.nodoActual = 0; tortuga.t = 0;
                     tortuga.x = c.nodos[0].x; tortuga.y = c.nodos[0].y;
@@ -254,11 +289,8 @@
             });
         }
 
-        canvas.addEventListener('mousedown', e => intentodesplazar(e.clientX, e.clientY));
-        canvas.addEventListener('touchstart', e => {
-            e.preventDefault();
-            intentodesplazar(e.touches[0].clientX, e.touches[0].clientY);
-        }, { passive: false });
+        canvas.addEventListener('mousedown', e => interactuar(e.clientX, e.clientY));
+        canvas.addEventListener('touchstart', e => { e.preventDefault(); interactuar(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
 
         generarAmidakuji();
         renderingLoop();
