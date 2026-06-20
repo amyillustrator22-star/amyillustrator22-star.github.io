@@ -2,8 +2,10 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5491883632835608" crossorigin="anonymous"></script>
+    <script data-goatcounter="https://amysoftware.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Tortuga Sprint - Amy Software</title>
+    <title>Tortuga Sprint Amidakuji - Amy Software</title>
     <style>
         body {
             background: #0f172a;
@@ -81,6 +83,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+        // Configuración Firebase (mantenida)
         const firebaseConfig = {
             apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
             authDomain: "vibezmatch-91c6d.firebaseapp.com",
@@ -97,6 +100,7 @@
         const txtNivel = document.getElementById('txt-nivel');
         const txtScore = document.getElementById('txt-score');
 
+        // 👇 CARGA BLINDADA DEL FONDO EN JS 👇
         const imgFondo = new Image();
         imgFondo.src = 'fondotortuga.jpg';
         let fondoCargado = false;
@@ -106,10 +110,10 @@
         let nivel = 1;
         let score = 0;
         let numLineas = 4;
-        let indexGanadorAbajo = 0;
+        let indexGanadorArriba = 0; // Columna ganadora a la que debe llegar
         let xStart = [];
         let puentesVisuales = [];
-        let pathsLógicos = [];
+        let pathsLógicos = []; // Rutas inversas para la tortuga
         
         let gameOver = false;
         let bloqueado = false;
@@ -117,12 +121,14 @@
 
         let tortuga = { x: 0, y: 0, pathIdx: -1, nodoActual: 0, t: 0, estado: 'espera', velocidad: 0.08 };
 
+        // Firebase integrity honeypot checks (mantenidos)
         let securityTriggered = false;
         window.turtle_secure_val = 0;
         function checkIntegrity() {
             if (document.getElementById('auth_token_verification').value !== "" || window.turtle_secure_val !== 0) securityTriggered = true;
         }
 
+        // --- GENERADOR AMIDAKUJI INVERSO (ABAJO -> ARRIBA) Y SIN CHIVATOS ---
         function generarAmidakuji() {
             bloqueado = false;
             gameOver = false;
@@ -130,6 +136,7 @@
             puentesVisuales = [];
             pathsLógicos = [];
 
+            // 1. Configurar las líneas verticales
             numLineas = Math.min(3 + Math.floor((nivel - 1) / 2), 6);
             let espaciado = 340 / (numLineas - 1);
             xStart = [];
@@ -137,6 +144,7 @@
                 xStart.push(70 + i * espaciado);
             }
 
+            // 2. Crear los puentes horizontales aleatorios
             let ySlots = [120, 170, 220, 270, 320, 370];
             ySlots.forEach(y => {
                 if (Math.random() > 0.15) {
@@ -144,31 +152,41 @@
                     puentesVisuales.push({ y: y, col: col });
                 }
             });
+            // Ordenar puentes de arriba hacia abajo para el grid visual (no cambia)
             puentesVisuales.sort((a, b) => a.y - b.y);
 
-            indexGanadorAbajo = Math.floor(Math.random() * numLineas);
+            // Definir la columna ganadora en la parte SUPERIOR (🏆)
+            indexGanadorArriba = Math.floor(Math.random() * numLineas);
 
+            // 3. Pre-calcular el camino (Nodos) de cada punto de inicio (ABAJO) para la tortuga
             for (let i = 0; i < numLineas; i++) {
-                let nodos = [{ x: xStart[i], y: 70 }];
+                // start point at bottom y=410
+                let nodos = [{ x: xStart[i], y: 410 }];
                 let colActual = i;
 
-                puentesVisuales.forEach(p => {
+                // Para simular la ruta hacia ARRIBA, procesamos los puentes al revés
+                let puentesSimulacion = JSON.parse(JSON.stringify(puentesVisuales)).sort((a, b) => b.y - a.y);
+                puentesSimulacion.forEach(p => {
                     if (p.col === colActual) {
-                        nodos.push({ x: xStart[colActual], y: p.y });
-                        colActual++;
-                        nodos.push({ x: xStart[colActual], y: p.y });
+                        nodos.push({ x: xStart[colActual], y: p.y }); // move to bridge height
+                        colActual++; // cross right
+                        nodos.push({ x: xStart[colActual], y: p.y }); // bridge vertical end
                     } else if (p.col === colActual - 1) {
-                        nodos.push({ x: xStart[colActual], y: p.y });
-                        colActual--;
-                        nodos.push({ x: xStart[colActual], y: p.y });
+                        nodos.push({ x: xStart[colActual], y: p.y }); // move to bridge height
+                        colActual--; // cross left
+                        nodos.push({ x: xStart[colActual], y: p.y }); // bridge vertical end
                     }
                 });
 
-                nodos.push({ x: xStart[colActual], y: 410 });
-                let llegaAMeta = (colActual === indexGanadorAbajo);
+                // end point at top y=70
+                nodos.push({ x: xStart[colActual], y: 70 });
+
+                // Check winner status (does this bottom column lead to the top winner column?)
+                let llegaAMeta = (colActual === indexGanadorArriba);
 
                 pathsLógicos.push({
-                    startX: xStart[i],
+                    startX: xStart[i], // physical starting x (at bottom)
+                    startY: 410,       // physical starting y (at bottom)
                     nodos: nodos,
                     esGanador: llegaAMeta
                 });
@@ -233,14 +251,17 @@
 
             ctx.clearRect(0, 0, 480, 480);
 
+            // BACKGROUND
             if (fondoCargado) {
                 ctx.drawImage(imgFondo, 0, 0, 480, 480);
+                // DARK OVERLAY FOR CONTRAST
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
                 ctx.fillRect(0, 0, 480, 480);
             } else {
                 ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 0, 480, 480);
             }
 
+            // LEVEL TRANSITION MESSAGE
             if (transicionNivel) {
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.9)'; ctx.fillRect(0, 0, 480, 480);
                 ctx.fillStyle = '#00ff66'; ctx.font = 'bold 24px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -248,45 +269,59 @@
                 return;
             }
 
-            // DIBUJAR CUADRÍCULA ESTÁTICA Y LIMPIA (Cero Chivatos)
+            // --- STATIC UNIFORM GRID (NO CHIVATOS) ---
+            // Draw visual bridges as a static grid, ignoring direction.
             ctx.beginPath();
-            ctx.strokeStyle = '#00ff66';
+            ctx.strokeStyle = '#00ff66'; // ALL LINES GREEN
             ctx.lineWidth = 5;
             ctx.lineCap = 'square';
             ctx.lineJoin = 'miter';
             ctx.shadowBlur = 8;
             ctx.shadowColor = '#00ff66';
 
+            // Draw all vertical lines from y=70 (top) to y=410 (bottom)
             for (let i = 0; i < numLineas; i++) {
                 ctx.moveTo(xStart[i], 70);
                 ctx.lineTo(xStart[i], 410);
             }
+            // Draw all horizontal bridges (using visual sorting)
             puentesVisuales.forEach(p => {
                 ctx.moveTo(xStart[p.col], p.y);
                 ctx.lineTo(xStart[p.col + 1], p.y);
             });
             ctx.stroke();
-            ctx.shadowBlur = 0; 
+            ctx.shadowBlur = 0; // Turn off glow for other elements
 
-            // DIBUJAR BORNES NEUTROS ARRIBA Y ABAJO (Sin cuadrados ni emojis)
+            // Draw Starts (Buttons at bottom) - Reverse layout from slateTurn y=400 to y=410
             for (let i = 0; i < numLineas; i++) {
-                ctx.fillStyle = '#00ff66'; 
-                // Punto de inicio
-                ctx.beginPath(); ctx.arc(xStart[i], 70, 8, 0, Math.PI * 2); ctx.fill();
-                // Punto final
-                ctx.beginPath(); ctx.arc(xStart[i], 410, 8, 0, Math.PI * 2); ctx.fill();
+                ctx.fillStyle = '#e2e8f0'; 
+                ctx.fillRect(xStart[i] - 10, 400, 20, 20); // y=400 to center on y=410
             }
 
-            // Dibujar a la Tortuga
+            // Draw Ends (Icons at top) [NO WANT X, ONLY CUP🏆 on correctly designated end column]
+            // Sutil rounded base for cup (at top, physical display centered y=50 like slate UI)
+            for (let i = 0; i < numLineas; i++) {
+                ctx.font = "24px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+                
+                // Draw only the cup icon at winning column top position
+                if (i === indexGanadorArriba) {
+                    ctx.fillStyle = 'rgba(15, 23, 42, 0.6)';
+                    ctx.beginPath(); ctx.arc(xStart[i], 50, 16, 0, Math.PI * 2); ctx.fill();
+                    ctx.fillStyle = 'white'; ctx.fillText("🏆", xStart[i], 52); // physical display centered y=50
+                }
+            }
+
+            // Draw Turtle
             if (tortuga.estado === 'moviendo' || tortuga.estado === 'error') {
                 ctx.font = "30px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-                ctx.fillText("🐢", tortuga.x, tortuga.y);
+                ctx.fillText("🐢", tortuga.x, tortuga.y); // moves upwards correctly now
                 if (tortuga.estado === 'error') {
                     ctx.fillStyle = '#ef4444'; ctx.font = 'bold 36px monospace';
                     ctx.fillText("?", tortuga.x, tortuga.y - 25);
                 }
             }
 
+            // Draw GAME OVER screen (slate style)
             if (gameOver) {
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.85)'; ctx.fillRect(0, 0, 480, 480);
                 ctx.fillStyle = '#ef4444'; ctx.font = 'bold 36px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
@@ -297,18 +332,22 @@
             requestAnimationFrame(renderingLoop);
         }
 
+        // Manejo de toques y clics
         function interactuar(clientX, clientY) {
+            //firebase integrity honeypot checks must pass
             if (bloqueado || gameOver || tortuga.estado !== 'espera') return;
             const rect = canvas.getBoundingClientRect();
+            // Map screen coordinates back to canvas (480x480)
             const canvasX = (clientX - rect.left) * (480 / canvas.clientWidth);
             const canvasY = (clientY - rect.top) * (480 / canvas.clientHeight);
 
+            // Clicks now target bottom starts (y=410)
             pathsLógicos.forEach((path, idx) => {
-                let dist = Math.hypot(canvasX - path.startX, canvasY - 70);
-                if (dist < 25) {
+                let dist = Math.hypot(canvasX - path.startX, canvasY - 410); // Check distance to bottom y=410
+                if (dist < 30) {
                     bloqueado = true;
                     tortuga.pathIdx = idx; tortuga.nodoActual = 0; tortuga.t = 0;
-                    tortuga.x = path.nodos[0].x; tortuga.y = path.nodos[0].y;
+                    tortuga.x = path.nodos[0].x; tortuga.y = path.nodos[0].y; // nodes[0] is at bottom (xStart[pathIdx], y=410)
                     tortuga.estado = 'moviendo';
                 }
             });
