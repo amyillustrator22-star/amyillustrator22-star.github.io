@@ -2,12 +2,15 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5491883632835608" crossorigin="anonymous"></script>
+    <script data-goatcounter="https://amysoftware.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Tortuga Logic - Amy Software Pro</title>
+    <title>Tortuga Logic Amidakuji - Amy Software</title>
     <style>
         body { background: #0f172a; color: white; font-family: monospace; display: flex; flex-direction: column; align-items: center; min-height: 100dvh; margin: 0; padding-top: max(20px, env(safe-area-inset-top)); box-sizing: border-box; overscroll-behavior: none; }
-        .top-bar { width: 100%; max-width: 480px; display: flex; justify-content: flex-start; margin-bottom: 8px; padding: 0 10px; box-sizing: border-box; }
+        .top-bar { width: 100%; max-width: 480px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 10px; box-sizing: border-box; }
         .btn-volver { background: rgba(239, 68, 68, 0.2); border: 1px solid rgba(239, 68, 68, 0.5); color: #f87171; padding: 6px 16px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 0.9rem; }
+        .score-info { font-size: 1.1rem; font-weight: bold; color: #22d3ee; background: rgba(30, 41, 59, 0.8); padding: 4px 12px; border-radius: 8px; border: 1px solid #334155; }
         canvas { border: 4px solid #334155; border-radius: 16px; width: 100% !important; max-width: 480px !important; height: auto !important; aspect-ratio: 1 / 1 !important; touch-action: none; cursor: pointer; }
         .system-validate-field { position: absolute; left: -9999px; }
     </style>
@@ -15,209 +18,250 @@
 <body>
 
     <div class="system-validate-field"><input type="text" id="auth_token_verification"></div>
-    <div class="top-bar"><a href="juegos.html" class="btn-volver">⬅ VOLVER</a></div>
+    <div class="top-bar">
+        <a href="juegos.html" class="btn-volver">⬅ VOLVER al MENÚ</a>
+        <div class="score-info">Nivel: <span id="txt-nivel" style="color: #eab308;">1</span> | Pts: <span id="txt-score">0</span></div>
+    </div>
     <canvas id="canvas-tortuga" width="480" height="480"></canvas>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-        // CONFIGURACIÓN FIREBASE MANTENIDA
-        const firebaseConfig = {
-            apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA",
-            authDomain: "vibezmatch-91c6d.firebaseapp.com",
-            projectId: "vibezmatch-91c6d",
-            storageBucket: "vibezmatch-91c6d.appspot.com",
-            messagingSenderId: "645008717503",
-            appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyBcStr-j9DH-2HfQatHiZioxJNmmvE74sA", authDomain: "vibezmatch-91c6d.firebaseapp.com", projectId: "vibezmatch-91c6d", storageBucket: "vibezmatch-91c6d.appspot.com", messagingSenderId: "645008717503", appId: "1:645008717503:web:f1dfb07ddfcee571a8f80a" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         const canvas = document.getElementById('canvas-tortuga');
         const ctx = canvas.getContext('2d');
+        const txtNivel = document.getElementById('txt-nivel');
+        const txtScore = document.getElementById('txt-score');
 
-        // 👇 CARGA DE FONDO DIRECTA Y BLINDADA EN JAVASCRIPT 👇
+        // 👇 CARGA BLINDADA DEL FONDO EN JAVASCRIPT 👇
         const imgFondo = new Image();
-        imgFondo.src = 'fondotortuga.jpg'; // Asegúrate de que el nombre coincide EXACTAMENTE en tu Linux Mint
-        
+        imgFondo.src = 'fondotortuga.jpg';
         let fondoCargado = false;
         imgFondo.onload = () => { fondoCargado = true; };
-        imgFondo.onerror = () => { console.error("ERROR: No se pudo cargar fondotortuga.jpg. Asegúrate de que el archivo existe y el nombre es correcto (minúsculas)."); };
+        imgFondo.onerror = () => { console.error("ERROR: No se encontró fondotortuga.jpg. Revisa el nombre y la extensión en Linux."); };
 
         let nivel = 1;
         let score = 0;
-        let cables = [];
+        let circuitBoard = []; // Estructura Amidakuji
+        let numLineas = 3; 
+        let indexGanador = 0;
+        let metaX = 0;
         let gameOver = false;
-        let tortuga = { x: 0, y: 0, activo: false, cableIdx: -1, progreso: 0, estado: 'espera' }; 
+        let bloqueado = false;
+        let transicionNivel = false;
 
-        // VOLVEMOS A LA LÓGICA DE CURVAS DE BÉZIER SIMPLES QUE TE GUSTABA (Lógica 1)
-        function generarNivel() {
-            cables = [];
-            let num = 2 + nivel; // Empieza en 3, sube a 4, 5...
-            let salidaCorrecta = Math.floor(Math.random() * num); // Uno es la salida correcta
+        let tortuga = { x: 0, y: 0, cableIdx: -1, nodoActual: 0, t: 0, estado: 'espera', velocidad: 0.08 };
 
-            for (let i = 0; i < num; i++) {
-                // Definir puntos de inicio (Izq) y destino (Der) espaciados uniformemente
-                let y_inicio = 50 + (i * 400 / (num - 1));
-                let y_fin = 50 + (i * 400 / (num - 1));
-                
-                // Crear puntos de control aleatorios para la curva (esto los entrelaza visualmente)
-                let cp1x = 100 + Math.random() * 280;
-                let cp1y = 50 + Math.random() * 400;
-                let cp2x = 100 + Math.random() * 280;
-                let cp2y = 50 + Math.random() * 400;
+        let securityTriggered = false;
+        window.turtle_secure_val = 0;
+        function checkIntegrity() { if (document.getElementById('auth_token_verification').value !== "" || window.turtle_secure_val !== 0) securityTriggered = true; }
 
-                cables.push({
-                    id: i,
-                    // Color neón fijo para todos para que sea un reto visual
-                    color: '#00ff66',
-                    esCorrecto: i === salidaCorrecta,
-                    inicio: { x: 40, y: y_inicio },
-                    cp1: { x: cp1x, y: cp1y },
-                    cp2: { x: cp2x, y: cp2y },
-                    fin: { x: 440, y: y_fin }
+        // --- LÓGICA AMIDAKUJI (GHOST LEG) ---
+        function generarAmidakuji() {
+            circuitBoard = [];
+            bloqueado = false;
+            gameOver = false;
+            tortuga.estado = 'espera';
+            tortuga.nodoActual = 0;
+            tortuga.t = 0;
+
+            numLineas = Math.min(3 + Math.floor((nivel - 1) / 3), 5); 
+            let espaciado = 360 / (numLineas - 1);
+            let xStart = [];
+            for (let i = 0; i < numLineas; i++) xStart.push(60 + i * espaciado);
+
+            // Generar puentes horizontales aleatorios
+            let ranurasY = [];
+            for (let y = 380; y >= 140; y -= 40) ranurasY.push(y); // Espacios donde pueden cruzarse
+            ranurasY.sort(() => Math.random() - 0.5); // Desordenar espacios
+
+            let puentes = [];
+            let numPuentes = numLineas * 2 + Math.floor(nivel / 2);
+            for (let i = 0; i < Math.min(ranurasY.length, numPuentes); i++) {
+                puentes.push({
+                    y: ranurasY[i],
+                    col: Math.floor(Math.random() * (numLineas - 1)) // Une columna 'col' con 'col+1'
                 });
             }
-            tortuga.estado = 'espera';
-        }
+            puentes.sort((a, b) => b.y - a.y); // Ordenar de abajo hacia arriba
 
-        // Fórmula Cubic Bezier para un progreso 't' (0 a 1)
-        function getBezierPoint(p0, p1, p2, p3, t) {
-            const cx = 3 * (p1.x - p0.x);
-            const bx = 3 * (p2.x - p1.x) - cx;
-            const ax = p3.x - p0.x - cx - bx;
+            indexGanador = Math.floor(Math.random() * numLineas);
 
-            const cy = 3 * (p1.y - p0.y);
-            const by = 3 * (p2.y - p1.y) - cy;
-            const ay = p3.y - p0.y - cy - by;
+            // Trazar el camino exacto para cada cable (esquinas ortogonales)
+            for (let i = 0; i < numLineas; i++) {
+                let nodos = [];
+                let xIn = xStart[i];
+                nodos.push({ x: xIn, y: 440 }); // Inicio abajo
 
-            const x = (ax * Math.pow(t, 3)) + (bx * Math.pow(t, 2)) + (cx * t) + p0.x;
-            const y = (ay * Math.pow(t, 3)) + (by * Math.pow(t, 2)) + (cy * t) + p0.y;
-            return { x, y };
+                let colActual = i;
+                for (let p of puentes) {
+                    if (p.col === colActual) {
+                        nodos.push({ x: xStart[colActual], y: p.y });
+                        colActual++;
+                        nodos.push({ x: xStart[colActual], y: p.y });
+                    } else if (p.col === colActual - 1) {
+                        nodos.push({ x: xStart[colActual], y: p.y });
+                        colActual--;
+                        nodos.push({ x: xStart[colActual], y: p.y });
+                    }
+                }
+
+                // El cable ganador llega hasta arriba. Los demás se cortan ciegos.
+                let esGanador = (i === indexGanador);
+                if (esGanador) {
+                    nodos.push({ x: xStart[colActual], y: 50 }); // Final limpio arriba
+                    metaX = xStart[colActual]; // Guardamos la meta
+                } else {
+                    nodos.push({ x: xStart[colActual], y: 120 });
+                    nodos.push({ x: xStart[colActual] + (Math.random() > 0.5 ? 20 : -20), y: 120 });
+                }
+
+                circuitBoard.push({ color: '#00ff66', nodos: nodos, esCorrecto: esGanador });
+            }
         }
 
         async function registrarRecord() {
             if (securityTriggered) return;
-            const alias = prompt(`🐢 PARTIDA TERMINADA\nNivel: ${nivel}\nPuntuación: ${score}\n\nIntroduce tu nombre para la clasificación:`);
+            const alias = prompt(`💀 JUEGO TERMINADO\nPuntuación: ${score} pts.\n\nIntroduce tu nombre para la clasificación:`);
             if (alias && alias.trim() !== "") {
                 try {
-                    await addDoc(collection(db, "scores_arcade"), {
-                        game: "tortuga",
-                        player: alias.trim().substring(0, 12),
-                        score: parseInt(score),
-                        date: new Date().toISOString()
-                    });
+                    await addDoc(collection(db, "scores_arcade"), { game: "tortuga", player: alias.trim().substring(0, 12), score: parseInt(score), country: "🇪🇸", date: new Date().toISOString() });
                 } catch (e) { console.error(e); }
             }
             window.location.href = "juegos.html";
         }
 
         function actualizar() {
-            if (securityTriggered || gameOver || tortuga.estado !== 'espera') return;
+            if (gameOver || securityTriggered || tortuga.estado !== 'espera' || transicionNivel) return;
 
-            if(tortuga.activo) {
-                tortuga.progreso += 0.005; // Velocidad de la tortuga
-                let cable = cables[tortuga.cableIdx];
-                
-                // Mover tortuga por la curva de Bezier
-                let punto = getBezierPoint(cable.inicio, cable.cp1, cable.cp2, cable.fin, tortuga.progreso);
-                tortuga.x = punto.x;
-                tortuga.y = punto.y;
+            let cable = circuitBoard[tortuga.cableIdx];
+            let p1 = cable.nodos[tortuga.nodoActual];
+            let p2 = cable.nodos[tortuga.nodoActual + 1];
 
-                if(tortuga.progreso >= 1) {
-                    tortuga.activo = false;
-                    if(cable.esCorrecto) {
-                        tortuga.estado = 'espera';
-                        score += 100 * nivel;
+            if (!p2) {
+                // Llegó al final del cable
+                if (cable.esCorrecto) {
+                    tortuga.estado = 'exito';
+                    score += 10; 
+                    txtScore.innerText = score;
+                    transicionNivel = true;
+                    setTimeout(() => {
                         nivel++;
-                        generarNivel();
-                    } else {
-                        tortuga.estado = 'error';
-                        gameOver = true;
-                        setTimeout(registrarRecord, 1500);
-                    }
+                        txtNivel.innerText = nivel;
+                        generarAmidakuji();
+                        transicionNivel = false;
+                    }, 1200);
+                } else {
+                    tortuga.estado = 'error';
+                    gameOver = true;
+                    setTimeout(registrarRecord, 1500);
                 }
+                return;
+            }
+
+            // Interpolación para moverse perfectamente por las líneas rectas
+            tortuga.x = p1.x + (p2.x - p1.x) * tortuga.t;
+            tortuga.y = p1.y + (p2.y - p1.y) * tortuga.t;
+
+            // Avanza basado en la distancia para que vaya fluido en codos largos o cortos
+            let dist = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+            tortuga.t += (tortuga.velocidad * 100) / dist; 
+
+            if (tortuga.t >= 1) {
+                tortuga.t = 0;
+                tortuga.nodoActual++;
+                // Asegurar que quede exactamente en la esquina al girar
+                tortuga.x = p2.x; tortuga.y = p2.y;
             }
         }
 
-        function animar() {
-            // 1. DIBUJAR FONDO DIRECTAMENTE EN EL CANVAS (Si cargó)
+        function renderingLoop() {
+            checkIntegrity();
+            if (securityTriggered) return;
+
+            //👇 DIBUJAMOS LA IMAGEN DE FONDO DIRECTAMENTE EN EL CANVAS 👇
             if (fondoCargado) {
                 ctx.drawImage(imgFondo, 0, 0, canvas.width, canvas.height);
-                // Capa oscura translúcida opcional para visibilidad de cables
-                ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                ctx.fillRect(0,0, canvas.width, canvas.height);
             } else {
-                ctx.fillStyle = '#020617'; ctx.fillRect(0,0, canvas.width, canvas.height);
+                ctx.fillStyle = '#020617'; ctx.fillRect(0, 0, 480, 480);
             }
 
-            // 2. DIBUJAR CABLES (Volvemos a las curvas suaves)
-            cables.forEach(c => {
-                ctx.beginPath();
-                ctx.strokeStyle = c.color;
-                ctx.lineWidth = 6;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
+            if (transicionNivel) {
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.9)'; ctx.fillRect(0, 0, 480, 480);
+                ctx.fillStyle = '#00ff66'; ctx.font = 'bold 24px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText("¡CAMINO CORRECTO! 🐢", 240, 210);
+                return;
+            }
+
+            // Dibujar Meta
+            ctx.fillStyle = 'rgba(34, 211, 238, 0.4)'; ctx.shadowBlur = 15; ctx.shadowColor = '#22d3ee';
+            ctx.beginPath(); ctx.arc(metaX, 50, 22, 0, Math.PI * 2); ctx.fill();
+            ctx.shadowBlur = 0; ctx.fillStyle = 'white'; ctx.font = '20px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText("🏆", metaX, 50);
+
+            // Dibujar los cables Amidakuji
+            circuitBoard.forEach(c => {
+                ctx.beginPath(); ctx.strokeStyle = c.color; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
                 ctx.shadowBlur = 10; ctx.shadowColor = '#00ff66';
                 
-                ctx.moveTo(c.inicio.x, c.inicio.y);
-                ctx.bezierCurveTo(c.cp1.x, c.cp1.y, c.cp2.x, c.cp2.y, c.fin.x, c.fin.y);
-                ctx.stroke();
-                ctx.shadowBlur = 0;
+                ctx.moveTo(c.nodos[0].x, c.nodos[0].y);
+                for (let n = 1; n < c.nodos.length; n++) ctx.lineTo(c.nodos[n].x, c.nodos[n].y);
+                ctx.stroke(); ctx.shadowBlur = 0;
 
                 // Círculos de entrada (Abajo)
-                ctx.fillStyle = c.color;
-                ctx.beginPath(); ctx.arc(c.inicio.x, c.inicio.y, 14, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.fillStyle = c.color; ctx.arc(c.nodos[0].x, c.nodos[0].y, 14, 0, Math.PI * 2); ctx.fill();
             });
 
-            // 3. DIBUJAR TORTUGA
-            if (tortuga.activo || tortuga.estado === 'error') {
+            // Dibujar la tortuga
+            if (tortuga.estado === 'moviendo' || tortuga.estado === 'error' || tortuga.estado === 'exito') {
                 ctx.font = "32px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
                 ctx.fillText("🐢", tortuga.x, tortuga.y);
-                
                 if (tortuga.estado === 'error') {
-                    ctx.fillStyle = '#ef4444'; ctx.font = 'bold 36px monospace'; ctx.fillText("?", tortuga.x, tortuga.y - 30);
+                    ctx.fillStyle = '#ef4444'; ctx.font = 'bold 36px monospace'; ctx.shadowBlur = 10; ctx.shadowColor = '#ef4444';
+                    ctx.fillText("?", tortuga.x, tortuga.y - 30); ctx.shadowBlur = 0;
                 }
             }
 
-            // 4. TEXTO INFO
-            ctx.fillStyle = 'white'; ctx.font = 'bold 20px monospace'; ctx.textAlign = 'left';
-            ctx.fillText(`Nivel: ${nivel}`, 15, 30);
-            ctx.textAlign = 'right';
-            ctx.fillText(`Score: ${score}`, 465, 30);
-
-            // 5. GAME OVER SCREEN
+            // Game Over
             if (gameOver) {
-                ctx.fillStyle = 'rgba(15, 23, 42, 0.9)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.fillStyle = '#ef4444'; ctx.font = 'bold 40px monospace'; ctx.textAlign = 'center';
-                ctx.fillText("¡CAMINO ERRÓNEO!", 240, 220);
-                ctx.fillStyle = 'white'; ctx.font = '16px monospace'; ctx.fillText("La tortuga ha fallado el cable.", 240, 260);
+                ctx.fillStyle = 'rgba(15, 23, 42, 0.85)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#ef4444'; ctx.font = 'bold 36px monospace'; ctx.textAlign = 'center'; ctx.fillText("CORRIENTE CORTADA", 240, 220);
             }
 
             actualizar();
-            requestAnimationFrame(animar);
+            requestAnimationFrame(renderingLoop);
         }
 
-        let securityTriggered = false; // Honeypot kept
-        canvas.addEventListener('mousedown', e => {
-            if(securityTriggered || gameOver || tortuga.estado !== 'espera' || tortuga.activo) return;
+        // Manejo de toques y clics
+        function intentodesplazar(clientX, clientY) {
+            if (bloqueado || gameOver || tortuga.estado !== 'espera' || transicionNivel) return;
             const rect = canvas.getBoundingClientRect();
-            const canvasX = (e.clientX - rect.left) * (480 / canvas.clientWidth);
-            const canvasY = (e.clientY - rect.top) * (480 / canvas.clientHeight);
+            const canvasX = (clientX - rect.left) * (480 / canvas.clientWidth);
+            const canvasY = (clientY - rect.top) * (480 / canvas.clientHeight);
 
-            cables.forEach((c, idx) => {
-                // Comprobamos si ha tocado el círculo inicial
-                let dist = Math.hypot(canvasX - c.inicio.x, canvasY - c.inicio.y);
-                if (dist < 30) {
-                    tortuga.activo = true; tortuga.cableIdx = idx; tortuga.progreso = 0;
-                    tortuga.x = c.inicio.x; tortuga.y = c.inicio.y;
+            circuitBoard.forEach((c, idx) => {
+                // Comprobamos si ha tocado el círculo inicial (Y=440)
+                let dist = Math.hypot(canvasX - c.nodos[0].x, canvasY - c.nodos[0].y);
+                if (dist < 32) {
+                    bloqueado = true;
+                    tortuga.cableIdx = idx; tortuga.nodoActual = 0; tortuga.t = 0;
+                    tortuga.x = c.nodos[0].x; tortuga.y = c.nodos[0].y;
+                    tortuga.estado = 'moviendo';
                 }
             });
-        });
+        }
 
-        generarNivel();
-        animar();
+        canvas.addEventListener('mousedown', e => intentodesplazar(e.clientX, e.clientY));
+        canvas.addEventListener('touchstart', e => {
+            e.preventDefault();
+            intentodesplazar(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
+
+        generarAmidakuji();
+        renderingLoop();
     </script>
 </body>
 </html>
