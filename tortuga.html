@@ -63,14 +63,9 @@
             touch-action: none;
             cursor: pointer;
         }
-        .system-validate-field { position: absolute; left: -9999px; opacity: 0; }
     </style>
 </head>
 <body>
-
-    <div class="system-validate-field" aria-hidden="true">
-        <input type="text" id="auth_token_verification" tabindex="-1" autocomplete="off">
-    </div>
 
     <div class="top-bar">
         <a href="juegos.html" class="btn-volver">⬅ VOLVER</a>
@@ -119,12 +114,6 @@
 
         let tortuga = { x: 0, y: 0, pathIdx: -1, nodoActual: 0, t: 0, estado: 'espera', velocidad: 0.08 };
 
-        let securityTriggered = false;
-        window.turtle_secure_val = 0;
-        function checkIntegrity() {
-            if (document.getElementById('auth_token_verification').value !== "" || window.turtle_secure_val !== 0) securityTriggered = true;
-        }
-
         function generarAmidakuji() {
             bloqueado = false;
             gameOver = false;
@@ -168,7 +157,6 @@
                 });
 
                 nodos.push({ x: xStart[colActual], y: 70 });
-
                 let llegaAMeta = (colActual === indexGanadorArriba);
 
                 pathsLógicos.push({
@@ -181,18 +169,26 @@
         }
 
         async function registrarRecord() {
-            if (securityTriggered) return;
-            const alias = prompt(`💀 JUEGO TERMINADO\nPuntuación: ${score} pts.\nIntroduce tu nombre para la clasificación:`);
+            // FIX: Removido el cortafuegos fantasma. Ahora salta directo siempre.
+            const alias = prompt(`💀 JUEGO TERMINADO\nPuntuación: ${score} pts.\nIntroduce tu nombre para la clasificación mundial:`);
             if (alias && alias.trim() !== "") {
                 try {
-                    await addDoc(collection(db, "scores_arcade"), { game: "tortugasprint", player: alias.trim().substring(0, 12), score: parseInt(score), country: "🇪🇸", date: new Date().toISOString() });
-                } catch (e) { console.error(e); }
+                    await addDoc(collection(db, "scores_arcade"), { 
+                        game: "tortugasprint", 
+                        player: alias.trim().substring(0, 12), 
+                        score: parseInt(score), 
+                        country: "🇪🇸", 
+                        date: new Date().toISOString() 
+                    });
+                } catch (e) { 
+                    console.error("Error al guardar récord:", e); 
+                }
             }
             window.location.href = "juegos.html";
         }
 
         function actualizar() {
-            if (gameOver || securityTriggered || tortuga.estado !== 'moviendo') return;
+            if (gameOver || tortuga.estado !== 'moviendo') return;
 
             let path = pathsLógicos[tortuga.pathIdx];
             let p1 = path.nodos[tortuga.nodoActual];
@@ -233,12 +229,8 @@
         }
 
         function renderingLoop() {
-            checkIntegrity();
-            if (securityTriggered) return;
-
             ctx.clearRect(0, 0, 480, 480);
 
-            // FONDO
             if (fondoCargado) {
                 ctx.drawImage(imgFondo, 0, 0, 480, 480);
                 ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
@@ -247,16 +239,14 @@
                 ctx.fillStyle = '#1e293b'; ctx.fillRect(0, 0, 480, 480);
             }
 
-            // PANTALLA DE TRANSICIÓN (FIX: ¡Ya no rompe el bucle!)
             if (transicionNivel) {
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.9)'; ctx.fillRect(0, 0, 480, 480);
                 ctx.fillStyle = '#00ff66'; ctx.font = 'bold 24px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                 ctx.fillText("¡CORRECTO! 🐢", 240, 240);
-                requestAnimationFrame(renderingLoop); // Mantiene vivo el bucle principal
+                requestAnimationFrame(renderingLoop); 
                 return;
             }
 
-            // CUADRÍCULA LIMPIA Y NEÓN
             ctx.beginPath();
             ctx.strokeStyle = '#00ff66'; 
             ctx.lineWidth = 5;
@@ -276,13 +266,13 @@
             ctx.stroke();
             ctx.shadowBlur = 0; 
 
-            // BOTONES DE INICIO (ABAJO)
+            // BOTONES DE INICIO EN LA PARTE INFERIOR
             for (let i = 0; i < numLineas; i++) {
                 ctx.fillStyle = '#e2e8f0'; 
                 ctx.fillRect(xStart[i] - 10, 400, 20, 20); 
             }
 
-            // COPA GANADORA (ARRIBA) - SOLO DONDE CORRESPONDE
+            // COPA GANADORA EN LA PARTE SUPERIOR (SIN ASPAS)
             for (let i = 0; i < numLineas; i++) {
                 ctx.font = "24px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
                 if (i === indexGanadorArriba) {
@@ -292,7 +282,6 @@
                 }
             }
 
-            // DIBUJAR TORTUGA
             if (tortuga.estado === 'moviendo' || tortuga.estado === 'error') {
                 ctx.font = "30px Arial"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
                 ctx.fillText("🐢", tortuga.x, tortuga.y); 
