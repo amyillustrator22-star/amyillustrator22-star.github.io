@@ -69,12 +69,39 @@
 
         /* HONEYPOT VISUAL TRAMPA (No tocar) */
         .system-validate-field { position: absolute; left: -9999px; opacity: 0; }
+
+        .top-bar {
+            width: 100%;
+            max-width: 480px;
+            display: flex;
+            justify-content: flex-start;
+            margin-bottom: 8px;
+            padding: 0 4px;
+            box-sizing: border-box;
+        }
+        .btn-volver {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #f87171;
+            padding: 6px 16px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-family: monospace;
+            transition: all 0.2s;
+        }
+        .btn-volver:hover { background: rgba(239, 68, 68, 0.4); color: white; }
     </style>
 </head>
 <body>
 
     <div class="system-validate-field" aria-hidden="true">
         <input type="text" id="auth_token_verification" tabindex="-1" autocomplete="off">
+    </div>
+
+    <div class="top-bar">
+        <a href="juegos.html" class="btn-volver">⬅ VOLVER AL MENÚ</a>
     </div>
 
     <div class="title">NEON MATCH 3</div>
@@ -498,7 +525,10 @@
             ctx.font = "36px Arial";
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
-            ctx.fillText(emoji, cx, cy + 2); 
+            // No manual +2 offset: textBaseline "middle" already centres the glyph.
+            // The old +2 caused the ❤️ emoji to render ~4–6 px too low on iOS Safari
+            // (Apple Color Emoji has different vertical metrics than desktop fonts).
+            ctx.fillText(emoji, cx, cy);
             ctx.restore();
         }
 
