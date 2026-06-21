@@ -13,7 +13,28 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
-    
+
+    <script>
+        window.AMY_DICT = {
+            levelLabel: { es: "Nivel:", en: "Level:" },
+            pointsLabel: { es: "Puntos:", en: "Points:" },
+            livesLabel: { es: "Vidas:", en: "Lives:" },
+            startBtn: { es: "INICIAR ENTRENAMIENTO", en: "START TRAINING" },
+            levelClearedTitle: { es: "¡NIVEL LOGRADO! 🎉", en: "LEVEL CLEARED! 🎉" },
+            bonusLifeTitle: { es: "¡BONUS: VIDA EXTRA! ❤️", en: "BONUS: EXTRA LIFE! ❤️" },
+            difficultyUpMsg: { es: "¡DIFICULTAD UP! Añadiendo +2 parejas 🚀", en: "DIFFICULTY UP! Adding +2 pairs 🚀" },
+            generatingMsg: { es: "Generando nueva combinación...", en: "Generating new combination..." },
+            gameOverTitle: { es: "MENTE SATURADA", en: "MIND OVERLOAD" },
+            gameOverDesc: { es: "Te has quedado sin corazones.", en: "You've run out of hearts." },
+            retryBtn: { es: "REINTENTAR EN JUEGOS", en: "RETRY IN GAMES" },
+            scorePrompt: {
+                es: "🧠 ¡FIN DE LA PARTIDA!\nPuntuación final: {score} puntos.\nIntroduce tu alias para el Top 10 mundial:",
+                en: "🧠 GAME OVER!\nFinal score: {score} points.\nEnter your alias for the world Top 10:"
+            }
+        };
+    </script>
+    <script src="i18n.js"></script>
+
     <style>
         /* 🌌 VINCULACIÓN DIRECTA DE TU ARCHIVO JPG AL FONDO GLOBAL */
         html {
@@ -105,13 +126,13 @@
     <div id="contenedor-juego" class="rounded-[2.5rem] p-5 flex flex-col items-center justify-between">
         
         <div class="grid grid-cols-3 gap-2 w-full text-center font-black bg-slate-900/80 backdrop-blur-md py-2 px-3 rounded-2xl border border-white/10 shadow-md mb-4 text-white text-sm">
-            <div>Nivel: <span id="memo-nivel" class="text-rose-400 block text-lg">1</span></div>
-            <div>Puntos: <span id="memo-puntos" class="text-purple-400 block text-lg">0</span></div>
-            <div>Vidas: <span id="memo-vidas" class="text-red-400 block text-lg">❤️❤️❤️❤️❤️</span></div>
+            <div><span data-i18n="levelLabel">Nivel:</span> <span id="memo-nivel" class="text-rose-400 block text-lg">1</span></div>
+            <div><span data-i18n="pointsLabel">Puntos:</span> <span id="memo-puntos" class="text-purple-400 block text-lg">0</span></div>
+            <div><span data-i18n="livesLabel">Vidas:</span> <span id="memo-vidas" class="text-red-400 block text-lg">❤️❤️❤️❤️❤️</span></div>
         </div>
 
         <div id="pantalla-inicio" class="my-auto text-center z-10">
-            <button id="btn-comenzar" class="bg-rose-600 hover:bg-rose-700 text-white font-black px-8 py-4 rounded-2xl shadow-lg border-2 border-white/30 text-xl tracking-wider transition-all active:scale-95 uppercase">
+            <button id="btn-comenzar" data-i18n="startBtn" class="bg-rose-600 hover:bg-rose-700 text-white font-black px-8 py-4 rounded-2xl shadow-lg border-2 border-white/30 text-xl tracking-wider transition-all active:scale-95 uppercase">
                 INICIAR ENTRENAMIENTO
             </button>
         </div>
@@ -125,9 +146,9 @@
         </div>
 
         <div id="pantalla-gameover" class="hidden text-center my-auto bg-slate-900/95 backdrop-blur-md py-5 px-6 rounded-3xl border border-red-500/30 shadow-2xl max-w-[280px]">
-            <p class="text-red-500 font-black text-2xl tracking-tight mb-2">MENTE SATURADA</p>
-            <p class="text-sm font-bold text-slate-300 mb-4">Te has quedado sin corazones.</p>
-            <button id="btn-reiniciar" class="bg-red-600 hover:bg-red-700 text-white font-black px-5 py-2.5 rounded-xl text-sm transition-transform active:scale-95">
+            <p class="text-red-500 font-black text-2xl tracking-tight mb-2" data-i18n="gameOverTitle">MENTE SATURADA</p>
+            <p class="text-sm font-bold text-slate-300 mb-4" data-i18n="gameOverDesc">Te has quedado sin corazones.</p>
+            <button id="btn-reiniciar" data-i18n="retryBtn" class="bg-red-600 hover:bg-red-700 text-white font-black px-5 py-2.5 rounded-xl text-sm transition-transform active:scale-95">
                 REINTENTAR EN JUEGOS
             </button>
         </div>
@@ -331,11 +352,11 @@
 
         tablero.classList.add('hidden');
 
-        let tituloSuperadoTxt = "¡NIVEL LOGRADO! 🎉";
+        let tituloSuperadoTxt = t('levelClearedTitle');
         if ((nivelActual - 1) % 5 === 0) {
             if (vidas < 5) {
                 vidas++;
-                tituloSuperadoTxt = "¡BONUS: VIDA EXTRA! ❤️";
+                tituloSuperadoTxt = t('bonusLifeTitle');
                 playSound(440, 'sine', 0.1);
                 setTimeout(() => playSound(880, 'sine', 0.2), 100);
             }
@@ -343,9 +364,9 @@
         document.getElementById('titulo-superado').innerText = tituloSuperadoTxt;
 
         if ((nivelActual - 1) % 3 === 0) {
-            msgDificultad.innerText = "¡DIFICULTAD UP! Añadiendo +2 parejas 🚀";
+            msgDificultad.innerText = t('difficultyUpMsg');
         } else {
-            msgDificultad.innerText = "Generando nueva combinación...";
+            msgDificultad.innerText = t('generatingMsg');
         }
 
         pantallaSuperado.classList.remove('hidden');
@@ -372,7 +393,7 @@
         recordProcesado = true;
 
         setTimeout(async () => {
-            const alias = prompt(`🧠 ¡FIN DE LA PARTIDA!\nPuntuación final: ${puntos} puntos.\nIntroduce tu alias para el Top 10 mundial:`);
+            const alias = prompt(t('scorePrompt').replace('{score}', puntos));
             
             if (alias && alias.trim() !== "") {
                 try {

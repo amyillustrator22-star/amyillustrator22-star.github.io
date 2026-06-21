@@ -7,6 +7,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VibezMatch - Chat Room Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        window.AMY_DICT = {
+            authSubtitle: { es: "Accede o regístrate para conectar con la comunidad", en: "Sign in or register to connect with the community" },
+            tabLogin: { es: "Entrar", en: "Log In" },
+            tabRegister: { es: "Registrarse", en: "Register" },
+            emailLabel: { es: "Correo Electrónico", en: "Email Address" },
+            passwordLabel: { es: "Contraseña", en: "Password" },
+            forgotPassword: { es: "¿Olvidaste tu contraseña?", en: "Forgot your password?" },
+            backToLogin: { es: "Volver a Entrar", en: "Back to Login" },
+            loginBtn: { es: "Iniciar Sesión", en: "Log In" },
+            createAccountBtn: { es: "Crear Cuenta", en: "Create Account" },
+            sendLinkBtn: { es: "Enviar Enlace", en: "Send Link" },
+            roomIdTitle: { es: "Identificación en la Sala", en: "Room Identification" },
+            aliasLabel: { es: "Elige tu nombre de usuario o alias:", en: "Choose your username or alias:" },
+            aliasPlaceholder: { es: "Ej: Amiga_22, GamerX...", en: "E.g: Amiga_22, GamerX..." },
+            rulesTitle: { es: "Normas de Convivencia", en: "Community Guidelines" },
+            rule1: { es: "Prohibido insultos o lenguaje ofensivo.", en: "Insults or offensive language are prohibited." },
+            rule2: { es: "Cero tolerancia a material explícito o acoso.", en: "Zero tolerance for explicit content or harassment." },
+            rule3: { es: "El respeto es obligatorio. Las faltas terminan en baneo.", en: "Respect is mandatory. Violations result in a ban." },
+            acceptEnterBtn: { es: "Aceptar y Entrar al Chat", en: "Accept and Enter Chat" },
+            generalRoom: { es: "Sala General", en: "General Room" },
+            adminModeOff: { es: "Modo Admin: OFF", en: "Admin Mode: OFF" },
+            adminModeOn: { es: "Modo Admin: ON", en: "Admin Mode: ON" },
+            logoutBtn: { es: "Salir", en: "Log Out" },
+            msgPlaceholder: { es: "Escribe un mensaje con respeto...", en: "Write a respectful message..." },
+            banTitle: { es: "Banear Usuario", en: "Ban User" },
+            bannedAlert: { es: "Tu cuenta ha sido suspendida por incumplir las normas de la comunidad.", en: "Your account has been suspended for violating community guidelines." },
+            aliasRequiredAlert: { es: "Por favor, introduce un nombre o alias para mostrar en la sala.", en: "Please enter a name or alias to display in the room." },
+            chatLockNotice: {
+                es: "🔒 Los nombres están ocultos y los privados deshabilitados por privacidad.<br>Todo comportamiento abusivo resultará en baneo permanente.",
+                en: "🔒 Names are hidden and private messages are disabled for privacy.<br>Any abusive behavior will result in a permanent ban."
+            },
+            recoverySentAlert: { es: "Enlace de recuperación enviado. Revisa tu correo electrónico.", en: "Recovery link sent. Please check your email." },
+            errorPrefix: { es: "Error: ", en: "Error: " },
+            sendFailAlert: { es: "No se pudo enviar el mensaje. Verifica tu conexión o si tu cuenta tiene restricciones.", en: "The message couldn't be sent. Check your connection or whether your account has restrictions." },
+            confirmBanMsg: { es: "¿Confirmas la expulsión definitiva de este usuario?", en: "Confirm permanent removal of this user?" },
+            banSuccessAlert: { es: "Usuario bloqueado y desconectado con éxito.", en: "User successfully blocked and disconnected." },
+            adminOnlyAlert: { es: "Error: Solo la cuenta de Administradora puede ejecutar esta acción.", en: "Error: Only the Administrator account can perform this action." }
+        };
+    </script>
+    <script src="i18n.js"></script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -38,7 +81,7 @@
                 const banSnap = await getDoc(banRef);
                 
                 if (banSnap.exists()) {
-                    alert("Tu cuenta ha sido suspendida por incumplir las normas de la comunidad.");
+                    alert(t('bannedAlert'));
                     await signOut(auth);
                     window.location.reload();
                     return;
@@ -74,7 +117,7 @@
             try {
                 if (currentMode === 'recovery') {
                     await sendPasswordResetEmail(auth, email);
-                    alert("Enlace de recuperación enviado. Revisa tu correo electrónico.");
+                    alert(t('recoverySentAlert'));
                     resetToLoginTab();
                 } else if (isLogin) {
                     await signInWithEmailAndPassword(auth, email, password);
@@ -85,7 +128,7 @@
                 }
             } catch (error) {
                 console.error("Error completo de Firebase:", error);
-                alert("Error: " + error.message);
+                alert(t('errorPrefix') + error.message);
             }
         };
 
@@ -103,7 +146,7 @@
         window.acceptRulesAndEnter = function() {
             const inputAlias = document.getElementById('chat-user-alias').value.trim();
             if (!inputAlias) {
-                alert("Por favor, introduce un nombre o alias para mostrar en la sala.");
+                alert(t('aliasRequiredAlert'));
                 return;
             }
             
@@ -124,8 +167,7 @@
                 chatMessagesDiv.innerHTML = `
                     <div class="flex justify-center my-2">
                         <span class="bg-gray-200 text-gray-600 text-[10px] font-bold px-3 py-1 rounded-full shadow-sm text-center">
-                            🔒 Los nombres están ocultos y los privados deshabilitados por privacidad.<br>
-                            Todo comportamiento abusivo resultará en baneo permanente.
+                            ${t('chatLockNotice')}
                         </span>
                     </div>
                 `;
@@ -159,7 +201,7 @@
                                 <span class="block text-[9px] text-gray-500 font-bold mb-0.5">${escapeHTML(userIdentifier)}</span>
                                 <p class="text-sm font-medium leading-relaxed break-words">${escapeHTML(text)}</p>
                                 <span class="block text-[10px] text-gray-400 text-right mt-1 font-semibold">${timeString}</span>
-                                <button onclick="simulatedBan('${data.uid || userIdentifier}')" class="admin-action hidden absolute -top-3 -right-3 bg-red-600 text-white rounded-full p-1 shadow-lg hover:bg-red-700 transition-all" title="Banear Usuario">
+                                <button onclick="simulatedBan('${data.uid || userIdentifier}')" class="admin-action hidden absolute -top-3 -right-3 bg-red-600 text-white rounded-full p-1 shadow-lg hover:bg-red-700 transition-all" title="${t('banTitle')}">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"></path></svg>
                                 </button>
                             </div>
@@ -195,21 +237,21 @@
                     timestamp: serverTimestamp()
                 });
             } catch (error) {
-                alert("No se pudo enviar el mensaje. Verifica tu conexión o si tu cuenta tiene restricciones.");
+                alert(t('sendFailAlert'));
             }
         };
 
         window.simulatedBan = async function(uidToBan) {
-            if(!confirm("¿Confirmas la expulsión definitiva de este usuario?")) return;
+            if(!confirm(t('confirmBanMsg'))) return;
             try {
                 await setDoc(doc(db, 'usuarios_baneados', uidToBan), {
                     baneadoEn: serverTimestamp(),
                     motivo: "Violación de normas desde plataforma web",
-                    baneadoPor: currentUser.uid 
+                    baneadoPor: currentUser.uid
                 });
-                alert("Usuario bloqueado y desconectado con éxito.");
+                alert(t('banSuccessAlert'));
             } catch (error) {
-                alert("Error: Solo la cuenta de Administradora puede ejecutar esta acción.");
+                alert(t('adminOnlyAlert'));
             }
         }
         
@@ -228,22 +270,22 @@
     <div id="auth-container" class="w-full max-w-md bg-white/80 backdrop-blur-md rounded-[2.5rem] p-8 shadow-2xl border border-white/50">
         <div class="text-center mb-8">
             <h2 class="text-3xl font-extrabold text-gray-950 tracking-tight">VibezMatch Chat</h2>
-            <p class="text-sm text-gray-600 mt-2">Accede o regístrate para conectar con la comunidad</p>
+            <p data-i18n="authSubtitle" class="text-sm text-gray-600 mt-2">Accede o regístrate para conectar con la comunidad</p>
         </div>
 
         <div class="flex bg-gray-200/60 p-1 rounded-xl mb-6">
-            <button id="tab-login-btn" onclick="switchAuthTab('login')" class="w-1/2 py-2 text-sm font-bold rounded-lg bg-white shadow text-gray-900 transition-all">Entrar</button>
-            <button id="tab-register-btn" onclick="switchAuthTab('register')" class="w-1/2 py-2 text-sm font-medium rounded-lg text-gray-600 hover:text-gray-900 transition-all">Registrarse</button>
+            <button id="tab-login-btn" data-i18n="tabLogin" onclick="switchAuthTab('login')" class="w-1/2 py-2 text-sm font-bold rounded-lg bg-white shadow text-gray-900 transition-all">Entrar</button>
+            <button id="tab-register-btn" data-i18n="tabRegister" onclick="switchAuthTab('register')" class="w-1/2 py-2 text-sm font-medium rounded-lg text-gray-600 hover:text-gray-900 transition-all">Registrarse</button>
         </div>
 
         <div id="auth-form" class="space-y-4">
             <div class="hp-field"><input type="text" id="validation_code_hp" tabindex="-1"></div>
             <div>
-                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Correo Electrónico</label>
+                <label data-i18n="emailLabel" class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Correo Electrónico</label>
                 <input type="email" id="auth-email" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white/50 focus:ring-2 focus:ring-slate-900 focus:outline-none">
             </div>
             <div id="password-field-container">
-                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Contraseña</label>
+                <label data-i18n="passwordLabel" class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider">Contraseña</label>
                 <div class="relative">
                     <input type="password" id="auth-password" class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-white/50 focus:ring-2 focus:ring-slate-900 focus:outline-none pr-12">
                     <button type="button" onclick="togglePasswordVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none">
@@ -253,29 +295,29 @@
                 </div>
             </div>
             <div class="flex justify-between items-center text-xs">
-                <button type="button" onclick="showRecoveryView()" id="forgot-pass-btn" class="text-slate-600 font-medium hover:underline">¿Olvidaste tu contraseña?</button>
-                <button type="button" onclick="resetToLoginTab()" id="back-to-login-btn" class="hidden text-slate-600 font-medium hover:underline">Volver a Entrar</button>
+                <button type="button" onclick="showRecoveryView()" id="forgot-pass-btn" data-i18n="forgotPassword" class="text-slate-600 font-medium hover:underline">¿Olvidaste tu contraseña?</button>
+                <button type="button" onclick="resetToLoginTab()" id="back-to-login-btn" data-i18n="backToLogin" class="hidden text-slate-600 font-medium hover:underline">Volver a Entrar</button>
             </div>
-            <button onclick="handleAuthSubmitDirect()" id="auth-submit-btn" class="w-full py-3 px-4 bg-gray-950 text-white font-bold rounded-xl hover:bg-gray-800 transition-all shadow-md">Iniciar Sesión</button>
+            <button onclick="handleAuthSubmitDirect()" id="auth-submit-btn" data-i18n="loginBtn" class="w-full py-3 px-4 bg-gray-950 text-white font-bold rounded-xl hover:bg-gray-800 transition-all shadow-md">Iniciar Sesión</button>
         </div>
     </div>
 
     <div id="rules-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white rounded-[2.5rem] max-w-md w-full p-8 shadow-2xl">
-            <h3 class="text-2xl font-black text-center mb-2">Identificación en la Sala</h3>
-            
+            <h3 data-i18n="roomIdTitle" class="text-2xl font-black text-center mb-2">Identificación en la Sala</h3>
+
             <div class="mb-6 mt-4">
-                <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider text-left">Elige tu nombre de usuario o alias:</label>
-                <input type="text" id="chat-user-alias" placeholder="Ej: Amiga_22, GamerX..." class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-slate-50 focus:ring-2 focus:ring-slate-900 focus:outline-none font-bold text-sm">
+                <label data-i18n="aliasLabel" class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-wider text-left">Elige tu nombre de usuario o alias:</label>
+                <input type="text" id="chat-user-alias" data-i18n-placeholder="aliasPlaceholder" placeholder="Ej: Amiga_22, GamerX..." class="w-full px-4 py-3 rounded-xl border border-gray-300 bg-slate-50 focus:ring-2 focus:ring-slate-900 focus:outline-none font-bold text-sm">
             </div>
 
-            <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 text-left">Normas de Convivencia</h4>
+            <h4 data-i18n="rulesTitle" class="text-xs font-black text-gray-400 uppercase tracking-widest mb-2 text-left">Normas de Convivencia</h4>
             <ul class="space-y-3 text-sm text-gray-700 font-medium mb-8 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                <li class="flex items-start gap-2"><span class="text-red-500 font-bold">❌</span> <span>Prohibido insultos o lenguaje ofensivo.</span></li>
-                <li class="flex items-start gap-2"><span class="text-red-500 font-bold">❌</span> <span>Cero tolerancia a material explícito o acoso.</span></li>
-                <li class="flex items-start gap-2"><span class="text-green-500 font-bold">✨</span> <span>El respeto es obligatorio. Las faltas terminan en baneo.</span></li>
+                <li class="flex items-start gap-2"><span class="text-red-500 font-bold">❌</span> <span data-i18n="rule1">Prohibido insultos o lenguaje ofensivo.</span></li>
+                <li class="flex items-start gap-2"><span class="text-red-500 font-bold">❌</span> <span data-i18n="rule2">Cero tolerancia a material explícito o acoso.</span></li>
+                <li class="flex items-start gap-2"><span class="text-green-500 font-bold">✨</span> <span data-i18n="rule3">El respeto es obligatorio. Las faltas terminan en baneo.</span></li>
             </ul>
-            <button onclick="acceptRulesAndEnter()" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-md shadow-emerald-200 uppercase tracking-wider text-xs">Aceptar y Entrar al Chat</button>
+            <button onclick="acceptRulesAndEnter()" data-i18n="acceptEnterBtn" class="w-full py-4 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-500 transition-all shadow-md shadow-emerald-200 uppercase tracking-wider text-xs">Aceptar y Entrar al Chat</button>
         </div>
     </div>
 
@@ -283,11 +325,11 @@
         <header class="bg-gray-900 text-white px-6 py-4 flex items-center justify-between shadow-md z-10">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-gradient-to-tr from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center font-bold">VM</div>
-                <div><h3 class="font-extrabold text-lg tracking-tight">Sala General</h3></div>
+                <div><h3 data-i18n="generalRoom" class="font-extrabold text-lg tracking-tight">Sala General</h3></div>
             </div>
             <div class="flex items-center gap-2">
-                <button id="admin-toggle-btn" onclick="toggleAdminMode()" class="px-3 py-1.5 bg-gray-800 border border-gray-700 text-purple-400 rounded-xl text-xs font-bold transition-all hover:bg-gray-700">Modo Admin: OFF</button>
-                <button onclick="logout()" class="px-3 py-1.5 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 shadow-md">Salir</button>
+                <button id="admin-toggle-btn" onclick="toggleAdminMode()" data-i18n="adminModeOff" class="px-3 py-1.5 bg-gray-800 border border-gray-700 text-purple-400 rounded-xl text-xs font-bold transition-all hover:bg-gray-700">Modo Admin: OFF</button>
+                <button onclick="logout()" data-i18n="logoutBtn" class="px-3 py-1.5 bg-red-600 text-white rounded-xl text-xs font-bold hover:bg-red-700 shadow-md">Salir</button>
             </div>
         </header>
 
@@ -297,7 +339,7 @@
         <footer class="p-4 bg-white border-t border-gray-200 z-10">
             <form onsubmit="handleSendMessage(event)" class="flex gap-2 relative items-center">
                 <input type="text" name="chat_msg_honeypot" class="hp-field" tabindex="-1">
-                <input type="text" id="chat-message-input" required placeholder="Escribe un mensaje con respeto..." class="flex-1 bg-gray-100 border-0 focus:ring-2 focus:ring-gray-900 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none transition-all">
+                <input type="text" id="chat-message-input" required data-i18n-placeholder="msgPlaceholder" placeholder="Escribe un mensaje con respeto..." class="flex-1 bg-gray-100 border-0 focus:ring-2 focus:ring-gray-900 rounded-xl px-4 py-3 text-sm font-medium focus:outline-none transition-all">
                 <button type="submit" class="p-3 bg-gray-950 text-white rounded-xl hover:bg-gray-800 transition-all shadow-md flex items-center justify-center">
                     <svg class="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                 </button>
@@ -310,7 +352,7 @@
         let isAdminMode = false;
         function switchAuthTab(tab) {
             currentMode = tab;
-            document.getElementById('auth-submit-btn').innerText = tab === 'login' ? "Iniciar Sesión" : "Crear Cuenta";
+            document.getElementById('auth-submit-btn').innerText = tab === 'login' ? t('loginBtn') : t('createAccountBtn');
             if(tab === 'login') {
                 document.getElementById('tab-login-btn').className = "w-1/2 py-2 text-sm font-bold rounded-lg bg-white shadow text-gray-900 transition-all";
                 document.getElementById('tab-register-btn').className = "w-1/2 py-2 text-sm font-medium rounded-lg text-gray-600 hover:text-gray-900 transition-all";
@@ -322,14 +364,14 @@
         function showRecoveryView() {
             currentMode = 'recovery';
             document.getElementById('password-field-container').classList.add('hidden');
-            document.getElementById('auth-submit-btn').innerText = "Enviar Enlace";
+            document.getElementById('auth-submit-btn').innerText = t('sendLinkBtn');
             document.getElementById('forgot-pass-btn').classList.add('hidden');
             document.getElementById('back-to-login-btn').classList.remove('hidden');
         }
         function resetToLoginTab() {
             currentMode = 'login';
             document.getElementById('password-field-container').classList.remove('hidden');
-            document.getElementById('auth-submit-btn').innerText = "Iniciar Sesión";
+            document.getElementById('auth-submit-btn').innerText = t('loginBtn');
             document.getElementById('forgot-pass-btn').classList.remove('hidden');
             document.getElementById('back-to-login-btn').classList.add('hidden');
             switchAuthTab('login');
@@ -338,11 +380,11 @@
             isAdminMode = !isAdminMode;
             const btn = document.getElementById('admin-toggle-btn');
             if (isAdminMode) {
-                btn.innerText = "Modo Admin: ON";
+                btn.innerText = t('adminModeOn');
                 btn.className = "px-3 py-1.5 bg-red-600 border border-red-500 text-white rounded-xl text-xs font-bold transition-all hover:bg-red-500 animate-pulse";
                 document.querySelectorAll('.admin-action').forEach(b => b.classList.remove('hidden'));
             } else {
-                btn.innerText = "Modo Admin: OFF";
+                btn.innerText = t('adminModeOff');
                 btn.className = "px-3 py-1.5 bg-gray-800 border border-gray-700 text-purple-400 rounded-xl text-xs font-bold transition-all hover:bg-gray-700";
                 document.querySelectorAll('.admin-action').forEach(b => b.classList.add('hidden'));
             }

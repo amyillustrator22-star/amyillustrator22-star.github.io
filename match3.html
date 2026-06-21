@@ -4,6 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Neon Match 3</title>
+
+    <script>
+        window.AMY_DICT = {
+            backBtn: { es: "⬅ VOLVER AL MENÚ", en: "⬅ BACK TO MENU" },
+            scoreLabel: { es: "PUNTOS:", en: "SCORE:" },
+            levelLabel: { es: "NIVEL:", en: "LEVEL:" },
+            surrenderBtn: { es: "🏳️ RENDIDOR / FIN DE PARTIDA", en: "🏳️ SURRENDER / END GAME" },
+            noMovesMsg: { es: "¡SIN MOVIMIENTOS POSIBLES!", en: "NO POSSIBLE MOVES LEFT!" },
+            surrenderedMsg: { es: "🏳️ TE HAS RENDIDO VOLUNTARIAMENTE", en: "🏳️ YOU VOLUNTARILY SURRENDERED" },
+            scorePrompt: {
+                es: "{reason}\nPuntuación final: {score} puntos.\n\nEscribe tu nombre para la Leaderboard global:",
+                en: "{reason}\nFinal score: {score} points.\n\nEnter your name for the global Leaderboard:"
+            },
+            scoreSavedAlert: { es: "¡Tu récord se ha subido a la Leaderboard global!", en: "Your score has been uploaded to the global Leaderboard!" },
+            gameOverCanvas: { es: "PARTIDA CONCLUIDA", en: "GAME OVER" }
+        };
+    </script>
+    <script src="i18n.js"></script>
+
     <style>
         body {
             background: #0f172a;
@@ -101,16 +120,16 @@
     </div>
 
     <div class="top-bar">
-        <a href="/" class="btn-volver">⬅ VOLVER AL MENÚ</a>
+        <a href="/" data-i18n="backBtn" class="btn-volver">⬅ VOLVER AL MENÚ</a>
     </div>
 
     <div class="title">NEON MATCH 3</div>
     <div class="stats-container">
-        <div class="score-board">PUNTOS: <span id="score-val">0</span></div>
-        <div class="level-board">NIVEL: <span id="level-val">1</span></div>
+        <div class="score-board"><span data-i18n="scoreLabel">PUNTOS:</span> <span id="score-val">0</span></div>
+        <div class="level-board"><span data-i18n="levelLabel">NIVEL:</span> <span id="level-val">1</span></div>
     </div>
 
-    <button id="btn-surrender" class="btn-rendirse">🏳️ RENDIDOR / FIN DE PARTIDA</button>
+    <button id="btn-surrender" data-i18n="surrenderBtn" class="btn-rendirse">🏳️ RENDIDOR / FIN DE PARTIDA</button>
 
     <canvas id="canvas-match3" width="480" height="480"></canvas>
 
@@ -280,22 +299,22 @@
             return false;
         }
 
-        async function finalizarPartida(mensajeFinal = "¡SIN MOVIMIENTOS POSIBLES!") {
+        async function finalizarPartida(mensajeFinal = t('noMovesMsg')) {
             checkIntegrity();
             if (gameOver || securityTriggered) return;
             gameOver = true;
             setTimeout(async () => {
-                const nombre = prompt(`${mensajeFinal}\nPuntuación final: ${score} puntos.\n\nEscribe tu nombre para la Leaderboard global:`);
+                const nombre = prompt(t('scorePrompt').replace('{reason}', mensajeFinal).replace('{score}', score));
                 if (nombre && nombre.trim() !== "") {
                     try {
                         await addDoc(collection(db, "scores_arcade"), {
-                            game: "match3", 
+                            game: "match3",
                             player: nombre.trim().substring(0, 12),
                             score: parseInt(score),
                             country: "🇪🇸",
                             date: new Date().toISOString()
                         });
-                        alert("¡Tu récord se ha subido a la Leaderboard global!");
+                        alert(t('scoreSavedAlert'));
                     } catch(e) { console.error(e); }
                 }
             }, 300);
@@ -304,7 +323,7 @@
         btnSurrender.addEventListener('click', () => {
             iniciarAudio();
             if(!gameOver) {
-                finalizarPartida("🏳️ TE HAS RENDIDO VOLUNTARIAMENTE");
+                finalizarPartida(t('surrenderedMsg'));
             }
         });
 
@@ -591,7 +610,7 @@
             if (gameOver) {
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.95)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#f472b6'; ctx.font = 'bold 24px monospace'; ctx.textAlign = 'center';
-                ctx.fillText("PARTIDA CONCLUIDA", canvas.width/2, canvas.height/2);
+                ctx.fillText(t('gameOverCanvas'), canvas.width/2, canvas.height/2);
             }
 
             requestAnimationFrame(dibujar);

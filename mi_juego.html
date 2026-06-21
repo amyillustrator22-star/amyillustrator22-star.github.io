@@ -6,6 +6,35 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title> Juego de Brain Training de Burbujas</title>
+
+    <script>
+        window.AMY_DICT = {
+            sequenceLabel: { es: "SECUENCIA ACTIVA", en: "ACTIVE SEQUENCE" },
+            phaseValue: { es: "FASE {n}", en: "PHASE {n}" },
+            mentalAgeLabel: { es: "EDAD MENTAL ESTIMADA", en: "ESTIMATED MENTAL AGE" },
+            yearsValue: { es: "{n} AÑOS", en: "{n} YEARS" },
+            instruction: {
+                es: "ORDENA LOS PATRONES NUMÉRICOS: PULSA DE MENOR A MAYOR ⬆",
+                en: "SORT THE NUMBER PATTERNS: TAP FROM LOWEST TO HIGHEST ⬆"
+            },
+            abandonBtn: { es: "❌ ABANDONAR ENTRENAMIENTO", en: "❌ ABANDON TRAINING" },
+            gameOverHtml: { es: "💥 ¡ERROR SECUENCIAL! GAME OVER 💥", en: "💥 SEQUENCE ERROR! GAME OVER 💥" },
+            scorePrompt: {
+                es: "🏁 FIN DEL ENTRENAMIENTO\nHas alcanzado la Fase {n}.\nIntroduce tu nombre para guardar tu récord mundial:",
+                en: "🏁 TRAINING COMPLETE\nYou reached Phase {n}.\nEnter your name to save your world record:"
+            },
+            botErrorTitle: { es: "⚠️ ERROR CRÍTICO DE SISTEMA ⚠️", en: "⚠️ CRITICAL SYSTEM ERROR ⚠️" },
+            botErrorDetail: {
+                es: "ALGORITMO NO HUMANO DETECTADO.<br>ACCESO TERMINAL SUSPENDIDO.",
+                en: "NON-HUMAN ALGORITHM DETECTED.<br>TERMINAL ACCESS SUSPENDED."
+            },
+            blockedLabel: { es: "BLOQUEADO", en: "BLOCKED" },
+            botYears: { es: "99 AÑOS", en: "99 YEARS" },
+            antimalwareNotice: { es: "PROTECCIÓN ANTIMALWARE ACTIVA - AMY SOFTWARE CO.", en: "ANTI-MALWARE PROTECTION ACTIVE - AMY SOFTWARE CO." }
+        };
+    </script>
+    <script src="i18n.js"></script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -156,21 +185,21 @@
 
     <div id="cyber-hud">
         <div>
-            <div class="hud-label">SECUENCIA ACTIVA</div>
+            <div class="hud-label" data-i18n="sequenceLabel">SECUENCIA ACTIVA</div>
             <div id="level-display" class="hud-value">FASE 01</div>
         </div>
         <div style="text-align: right;">
-            <div class="hud-label">EDAD MENTAL ESTIMADA</div>
+            <div class="hud-label" data-i18n="mentalAgeLabel">EDAD MENTAL ESTIMADA</div>
             <div id="age-display" class="hud-value">35 AÑOS</div>
         </div>
     </div>
 
     <div id="game-container"></div>
 
-    <div id="instruction">ORDENA LOS PATRONES NUMÉRICOS: PULSA DE MENOR A MAYOR ⬆</div>
+    <div id="instruction" data-i18n="instruction">ORDENA LOS PATRONES NUMÉRICOS: PULSA DE MENOR A MAYOR ⬆</div>
 
     <div class="btn-back-container">
-        <a href="/" class="btn-cyber-back">❌ ABANDONAR ENTRENAMIENTO</a>
+        <a href="/" data-i18n="abandonBtn" class="btn-cyber-back">❌ ABANDONAR ENTRENAMIENTO</a>
     </div>
 
 <script type="module">
@@ -229,7 +258,7 @@
         numbersInRound = [];
         
         bubblesCount = Math.min(3 + currentLevel, 8);
-        levelDisplay.innerText = `FASE ${String(currentLevel).padStart(2, '0')}`;
+        levelDisplay.innerText = t('phaseValue').replace('{n}', String(currentLevel).padStart(2, '0'));
 
         while(numbersInRound.length < bubblesCount) {
             let num = Math.floor(Math.random() * 99) + 1;
@@ -278,12 +307,12 @@
         processingGameOver = true;
         container.innerHTML = `
             <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#FF0055; font-weight:bold; letter-spacing:1px; text-align:center; padding:20px;">
-                <div>💥 ¡ERROR SECUENCIAL! GAME OVER 💥</div>
+                <div>${t('gameOverHtml')}</div>
             </div>
         `;
 
         setTimeout(async () => {
-            const alias = prompt(`🏁 FIN DEL ENTRENAMIENTO\nHas alcanzado la Fase ${currentLevel}.\nIntroduce tu nombre para guardar tu récord mundial:`);
+            const alias = prompt(t('scorePrompt').replace('{n}', currentLevel));
             
             if (alias && alias.trim() !== "") {
                 try {
@@ -329,7 +358,7 @@
                 
                 currentLevel++;
                 mentalAge = Math.max(15, mentalAge - 1);
-                ageDisplay.innerText = `${mentalAge} AÑOS`;
+                ageDisplay.innerText = t('yearsValue').replace('{n}', mentalAge);
                 
                 setTimeout(initRound, 600);
             }
@@ -345,17 +374,17 @@
         playSound(80, 'sawtooth', 1.0);
         container.innerHTML = `
             <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; color:#ff0055; font-weight:bold; letter-spacing:2px; text-align:center; padding:20px;">
-                <div>⚠️ ERROR CRÍTICO DE SISTEMA ⚠️</div>
-                <div style="font-size:11px; color:rgba(255,0,85,0.6); margin-top:15px; font-family:monospace;">ALGORITMO NO HUMANO DETECTADO.<br>ACCESO TERMINAL SUSPENDIDO.</div>
+                <div>${t('botErrorTitle')}</div>
+                <div style="font-size:11px; color:rgba(255,0,85,0.6); margin-top:15px; font-family:monospace;">${t('botErrorDetail')}</div>
             </div>
         `;
         container.style.borderColor = '#ff0055';
         container.style.boxShadow = '0 0 25px rgba(255, 0, 85, 0.3)';
-        levelDisplay.innerText = "BLOQUEADO";
+        levelDisplay.innerText = t('blockedLabel');
         levelDisplay.style.color = "#ff0055";
-        ageDisplay.innerText = "99 AÑOS";
+        ageDisplay.innerText = t('botYears');
         ageDisplay.style.color = "#ff0055";
-        document.getElementById('instruction').innerText = "PROTECCIÓN ANTIMALWARE ACTIVA - AMY SOFTWARE CO.";
+        document.getElementById('instruction').innerText = t('antimalwareNotice');
         document.getElementById('instruction').style.color = "#ff0055";
     }
 

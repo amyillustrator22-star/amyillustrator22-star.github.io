@@ -11,7 +11,20 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
-    
+
+    <script>
+        window.AMY_DICT = {
+            gameOverTitle: { es: "CORAZÓN ROTO", en: "BROKEN HEART" },
+            retryBtn: { es: "SANAR Y REINTENTAR", en: "HEAL & RETRY" },
+            backBtn: { es: "Volver a Selección", en: "Back to Selection" },
+            scorePrompt: {
+                es: "🎉 ¡FIN DE LA PARTIDA!\nTu récord: {score} puntos.\nIntroduce tu nombre para la tabla mundial:",
+                en: "🎉 GAME OVER!\nYour score: {score} points.\nEnter your name for the world leaderboard:"
+            }
+        };
+    </script>
+    <script src="i18n.js"></script>
+
     <style>
         body {
             background: #0f172a;
@@ -101,10 +114,10 @@
             </div>
             
             <div id="pantalla-gameover" class="text-center mb-auto pointer-events-auto hidden">
-                <div id="texto-gameover" class="text-red-600 text-4xl font-black tracking-tight bg-white/80 backdrop-blur-sm px-6 py-4 rounded-3xl border border-white/50 shadow-md mb-6">
+                <div id="texto-gameover" data-i18n="gameOverTitle" class="text-red-600 text-4xl font-black tracking-tight bg-white/80 backdrop-blur-sm px-6 py-4 rounded-3xl border border-white/50 shadow-md mb-6">
                     CORAZÓN ROTO
                 </div>
-                <button id="btn-reintentar" class="bg-red-600 hover:bg-red-700 active:scale-95 transition-transform text-white border-none px-6 py-3 text-lg font-bold rounded-2xl shadow-lg cursor-pointer">
+                <button id="btn-reintentar" data-i18n="retryBtn" class="bg-red-600 hover:bg-red-700 active:scale-95 transition-transform text-white border-none px-6 py-3 text-lg font-bold rounded-2xl shadow-lg cursor-pointer">
                     SANAR Y REINTENTAR
                 </button>
             </div>
@@ -112,7 +125,7 @@
     </div>
 
     <footer class="mt-6">
-        <a href="/" class="inline-flex items-center justify-center px-6 py-3 font-bold text-white transition-all duration-200 bg-gray-900 rounded-xl hover:bg-gray-800 hover:-translate-y-0.5 shadow-md">
+        <a href="/" data-i18n="backBtn" class="inline-flex items-center justify-center px-6 py-3 font-bold text-white transition-all duration-200 bg-gray-900 rounded-xl hover:bg-gray-800 hover:-translate-y-0.5 shadow-md">
             Volver a Selección
         </a>
     </footer>
@@ -222,7 +235,7 @@
         recordProcesado = true;
 
         setTimeout(async () => {
-            const alias = prompt(`🎉 ¡FIN DE LA PARTIDA!\nTu récord: ${puntuacion} puntos.\nIntroduce tu nombre para la tabla mundial:`);
+            const alias = prompt(t('scorePrompt').replace('{score}', puntuacion));
             
             if (alias && alias.trim() !== "") {
                 try {

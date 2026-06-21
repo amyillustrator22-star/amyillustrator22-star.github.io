@@ -6,6 +6,21 @@
     <script data-goatcounter="https://amysoftware.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Tortuga Sprint Amidakuji - Amy Software</title>
+
+    <script>
+        window.AMY_DICT = {
+            backBtn: { es: "⬅ VOLVER", en: "⬅ BACK" },
+            levelLabel: { es: "Nivel:", en: "Level:" },
+            ptsLabel: { es: "Pts:", en: "Pts:" },
+            correctCanvas: { es: "¡CORRECTO! 🐢", en: "CORRECT! 🐢" },
+            scorePrompt: {
+                es: "💀 JUEGO TERMINADO\nPuntuación: {score} pts.\nIntroduce tu nombre para la clasificación mundial:",
+                en: "💀 GAME OVER\nScore: {score} pts.\nEnter your name for the world ranking:"
+            }
+        };
+    </script>
+    <script src="i18n.js"></script>
+
     <style>
         body {
             background: #0f172a;
@@ -68,8 +83,8 @@
 <body>
 
     <div class="top-bar">
-        <a href="/" class="btn-volver">⬅ VOLVER</a>
-        <div class="score-info">Nivel: <span id="txt-nivel" style="color: #eab308;">1</span> | Pts: <span id="txt-score">0</span></div>
+        <a href="/" data-i18n="backBtn" class="btn-volver">⬅ VOLVER</a>
+        <div class="score-info"><span data-i18n="levelLabel">Nivel:</span> <span id="txt-nivel" style="color: #eab308;">1</span> | <span data-i18n="ptsLabel">Pts:</span> <span id="txt-score">0</span></div>
     </div>
 
     <canvas id="canvas-tortuga" width="480" height="480"></canvas>
@@ -115,39 +130,10 @@
 
         let tortuga = { x: 0, y: 0, pathIdx: -1, nodoActual: 0, t: 0, estado: 'espera', velocidad: 0.08 };
 
-        function generarAmidakuji() {
-            bloqueado = false;
-            gameOver = false;
-            tortuga.estado = 'espera';
-            puentesVisuales = [];
-            pathsLógicos = [];
-
-            numLineas = Math.min(3 + Math.floor((nivel - 1) / 2), 6);
-            espaciado = 340 / (numLineas - 1);
-            xStart = [];
-            for (let i = 0; i < numLineas; i++) {
-                xStart.push(70 + i * espaciado);
-            }
-
-            // Dificultad progresiva: más filas de puentes y mayor densidad cuanto más alto el nivel
-            const numFilas = Math.min(4 + Math.floor((nivel - 1) / 3), 9);
-            const densidadPuente = Math.min(0.55 + nivel * 0.03, 0.9);
-            const yTope = 110, yBase = 380;
-            let ySlots = [];
-            for (let i = 0; i < numFilas; i++) {
-                ySlots.push(yTope + (i * (yBase - yTope)) / (numFilas - 1));
-            }
-
-            ySlots.forEach(y => {
-                if (Math.random() < densidadPuente) {
-                    let col = Math.floor(Math.random() * (numLineas - 1));
-                    puentesVisuales.push({ y: y, col: col });
-                }
-            });
-            puentesVisuales.sort((a, b) => a.y - b.y);
-
-            indexGanadorArriba = Math.floor(Math.random() * numLineas);
-
+        // Simula el recorrido de cada columna inferior a través de los puentes actuales
+        // (de abajo a arriba) y devuelve las rutas lógicas resultantes, una por columna.
+        function construirPaths() {
+            const paths = [];
             for (let i = 0; i < numLineas; i++) {
                 let nodos = [{ x: xStart[i], y: 410 }];
                 let colActual = i;
@@ -155,34 +141,92 @@
                 let puentesSimulacion = [...puentesVisuales].sort((a, b) => b.y - a.y);
                 puentesSimulacion.forEach(p => {
                     if (p.col === colActual) {
-                        nodos.push({ x: xStart[colActual], y: p.y }); 
-                        colActual++; 
-                        nodos.push({ x: xStart[colActual], y: p.y }); 
+                        nodos.push({ x: xStart[colActual], y: p.y });
+                        colActual++;
+                        nodos.push({ x: xStart[colActual], y: p.y });
                     } else if (p.col === colActual - 1) {
-                        nodos.push({ x: xStart[colActual], y: p.y }); 
-                        colActual--; 
-                        nodos.push({ x: xStart[colActual], y: p.y }); 
+                        nodos.push({ x: xStart[colActual], y: p.y });
+                        colActual--;
+                        nodos.push({ x: xStart[colActual], y: p.y });
                     }
                 });
 
                 nodos.push({ x: xStart[colActual], y: 70 });
-                let llegaAMeta = (colActual === indexGanadorArriba);
 
-                pathsLógicos.push({
+                paths.push({
                     startX: xStart[i],
                     startY: 410,
                     nodos: nodos,
-                    esGanador: llegaAMeta
+                    esGanador: colActual === indexGanadorArriba
                 });
             }
+            return paths;
+        }
+
+        function generarAmidakuji() {
+            bloqueado = false;
+            gameOver = false;
+            tortuga.estado = 'espera';
+
+            // Dificultad progresiva más agresiva: más columnas y más puentes por nivel.
+            numLineas = Math.min(4 + Math.floor((nivel - 1) / 2), 8);
+            espaciado = 340 / (numLineas - 1);
+            xStart = [];
+            for (let i = 0; i < numLineas; i++) {
+                xStart.push(70 + i * espaciado);
+            }
+
+            const numFilas = Math.min(6 + Math.floor((nivel - 1) / 2), 12);
+            const densidadPuente = Math.min(0.65 + nivel * 0.04, 0.95);
+            const yTope = 110, yBase = 380;
+            let ySlots = [];
+            for (let i = 0; i < numFilas; i++) {
+                ySlots.push(yTope + (i * (yBase - yTope)) / (numFilas - 1));
+            }
+
+            // La ruta ganadora debe cruzar varios puentes (sube con el nivel) para que
+            // nunca se pueda resolver "a simple vista" siguiendo una columna recta.
+            // El tope depende del nº de columnas: pedir más cruces de los que el
+            // propio tablero puede ofrecer haría la generación inviable.
+            const minCruces = Math.min(2 + Math.floor((nivel - 1) / 4), Math.ceil(numLineas / 2));
+
+            let intentos = 0;
+            let conexionCompleta = false;
+            let cruceSuficiente = false;
+
+            do {
+                puentesVisuales = [];
+                ySlots.forEach(y => {
+                    if (Math.random() < densidadPuente) {
+                        let col = Math.floor(Math.random() * (numLineas - 1));
+                        puentesVisuales.push({ y: y, col: col });
+                    }
+                });
+                puentesVisuales.sort((a, b) => a.y - b.y);
+
+                indexGanadorArriba = Math.floor(Math.random() * numLineas);
+                pathsLógicos = construirPaths();
+
+                // Toda columna debe participar en al menos un puente: evita líneas
+                // "libres" que llegan directas y delatan la solución sin razonar.
+                const columnasConectadas = new Set();
+                puentesVisuales.forEach(p => { columnasConectadas.add(p.col); columnasConectadas.add(p.col + 1); });
+                conexionCompleta = columnasConectadas.size === numLineas;
+
+                const ganador = pathsLógicos.find(p => p.esGanador);
+                const cruces = (ganador.nodos.length - 2) / 2;
+                cruceSuficiente = cruces >= minCruces;
+
+                intentos++;
+            } while (intentos < 50 && (!conexionCompleta || !cruceSuficiente));
 
             // La tortuga avanza más rápido en niveles altos: más exigencia visual, tope para que siga siendo jugable
-            tortuga.velocidad = Math.min(0.08 + (nivel - 1) * 0.004, 0.16);
+            tortuga.velocidad = Math.min(0.08 + (nivel - 1) * 0.006, 0.22);
         }
 
         async function registrarRecord() {
             // FIX: Removido el cortafuegos fantasma. Ahora salta directo siempre.
-            const alias = prompt(`💀 JUEGO TERMINADO\nPuntuación: ${score} pts.\nIntroduce tu nombre para la clasificación mundial:`);
+            const alias = prompt(t('scorePrompt').replace('{score}', score));
             if (alias && alias.trim() !== "") {
                 try {
                     await addDoc(collection(db, "scores_arcade"), { 
@@ -254,7 +298,7 @@
             if (transicionNivel) {
                 ctx.fillStyle = 'rgba(15, 23, 42, 0.9)'; ctx.fillRect(0, 0, 480, 480);
                 ctx.fillStyle = '#00ff66'; ctx.font = 'bold 24px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-                ctx.fillText("¡CORRECTO! 🐢", 240, 240);
+                ctx.fillText(t('correctCanvas'), 240, 240);
                 requestAnimationFrame(renderingLoop); 
                 return;
             }

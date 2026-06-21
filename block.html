@@ -6,6 +6,25 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>BLOCK - Arcade Edition</title>
+
+    <script>
+        window.AMY_DICT = {
+            backBtn: { es: "VOLVER", en: "BACK" },
+            levelLabel: { es: "NIVEL", en: "LEVEL" },
+            ptsLabel: { es: "PTS", en: "PTS" },
+            pauseBtn: { es: "⏸ PAUSA", en: "⏸ PAUSE" },
+            resumeBtn: { es: "▶ REANUDAR", en: "▶ RESUME" },
+            pauseCanvasLine1: { es: "JUEGO EN", en: "GAME" },
+            pauseCanvasLine2: { es: "PAUSA", en: "PAUSED" },
+            scorePrompt: {
+                es: "🎮 ¡FIN DE LA PARTIDA!\nHas conseguido {score} puntos.\nIntroduce tu nombre para el Ranking Mundial:",
+                en: "🎮 GAME OVER!\nYou scored {score} points.\nEnter your name for the World Ranking:"
+            },
+            scoreSavedAlert: { es: "🏆 ¡Puntuación registrada con éxito!", en: "🏆 Score successfully saved!" }
+        };
+    </script>
+    <script src="i18n.js"></script>
+
     <style>
         /* Fondo con tu imagen personalizada de la ciudad vintage */
         body {
@@ -157,14 +176,14 @@
 
 <div id="game-wrapper">
     <div class="w-full flex justify-between items-center mb-2" style="width: 100%; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 380px;">
-        <a href="/" class="btn-exit" style="margin-bottom: 0;">⬅ VOLVER</a>
-        <button id="btn-pause" class="btn-pause">⏸ PAUSA</button>
+        <a href="/" class="btn-exit" style="margin-bottom: 0;">⬅ <span data-i18n="backBtn">VOLVER</span></a>
+        <button id="btn-pause" data-i18n="pauseBtn" class="btn-pause">⏸ PAUSA</button>
     </div>
 
     <div class="ui" style="margin-top: 10px;">
-        <div class="stats">NIVEL<br><span id="display-level">0</span></div>
+        <div class="stats"><span data-i18n="levelLabel">NIVEL</span><br><span id="display-level">0</span></div>
         <h2>BLOCK</h2>
-        <div class="stats">PTS<br><span id="display-score">0</span></div>
+        <div class="stats"><span data-i18n="ptsLabel">PTS</span><br><span id="display-score">0</span></div>
     </div>
 
     <canvas id="game" width="200" height="400"></canvas>
@@ -305,8 +324,8 @@
             ctx.fillStyle = '#0ffff0';
             ctx.font = '0.9px monospace';
             ctx.textAlign = 'center';
-            ctx.fillText("JUEGO EN", 5, 9.5);
-            ctx.fillText("PAUSA", 5, 11);
+            ctx.fillText(t('pauseCanvasLine1'), 5, 9.5);
+            ctx.fillText(t('pauseCanvasLine2'), 5, 11);
         }
     }
 
@@ -397,8 +416,8 @@
         setTimeout(() => playAudioTone(110, 'sawtooth', 0.5, 0.08), 400);
 
         setTimeout(async () => {
-            const playerName = prompt(`🎮 ¡FIN DE LA PARTIDA!\nHas conseguido ${_realInternalPointsCounter} puntos.\nIntroduce tu nombre para el Ranking Mundial:`);
-            
+            const playerName = prompt(t('scorePrompt').replace('{score}', _realInternalPointsCounter));
+
             if (playerName && playerName.trim() !== "") {
                 try {
                     const userFlag = getCountryFlag();
@@ -408,7 +427,7 @@
                         game: "block",
                         country: userFlag
                     });
-                    alert("🏆 ¡Puntuación registrada con éxito!");
+                    alert(t('scoreSavedAlert'));
                 } catch (error) {
                     console.error("Error guardando record:", error);
                 }
@@ -488,12 +507,12 @@
         const btn = document.getElementById('btn-pause');
         
         if (isPaused) {
-            btn.innerText = "▶ REANUDAR";
+            btn.innerText = t('resumeBtn');
             btn.classList.add('active-mode');
             playAudioTone(290, 'sine', 0.12, 0.05);
             draw();
         } else {
-            btn.innerText = "⏸ PAUSA";
+            btn.innerText = t('pauseBtn');
             btn.classList.remove('active-mode');
             playAudioTone(440, 'sine', 0.08, 0.05);
             requestAnimationFrame(update);

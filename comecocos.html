@@ -4,6 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Neon Dog Eater</title>
+
+    <script>
+        window.AMY_DICT = {
+            backBtn: { es: "⬅ VOLVER AL MENÚ", en: "⬅ BACK TO MENU" },
+            levelLabel: { es: "NIVEL:", en: "LEVEL:" },
+            scoreLabel: { es: "PUNTOS:", en: "SCORE:" },
+            livesLabel: { es: "VIDAS:", en: "LIVES:" },
+            helpLine1: { es: "🎮 PC: TECLAS W,A,S,D | 📱 MÓVIL: DESLIZA EL DEDO", en: "🎮 PC: W,A,S,D KEYS | 📱 MOBILE: SWIPE YOUR FINGER" },
+            helpLine2: { es: "¡LIMPIA EL TABLERO Y ESQUIVA LOS OVNIS!", en: "CLEAR THE BOARD AND DODGE THE UFOS!" },
+            scorePrompt: {
+                es: "¡FIN DE LA PARTIDA!\nNivel alcanzado: {level}\nPuntuación: {score} puntos.\n\nEscribe tu nombre para la Leaderboard:",
+                en: "GAME OVER!\nLevel reached: {level}\nScore: {score} points.\n\nEnter your name for the Leaderboard:"
+            },
+            scoreSavedAlert: { es: "¡Puntuación subida con éxito!", en: "Score successfully uploaded!" },
+            levelClearedCanvas: { es: "¡NIVEL {level} SUPERADO!", en: "LEVEL {level} CLEARED!" },
+            preparingLevelCanvas: { es: "PREPARANDO NIVEL {level}...", en: "PREPARING LEVEL {level}..." },
+            missionFailedCanvas: { es: "MISION FALLIDA", en: "MISSION FAILED" }
+        };
+    </script>
+    <script src="i18n.js"></script>
+
     <style>
         body {
             background: #090d16;
@@ -97,21 +118,21 @@
     </div>
 
     <div class="top-bar">
-        <a href="/" class="btn-volver">⬅ VOLVER AL MENÚ</a>
+        <a href="/" data-i18n="backBtn" class="btn-volver">⬅ VOLVER AL MENÚ</a>
     </div>
 
     <div class="header">
         <div class="title">NEON DOG EATER</div>
         <div class="stats">
-            <div>NIVEL: <span id="level-val" style="color:#eab308">1</span></div>
-            <div>PUNTOS: <span id="score-val" style="color:#22d3ee">0</span></div>
-            <div>VIDAS: <span id="lives-val" style="color:#ec4899">3</span></div>
+            <div><span data-i18n="levelLabel">NIVEL:</span> <span id="level-val" style="color:#eab308">1</span></div>
+            <div><span data-i18n="scoreLabel">PUNTOS:</span> <span id="score-val" style="color:#22d3ee">0</span></div>
+            <div><span data-i18n="livesLabel">VIDAS:</span> <span id="lives-val" style="color:#ec4899">3</span></div>
         </div>
     </div>
 
     <div class="ayuda-barra">
-        🎮 PC: TECLAS W,A,S,D | 📱 MÓVIL: DESLIZA EL DEDO<br>
-        <span style="color: #eab308;">¡LIMPIA EL TABLERO Y ESQUIVA LOS OVNIS!</span>
+        <span data-i18n="helpLine1">🎮 PC: TECLAS W,A,S,D | 📱 MÓVIL: DESLIZA EL DEDO</span><br>
+        <span style="color: #eab308;" data-i18n="helpLine2">¡LIMPIA EL TABLERO Y ESQUIVA LOS OVNIS!</span>
     </div>
 
     <canvas id="canvas-game" width="520" height="520" tabindex="1"></canvas>
@@ -385,7 +406,7 @@
         async function guardarRecord() {
             checkIntegrity();
             if (securityTriggered) return;
-            const nombre = prompt(`¡FIN DE LA PARTIDA!\nNivel alcanzado: ${nivel}\nPuntuación: ${score} puntos.\n\nEscribe tu nombre para la Leaderboard:`);
+            const nombre = prompt(t('scorePrompt').replace('{level}', nivel).replace('{score}', score));
             if (nombre && nombre.trim() !== "") {
                 try {
                     await addDoc(collection(db, "scores_arcade"), {
@@ -395,7 +416,7 @@
                         country: "🇪🇸",
                         date: new Date().toISOString()
                     });
-                    alert("¡Puntuación subida con éxito!");
+                    alert(t('scoreSavedAlert'));
                 } catch(e) { console.error(e); }
             }
             window.location.href = "/";
@@ -587,9 +608,9 @@
                 ctx.fillStyle = 'rgba(2, 6, 23, 0.9)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#22d3ee'; ctx.font = 'bold 30px monospace'; ctx.textAlign = 'center';
-                ctx.fillText(`¡NIVEL ${nivel-1} SUPERADO!`, canvas.width/2, canvas.height/2 - 20);
+                ctx.fillText(t('levelClearedCanvas').replace('{level}', nivel - 1), canvas.width/2, canvas.height/2 - 20);
                 ctx.fillStyle = '#eab308'; ctx.font = 'bold 20px monospace';
-                ctx.fillText(`PREPARANDO NIVEL ${nivel}...`, canvas.width/2, canvas.height/2 + 25);
+                ctx.fillText(t('preparingLevelCanvas').replace('{level}', nivel), canvas.width/2, canvas.height/2 + 25);
                 return;
             }
 
@@ -658,7 +679,7 @@
                 ctx.fillStyle = 'rgba(2, 6, 23, 0.95)';
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.fillStyle = '#ef4444'; ctx.font = 'bold 30px monospace'; ctx.textAlign = 'center';
-                ctx.fillText("MISION FALLIDA", canvas.width/2, canvas.height/2);
+                ctx.fillText(t('missionFailedCanvas'), canvas.width/2, canvas.height/2);
             }
         }
 
