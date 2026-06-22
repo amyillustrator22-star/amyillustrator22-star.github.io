@@ -6,112 +6,120 @@
     <script data-goatcounter="https://amysoftware.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Amy Software - Arcade Central</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css?family=Nabla&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
+
     <script>
-    window.AMY_DICT = {
-        sub: { es: "Elige tu entrenamiento mental", en: "Choose your mental training" },
-        introText: {
-            es: "Bienvenida/o al <strong>Arcade Center</strong> de Amy Software: una colección de minijuegos HTML5 pensada para entrenar tu mente y competir en clasificaciones mundiales, sin descargas ni instalaciones. Elige un juego, supera tu propio récord y compara tu puntuación con el resto de la comunidad.",
-            en: "Welcome to the Amy Software <strong>Arcade Center</strong>: a collection of HTML5 mini-games designed to train your mind and compete on global leaderboards, no downloads or installs required. Pick a game, beat your own record, and compare your score with the rest of the community."
-        },
-        vflyDesc: {
-            es: "Mantén el vuelo del corazón a base de toques y esquiva los letales cuchillos en este reto de reflejos.",
-            en: "Keep the heart airborne with well-timed taps and dodge lethal knives in this reflection challenge."
-        },
-        brainTitle: { es: "Brain Training", en: "Brain Training" },
-        brainDesc: {
-            es: "Pon a prueba tu velocidad mental ordenando secuencias de burbujas numéricas de menor a mayor.",
-            en: "Test your mental processing speed by sorting numerical bubble sequences from lowest to highest."
-        },
-        memoDesc: {
-            es: "Potencia tu memoria fotográfica emparejando elements ocultos. El tablero se expande cada 3 niveles superados.",
-            en: "Boost your photographic memory by pairing hidden elements. The layout expands every 3 completed levels."
-        },
-        blockDesc: {
-            es: "El clásico juego de apilar bloques con tu estética vintage preferida. ¡Pon a prueba tu precisión!",
-            en: "The classic block-stacking game with your favorite vintage aesthetic. Test your precision!"
-        },
-        match3Desc: {
-            es: "Entrena tu visión espacial alineando gemas y sprites de neón modernos y llenos de colorido en este adictivo puzzle.",
-            en: "Train your spatial awareness and logic by lining up neon gemstones and vibrant blocks in this addictive puzzle."
-        },
-        comecocosDesc: {
-            es: "Guía al tierno perrito de neón para comer todas las galletas con las letras W, A, S, D y huye de los OVNIs alienígenas.",
-            en: "Guide the cute neon dog to eat all the treats using W, A, S, D keys while escaping from fast alien UFOs."
-        },
-        playBtn: { es: "Jugar Ahora", en: "Play Now" },
-        boardTitle: { es: " RÉCORDS MUNDIALES", en: " WORLD LEADERBOARDS" },
-        headPos: { es: "Posición", en: "Rank" },
-        headUser: { es: "Jugador", en: "Player" },
-        headScore: { es: "Puntos", en: "Score" },
-        loading: { es: "Cargando puntuaciones online...", en: "Loading live scores..." },
-        empty: { es: "¡Nadie ha registrado récords aún! Sé el primero.", en: "No highscores registered yet! Be the first one." },
-        error: { es: "Error al conectar con los récords mundiales.", en: "Failed to connect to the global leaderboards." },
-        btnBack: { es: "Volver al Inicio", en: "Back to Home" },
-        chatTitle: { es: "CHAT GLOBAL EN VIVO", en: "LIVE GLOBAL CHAT" },
-        chatDesc: {
-            es: "Conecta en tiempo real con el resto de la comunidad desde la sala global, sincronizada también con la app móvil para Android. Comparte tus puntuaciones, trucos y consejos con otros jugadores.",
-            en: "Connect in real time with the rest of the community in the global room, also synced with the Android mobile app. Share your scores, tricks, and tips with other players."
-        },
-        chatBtn: { es: "Entrar al Chat", en: "Enter the Chat" },
-        appsTitle: { es: " NUESTRAS APPS", en: " OUR APPS" },
-        appsDesc: {
-            es: "Descubre el resto del ecosistema Amy Software directamente en tu móvil Android.",
-            en: "Discover the rest of the Amy Software ecosystem right on your Android phone."
-        },
-        appVibezDesc: {
-            es: "Tu app de citas inclusiva para la comunidad LGTBI, personas con discapacidad y cualquier neurotipo.",
-            en: "Your inclusive dating app for the LGBTQ+ community, people with disabilities, and every neurotype."
-        },
-        appDietDesc: {
-            es: "Escanea códigos de barras o QR al instante con IA nutricionista integrada.",
-            en: "Instantly scan barcodes or QR codes with built-in nutrition AI."
-        },
-        appInstallBtn: { es: "Instalar en Google Play", en: "Install on Google Play" },
-        aboutTitle: { es: "SOBRE AMY SOFTWARE", en: "ABOUT AMY SOFTWARE" },
-        aboutDesc: {
-            es: "Somos un pequeño estudio independiente que desarrolla aplicaciones y juegos pensados para entretener, conectar e incluir. Este Arcade Center reúne nuestros minijuegos HTML5 más divertidos, con clasificaciones mundiales en tiempo real para que compitas con jugadores de todo el mundo.",
-            en: "We're a small independent studio building apps and games meant to entertain, connect, and include. This Arcade Center brings together our most fun HTML5 mini-games, with real-time global leaderboards so you can compete with players from all over the world."
-        },
-        sugTitle: { es: "SUGERENCIAS Y FIRMAS", en: "FEEDBACK & GUESTBOOK" },
-        sugSub: { es: "Déjame tu opinión (Sujeta a moderación previa)", en: "Leave your feedback (Subject to review before publishing)" },
-        authLabel: { es: "Autentica tu correo para poder enviar comentarios:", en: "Authenticate your email address to submit a comment:" },
-        authBtn: { es: "Enviar Enlace", en: "Send Magic Link" },
-        authSent: { es: "¡Enlace enviado! Revisa tu correo para acceder y validar tu sesión.", en: "Link sent! Please check your inbox to access and validate your session." },
-        connectedAs: { es: "Conectado como:", en: "Logged in as:" },
-        logOut: { es: "Salir", en: "Sign Out" },
-        inputAutor: { es: "Tu nombre o alias", en: "Your name or alias" },
-        inputMsg: { es: "Tu sugerencia o firma aquí...", en: "Your feedback or signature here..." },
-        btnSubmit: { es: "Enviar para Revisión", en: "Submit for Review" },
-        submitSuccess: { es: "¡Enviado! Aparecerá públicamente cuando Amy lo apruebe.", en: "Sent! It will appear publicly once Amy approves it." },
-        modTitle: { es: "Panel de Moderación de Amy", en: "Amy's Moderation Dashboard" },
-        modNoComments: { es: "¡Al día! No hay comentarios pendientes por revisar.", en: "All caught up! No comments pending review." },
-        boardTitleSug: { es: "TABLÓN DE FIRMAS Y SUGERENCIAS", en: "GUESTBOOK & FEEDBACK BOARD" },
-        boardLoading: { es: "Cargando comentarios aprobados...", en: "Loading approved comments..." },
-        boardEmpty: { es: "Aún no hay firmas aprobadas en el libro.", en: "No approved signatures on the guestbook yet." },
-        verified: { es: "✓ Verificado", en: "✓ Verified" },
-        alertEmail: { es: "Por favor, introduce un correo válido.", en: "Please enter a valid email address." },
-        alertErrorLink: { es: "Error al enviar el enlace de acceso.", en: "Error sending the access link." },
-        alertPromptEmail: { es: "Por favor, introduce tu correo de nuevo para confirmar la sesión:", en: "Please enter your email again to confirm your session:" },
-        alertExpired: { es: "El enlace ha expirado o no es válido.", en: "The link has expired or is invalid." },
-        alertFillFields: { es: "Rellena tu nombre y el comentario.", en: "Please fill in your name and comment." },
-        alertVerifyFirst: { es: "Debes verificar tu correo primero.", en: "You must verify your email first." },
-        alertErrorSubmit: { es: "Error al enviar el comentario.", en: "Error sending your comment." },
-        confirmDelete: { es: "¿Segura que quieres borrar esta sugerencia?", en: "Are you sure you want to delete this feedback?" },
-        modAuthor: { es: "Autor: ", en: "Author: " },
-        modApproveBtn: { es: "Aprobar y Publicar", en: "Approve & Publish" },
-        modDeleteBtn: { es: "Eliminar", en: "Delete" },
-        footerChat: { es: "Chat Global", en: "Global Chat" },
-        footerApps: { es: "Nuestras Apps", en: "Our Apps" },
-        footerAbout: { es: "Sobre Nosotros", en: "About Us" },
-        footerSignatures: { es: "Firmas y Sugerencias", en: "Guestbook & Feedback" },
-        copyright: { es: "© 2026 Amy Software. Todos los derechos reservados.", en: "© 2026 Amy Software. All rights reserved." }
-    };
+        window.AMY_DICT = {
+            sub: { es: "Elige tu entrenamiento mental", en: "Choose your mental training" },
+            introText: {
+                es: "Bienvenida/o al <strong>Arcade Center</strong> de Amy Software: una colección de minijuegos HTML5 pensada para entrenar tu mente y competir en clasificaciones mundiales, sin descargas ni instalaciones. Elige un juego, supera tu propio récord y compara tu puntuación con el resto de la comunidad.",
+                en: "Welcome to the Amy Software <strong>Arcade Center</strong>: a collection of HTML5 mini-games designed to train your mind and compete on global leaderboards, no downloads or installs required. Pick a game, beat your own record, and compare your score with the rest of the community."
+            },
+            vflyDesc: {
+                es: "Mantén el vuelo del corazón a base de toques y esquiva los letales cuchillos en este reto de reflejos.",
+                en: "Keep the heart airborne with well-timed taps and dodge lethal knives in this reflection challenge."
+            },
+            brainTitle: { es: "Brain Training", en: "Brain Training" },
+            brainDesc: {
+                es: "Pon a prueba tu velocidad mental ordenando secuencias de burbujas numéricas de menor a mayor.",
+                en: "Test your mental processing speed by sorting numerical bubble sequences from lowest to highest."
+            },
+            memoDesc: {
+                es: "Potencia tu memoria fotográfica emparejando elementos ocultos. El tablero se expande cada 3 niveles superados.",
+                en: "Boost your photographic memory by pairing hidden elements. The layout expands every 3 completed levels."
+            },
+            blockDesc: {
+                es: "El clásico juego de apilar bloques con tu estética vintage preferida. ¡Pon a prueba tu precisión!",
+                en: "The classic block-stacking game with your favorite vintage aesthetic. Test your precision!"
+            },
+            match3Desc: {
+                es: "Entrena tu visión espacial alineando gemas y sprites de neón modernos y llenos de colorido en este adictivo puzzle.",
+                en: "Train your spatial awareness and logic by lining up neon gemstones and vibrant blocks in this addictive puzzle."
+            },
+            comecocosDesc: {
+                es: "Guía al tierno perrito de neón para comer todas las galletas con las letras W, A, S, D y huye de los OVNIs alienígenas.",
+                en: "Guide the cute neon dog to eat all the treats using W, A, S, D keys while escaping from fast alien UFOs."
+            },
+            pipesTitle: { es: "Pipe Mania", en: "Pipe Mania" },
+            pipesDesc: {
+                es: "¡Conecta las tuberías rotándolas antes de que el agua llegue al final del camino!",
+                en: "Connect the pipes by rotating them before the water reaches the end of the path!"
+            },
+            playBtn: { es: "Jugar Ahora", en: "Play Now" },
+            boardTitle: { es: "🏆 RÉCORDS MUNDIALES 🏆", en: "🏆 WORLD LEADERBOARDS 🏆" },
+            headPos: { es: "Posición", en: "Rank" },
+            headUser: { es: "Jugador", en: "Player" },
+            headScore: { es: "Puntos", en: "Score" },
+            loading: { es: "Cargando puntuaciones online...", en: "Loading live scores..." },
+            empty: { es: "¡Nadie ha registrado récords aún! Sé el primero.", en: "No highscores registered yet! Be the first one." },
+            error: { es: "Error al conectar con los récords mundiales.", en: "Failed to connect to the global leaderboards." },
+            btnBack: { es: "Volver al Inicio", en: "Back to Home" },
+            chatTitle: { es: "💬 CHAT GLOBAL EN VIVO", en: "💬 LIVE GLOBAL CHAT" },
+            chatDesc: {
+                es: "Conecta en tiempo real con el resto de la comunidad desde la sala global, sincronizada también con la app móvil para Android. Comparte tus puntuaciones, trucos y consejos con otros jugadores.",
+                en: "Connect in real time with the rest of the community in the global room, also synced with the Android mobile app. Share your scores, tricks, and tips with other players."
+            },
+            chatBtn: { es: "Entrar al Chat", en: "Enter the Chat" },
+            appsTitle: { es: "📱 NUESTRAS APPS", en: "📱 OUR APPS" },
+            appsDesc: {
+                es: "Descubre el resto del ecosistema Amy Software directamente en tu móvil Android.",
+                en: "Discover the rest of the Amy Software ecosystem right on your Android phone."
+            },
+            appVibezDesc: {
+                es: "Tu app de citas inclusiva para la comunidad LGTBI, personas con discapacidad y cualquier neurotipo.",
+                en: "Your inclusive dating app for the LGBTQ+ community, people with disabilities, and every neurotype."
+            },
+            appDietDesc: {
+                es: "Escanea códigos de barras o QR al instante con IA nutricionista integrada.",
+                en: "Instantly scan barcodes or QR codes with built-in nutrition AI."
+            },
+            appInstallBtn: { es: "Instalar en Google Play", en: "Install on Google Play" },
+            aboutTitle: { es: "ℹ️ SOBRE AMY SOFTWARE", en: "ℹ️ ABOUT AMY SOFTWARE" },
+            aboutDesc: {
+                es: "Somos un pequeño estudio independiente que desarrolla aplicaciones y juegos pensados para entretener, conectar e incluir. Este Arcade Center reúne nuestros minijuegos HTML5 más divertidos, con clasificaciones mundiales en tiempo real para que compitas con jugadores de todo el mundo.",
+                en: "We're a small independent studio building apps and games meant to entertain, connect, and include. This Arcade Center brings together our most fun HTML5 mini-games, with real-time global leaderboards so you can compete with players from all over the world."
+            },
+            sugTitle: { es: "✍️ SUGERENCIAS Y FIRMAS ✍️", en: "✍️ FEEDBACK & GUESTBOOK ✍️" },
+            sugSub: { es: "Déjame tu opinión (Sujeta a moderación previa)", en: "Leave your feedback (Subject to review before publishing)" },
+            authLabel: { es: "Autentica tu correo para poder enviar comentarios:", en: "Authenticate your email address to submit a comment:" },
+            authBtn: { es: "Enviar Enlace", en: "Send Magic Link" },
+            authSent: { es: "¡Enlace enviado! Revisa tu correo para acceder y validar tu sesión.", en: "Link sent! Please check your inbox to access and validate your session." },
+            connectedAs: { es: "Conectado como:", en: "Logged in as:" },
+            logOut: { es: "Salir", en: "Sign Out" },
+            inputAutor: { es: "Tu nombre o alias", en: "Your name or alias" },
+            inputMsg: { es: "Tu sugerencia o firma aquí...", en: "Your feedback or signature here..." },
+            btnSubmit: { es: "Enviar para Revisión", en: "Submit for Review" },
+            submitSuccess: { es: "¡Enviado! Aparecerá públicamente cuando Amy lo apruebe.", en: "Sent! It will appear publicly once Amy approves it." },
+            modTitle: { es: "⚙️ Panel de Moderación de Amy", en: "⚙️ Amy's Moderation Dashboard" },
+            modNoComments: { es: "🎉 ¡Al día! No hay comentarios pendientes por revisar.", en: "🎉 All caught up! No comments pending review." },
+            boardTitleSug: { es: "📝 TABLÓN DE FIRMAS Y SUGERENCIAS 📝", en: "📝 GUESTBOOK & FEEDBACK BOARD 📝" },
+            boardLoading: { es: "Cargando comentarios aprobados...", en: "Loading approved comments..." },
+            boardEmpty: { es: "Aún no hay firmas aprobadas en el libro.", en: "No approved signatures on the guestbook yet." },
+            verified: { es: "✓ Verificado", en: "✓ Verified" },
+            alertEmail: { es: "Por favor, introduce un correo válido.", en: "Please enter a valid email address." },
+            alertErrorLink: { es: "Error al enviar el enlace de acceso.", en: "Error sending the access link." },
+            alertPromptEmail: { es: "Por favor, introduce tu correo de nuevo para confirmar la sesión:", en: "Please enter your email again to confirm your session:" },
+            alertExpired: { es: "El enlace ha expirado o no es válido.", en: "The link has expired or is invalid." },
+            alertFillFields: { es: "Rellena tu nombre y el comentario.", en: "Please fill in your name and comment." },
+            alertVerifyFirst: { es: "Debes verificar tu correo primero.", en: "You must verify your email first." },
+            alertErrorSubmit: { es: "Error al enviar el comentario.", en: "Error sending your comment." },
+            confirmDelete: { es: "¿Segura que quieres borrar esta sugerencia?", en: "Are you sure you want to delete this feedback?" },
+            modAuthor: { es: "Autor: ", en: "Author: " },
+            modApproveBtn: { es: "Aprobar y Publicar", en: "Approve & Publish" },
+            modDeleteBtn: { es: "Eliminar", en: "Delete" },
+            footerChat: { es: "Chat Global", en: "Global Chat" },
+            footerApps: { es: "Nuestras Apps", en: "Our Apps" },
+            footerAbout: { es: "Sobre Nosotros", en: "About Us" },
+            footerSignatures: { es: "Firmas y Sugerencias", en: "Guestbook & Feedback" },
+            copyright: { es: "© 2026 Amy Software. Todos los derechos reservados.", en: "© 2026 Amy Software. All rights reserved." }
+        };
     </script>
     <script src="i18n.js"></script>
+
     <style>
         body {
             background: #0f172a;
@@ -124,7 +132,7 @@
             box-sizing: border-box;
         }
         body::before {
-            content: "";
+            content: '';
             position: fixed;
             inset: 0;
             z-index: -1;
@@ -146,162 +154,165 @@
     </style>
 </head>
 <body class="flex flex-col items-center py-12 px-4 sm:px-6 lg:px-8 font-sans text-gray-800">
+
     <div class="hidden" aria-hidden="true">
         <input type="text" id="auth_token_verification" tabindex="-1" autocomplete="off">
     </div>
+
     <header class="flex flex-col items-center gap-4 mb-12 mt-8">
         <h1 class="title-nabla text-center drop-shadow-xl">ARCADE CENTER</h1>
         <p id="menu-sub" data-i18n="sub" class="text-white text-lg font-medium bg-black/40 px-4 py-1 rounded-full backdrop-blur-sm">Elige tu entrenamiento mental</p>
     </header>
+
     <section class="w-full max-w-3xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-12 mx-4 text-center">
         <p id="intro-text" data-i18n-html="introText" class="text-gray-800 text-base sm:text-lg leading-relaxed font-medium">
             Bienvenida/o al <strong>Arcade Center</strong> de Amy Software: una colección de minijuegos HTML5 pensada para entrenar tu mente y competir en clasificaciones mundiales, sin descargas ni instalaciones. Elige un juego, supera tu propio récord y compara tu puntuación con el resto de la comunidad.
         </p>
     </section>
+
     <div id="contenedor-pantalla" class="w-full max-w-5xl glass-card rounded-[2.5rem] p-4 sm:p-6 mb-16 mx-4 flex flex-col items-center hidden" style="height: auto !important;">
         <button onclick="volverAlMenu()" class="mb-4 bg-red-600/80 hover:bg-red-700 text-white font-bold px-4 py-1.5 rounded-xl border border-red-500 text-xs tracking-wider uppercase transition-all shadow-md self-end">
-            X Cerrar Juego
+            ❌ Cerrar Juego
         </button>
         <iframe id="pantalla-juego" src="" class="w-full rounded-2xl border-4 border-slate-800 bg-black shadow-inner" style="height: 850px !important; min-height: 850px !important;"></iframe>
     </div>
+
     <main id="menu-juegos" class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 px-4">
+        
         <button onclick="window.location.href='vibez_fly.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-pink-500 to-red-600 text-white p-5 rounded-3xl mb-6 shadow-md">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                        </svg>
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
                     </div>
                     <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Vibez Fly</h2>
-                    <p id="desc-vfly" class="text-lg text-gray-700 leading-relaxed font-medium">Mantén el vuelo del corazón a base de toques y esquiva los letales cuchillos en este reto de reflejos.</p>
+                    <p id="desc-vfly" data-i18n="vflyDesc" class="text-lg text-gray-700 leading-relaxed font-medium">Mantén el vuelo del corazón a base de toques y esquiva los letales cuchillos en este reto de reflejos.</p>
                 </div>
-                <p class="mt-6 text-base text-pink-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
+                <p data-i18n="playBtn" class="mt-6 text-base text-pink-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
         </button>
+
         <button onclick="window.location.href='block.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-green-500 to-emerald-600 text-white p-5 rounded-3xl mb-6 shadow-md">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                     </div>
                     <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Retro Block</h2>
-                    <p id="desc-block" class="text-lg text-gray-700 leading-relaxed font-medium">El clásico juego de apilar bloques con tu estética vintage preferida. ¡Pon a prueba tu precisión!</p>
+                    <p id="desc-block" data-i18n="blockDesc" class="text-lg text-gray-700 leading-relaxed font-medium">El clásico juego de apilar bloques con tu estética vintage preferida. ¡Pon a prueba tu precisión!</p>
                 </div>
-                <p class="mt-6 text-base text-green-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
+                <p data-i18n="playBtn" class="mt-6 text-base text-green-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
         </button>
+
         <button onclick="window.location.href='mi_juego.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 focus:outline-none focus:ring-4 focus:ring-cyan-500 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-cyan-500 to-blue-600 text-white p-5 rounded-3xl mb-6 shadow-md">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
-                        </svg>
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
                     </div>
-                    <h2 id="title-brain" class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Brain Training</h2>
-                    <p id="desc-brain" class="text-lg text-gray-700 leading-relaxed font-medium">Pon a prueba tu velocidad mental ordenando secuencias de burbujas numéricas de menor a mayor.</p>
+                    <h2 id="title-brain" data-i18n="brainTitle" class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Brain Training</h2>
+                    <p id="desc-brain" data-i18n="brainDesc" class="text-lg text-gray-700 leading-relaxed font-medium">Pon a prueba tu velocidad mental ordenando secuencias de burbujas numéricas de menor a mayor.</p>
                 </div>
-                <p class="mt-6 text-base text-cyan-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
+                <p data-i18n="playBtn" class="mt-6 text-base text-cyan-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
         </button>
+
         <button onclick="window.location.href='tortuga.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-amber-400 to-orange-600 text-white p-5 rounded-3xl mb-6 shadow-md">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                        </svg>
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     </div>
                     <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Tortuga Sprint</h2>
                     <p id="desc-tortuga" class="text-lg text-gray-700 leading-relaxed font-medium">Sigue el camino correcto entre los cables cruzados antes de que se acabe el tiempo.</p>
                 </div>
-                <p class="mt-6 text-base text-orange-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
+                <p data-i18n="playBtn" class="mt-6 text-base text-orange-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
         </button>
+
         <button onclick="window.location.href='memo.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-pink-400 to-pink-600 text-white p-5 rounded-3xl mb-6 shadow-md">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
                     </div>
                     <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">MEMO</h2>
-                    <p id="desc-memo" class="text-lg text-gray-700 leading-relaxed font-medium">Potencia tu memoria fotográfica emparejando elementos ocultos. El tablero se expande cada 3 niveles superados.</p>
+                    <p id="desc-memo" data-i18n="memoDesc" class="text-lg text-gray-700 leading-relaxed font-medium">Potencia tu memoria fotográfica emparejando elementos ocultos. El tablero se expande cada 3 niveles superados.</p>
                 </div>
-                <p class="mt-6 text-base text-pink-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
+                <p data-i18n="playBtn" class="mt-6 text-base text-pink-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
         </button>
+
         <button onclick="window.location.href='match3.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-purple-500 to-indigo-600 text-white p-5 rounded-3xl mb-6 shadow-md">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
-                        </svg>
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
                     </div>
                     <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Neon Match 3</h2>
-                    <p id="desc-block-match3" class="text-lg text-gray-700 leading-relaxed font-medium">Entrena tu visión espacial alineando gemas y sprites de neón modernos y llenos de colorido en este adictivo puzzle.</p>
+                    <p id="desc-block-match3" data-i18n="match3Desc" class="text-lg text-gray-700 leading-relaxed font-medium">Entrena tu visión espacial alineando gemas y sprites de neón modernos y llenos de colorido en este adictivo puzzle.</p>
                 </div>
-                <p class="mt-6 text-base text-purple-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
+                <p data-i18n="playBtn" class="mt-6 text-base text-purple-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
         </button>
+
         <button onclick="window.location.href='comecocos.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-cyan-400 to-blue-600 text-white p-5 rounded-3xl mb-6 shadow-md">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
                     <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Neon Dog Eater</h2>
-                    <p id="desc-comecocos" class="text-lg text-gray-700 leading-relaxed font-medium">Guía al tierno perrito de neón para comer todas las galletas con las letras W, A, S, D y huye de los OVNIs alienígenas.</p>
+                    <p id="desc-comecocos" data-i18n="comecocosDesc" class="text-lg text-gray-700 leading-relaxed font-medium">Guía al tierno perrito de neón para comer todas las galletas con las letras W, A, S, D y huye de los OVNIs alienígenas.</p>
                 </div>
-                <p class="mt-6 text-base text-cyan-500 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
+                <p data-i18n="playBtn" class="mt-6 text-base text-cyan-500 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
         </button>
+
         <button onclick="window.location.href='pipes.html'" class="text-left block w-full transition-transform hover:scale-105 duration-300 rounded-[2.5rem]">
             <article class="glass-card rounded-[2.5rem] p-8 flex flex-col items-center text-center h-full aspect-[3/4] justify-between w-full max-w-sm mx-auto">
                 <div class="flex flex-col items-center">
                     <div class="bg-gradient-to-br from-teal-400 to-teal-600 text-white p-5 rounded-3xl mb-6 shadow-md">
-                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path>
-                        </svg>
+                        <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2"></path></svg>
                     </div>
-                    <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Pipe Mania</h2>
-                    <p class="text-lg text-gray-700 leading-relaxed font-medium">¡Conecta las tuberías rotándolas antes de que el agua llegue al final del camino!</p>
+                    <h2 id="title-pipes" data-i18n="pipesTitle" class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Pipe Mania</h2>
+                    <p id="desc-pipes" data-i18n="pipesDesc" class="text-lg text-gray-700 leading-relaxed font-medium">¡Conecta las tuberías rotándolas antes de que el agua llegue al final del camino!</p>
                 </div>
-                <p class="mt-6 text-base text-teal-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
+                <p data-i18n="playBtn" class="mt-6 text-base text-teal-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
         </button>
+
     </main>
+
     <section class="w-full max-w-2xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-16 mx-4">
-        <h2 id="board-title" data-i18n="boardTitle" class="text-2xl font-extrabold text-center text-gray-900 mb-6 tracking-tight flex items-center justify-center gap-2">RÉCORDS MUNDIALES</h2>
+        <h2 id="board-title" data-i18n="boardTitle" class="text-2xl font-extrabold text-center text-gray-900 mb-6 tracking-tight flex items-center justify-center gap-2">🏆 RÉCORDS MUNDIALES 🏆</h2>
+        
         <div class="flex justify-center gap-2 mb-6 bg-black/10 p-1.5 rounded-2xl backdrop-blur-sm flex-wrap">
-            <button id="btn-vibez" onclick="switchLeaderboard('vibez_fly')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-pink-600 text-white shadow-md">Vibez Fly</button>
-            <button id="btn-brain" onclick="switchLeaderboard('brain_training')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">Brain Training</button>
-            <button id="btn-memo" onclick="switchLeaderboard('memo')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">MEMO</button>
-            <button id="btn-match3" onclick="switchLeaderboard('match3')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">MATCH 3</button>
-            <button id="btn-dog" onclick="switchLeaderboard('dog_eater')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">DOG EATER</button>
-            <button id="btn-tortuga" onclick="switchLeaderboard('tortugasprint')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">TORTUGA</button>
-            <button id="btn-block" onclick="switchLeaderboard('block')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">RETRO BLOCK</button>
+            <button id="btn-vibez" data-game="vibez_fly" onclick="switchLeaderboard('vibez_fly')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-pink-600 text-white shadow-md">Vibez Fly</button>
+            <button id="btn-brain" data-game="brain_training" onclick="switchLeaderboard('brain_training')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">Brain Training</button>
+            <button id="btn-memo" data-game="memo" onclick="switchLeaderboard('memo')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">MEMO</button>
+            <button id="btn-match3" data-game="match3" onclick="switchLeaderboard('match3')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">MATCH 3</button>
+            <button id="btn-dog" data-game="dog_eater" onclick="switchLeaderboard('dog_eater')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">DOG EATER</button>
+            <button id="btn-tortuga" data-game="tortugasprint" onclick="switchLeaderboard('tortugasprint')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">TORTUGA</button>
+            <button id="btn-block" data-game="block" onclick="switchLeaderboard('block')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">RETRO BLOCK</button>
+            <button id="btn-pipes" data-game="pipes" onclick="switchLeaderboard('pipes')" class="px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 text-gray-700 hover:bg-white/40">PIPE MANIA</button>
         </div>
+
         <div class="bg-white/50 rounded-2xl overflow-hidden shadow-inner border border-white/30">
             <div id="leaderboard-header" class="grid grid-cols-3 bg-black/10 px-4 py-3 font-bold text-gray-900 text-sm tracking-wide uppercase">
-                <div>Posición</div>
-                <div>Jugador</div>
-                <div class="text-right">Puntos</div>
+                <div id="th-pos" data-i18n="headPos">Posición</div>
+                <div id="th-user" data-i18n="headUser">Jugador</div>
+                <div id="th-score" data-i18n="headScore" class="text-right">Puntos</div>
             </div>
             <div id="leaderboard-rows" class="divide-y divide-black/5 font-medium text-gray-800">
-                <div id="loading-msg" class="grid grid-cols-3 px-4 py-4 items-center text-center text-gray-500 col-span-3">Cargando puntuaciones online...</div>
+                <div id="loading-msg" data-i18n="loading" class="px-4 py-4 text-center text-gray-500 w-full structure-msg">Cargando puntuaciones online...</div>
             </div>
         </div>
     </section>
+
     <section id="chat-section" class="w-full max-w-2xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-16 mx-4 text-center">
-        <h2 id="chat-title" data-i18n="chatTitle" class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight flex items-center justify-center gap-2">CHAT GLOBAL EN VIVO</h2>
+        <h2 id="chat-title" data-i18n="chatTitle" class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight flex items-center justify-center gap-2">💬 CHAT GLOBAL EN VIVO</h2>
         <p id="chat-desc" data-i18n="chatDesc" class="text-gray-700 font-medium mb-6 leading-relaxed">
             Conecta en tiempo real con el resto de la comunidad desde la sala global, sincronizada también con la app móvil para Android. Comparte tus puntuaciones, trucos y consejos con otros jugadores.
         </p>
@@ -309,8 +320,9 @@
             Entrar al Chat
         </a>
     </section>
+
     <section id="apps-section" class="w-full max-w-4xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-16 mx-4">
-        <h2 id="apps-title" data-i18n="appsTitle" class="text-2xl font-extrabold text-center text-gray-900 mb-6 tracking-tight flex items-center justify-center gap-2">NUESTRAS APPS</h2>
+        <h2 id="apps-title" data-i18n="appsTitle" class="text-2xl font-extrabold text-center text-gray-900 mb-6 tracking-tight flex items-center justify-center gap-2">📱 NUESTRAS APPS</h2>
         <p id="apps-desc" data-i18n="appsDesc" class="text-center text-gray-700 font-medium mb-8 max-w-xl mx-auto">
             Descubre el resto del ecosistema Amy Software directamente en tu móvil Android.
         </p>
@@ -327,58 +339,66 @@
             </div>
         </div>
     </section>
+
     <section id="about-section" class="w-full max-w-2xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-16 mx-4 text-center">
-        <h2 id="about-title" data-i18n="aboutTitle" class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight flex items-center justify-center gap-2">SOBRE AMY SOFTWARE</h2>
+        <h2 id="about-title" data-i18n="aboutTitle" class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight flex items-center justify-center gap-2">ℹ️ SOBRE AMY SOFTWARE</h2>
         <p id="about-desc" data-i18n="aboutDesc" class="text-gray-700 font-medium leading-relaxed">
             Somos un pequeño estudio independiente que desarrolla aplicaciones y juegos pensados para entretener, conectar e incluir. Este Arcade Center reúne nuestros minijuegos HTML5 más divertidos, con clasificaciones mundiales en tiempo real para que compitas con jugadores de todo el mundo.
         </p>
     </section>
+
     <section id="firmas-section" class="w-full max-w-3xl glass-card rounded-[2.5rem] p-8 md:p-10 mb-12 mx-4">
-        <h2 id="sug-title" class="text-2xl font-extrabold text-center text-gray-900 mb-2 tracking-tight flex items-center justify-center gap-2">SUGERENCIAS Y FIRMAS</h2>
-        <p id="sug-sub" class="text-center text-sm font-semibold text-slate-600 mb-6">Déjame tu opinión (Sujeta a moderación previa)</p>
+        <h2 id="sug-title" data-i18n="sugTitle" class="text-2xl font-extrabold text-center text-gray-900 mb-2 tracking-tight flex items-center justify-center gap-2">✍️ SUGERENCIAS Y FIRMAS ✍️</h2>
+        <p id="sug-sub" data-i18n="sugSub" class="text-center text-sm font-semibold text-slate-600 mb-6">Déjame tu opinión (Sujeta a moderación previa)</p>
         <input type="text" id="sys_security_feedback_hp" style="position: absolute; left: -9999px; top: -9999px; opacity: 0;" tabindex="-1" autocomplete="off">
+        
         <div id="auth-container" class="space-y-4 max-w-md mx-auto">
-            <p id="auth-label" class="text-xs text-center font-bold text-slate-500 uppercase tracking-wider">Autentica tu correo para poder enviar comentarios:</p>
+            <p id="auth-label" data-i18n="authLabel" class="text-xs text-center font-bold text-slate-500 uppercase tracking-wider">Autentica tu correo para poder enviar comentarios:</p>
             <div class="flex flex-col sm:flex-row gap-2">
                 <input type="email" id="auth-email" placeholder="tu@correo.com" class="w-full px-4 py-3 rounded-2xl bg-white/60 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-pink-500 font-medium text-sm">
-                <button id="btn-enviar-enlace" class="whitespace-nowrap px-6 py-3 font-bold text-white bg-gray-900 rounded-2xl hover:bg-gray-800 transition-colors text-sm shadow-md active:scale-95">Enviar Enlace</button>
+                <button id="btn-enviar-enlace" data-i18n="authBtn" class="whitespace-nowrap px-6 py-3 font-bold text-white bg-gray-900 rounded-2xl hover:bg-gray-800 transition-colors text-sm shadow-md active:scale-95">Enviar Enlace</button>
             </div>
             <p id="auth-msg" class="text-xs text-center font-bold hidden"></p>
         </div>
+
         <div id="form-sugerencia-container" class="hidden space-y-4 max-w-xl mx-auto">
             <div class="bg-green-500/10 border border-green-500/30 rounded-2xl p-3 text-center text-xs font-bold text-green-700 flex justify-between items-center">
-                <span><span id="txt-connected-as">Conectado como:</span> <span id="user-logged-email"></span></span>
-                <button id="btn-cerrar-sesion" class="text-[10px] bg-red-600 text-white px-2 py-1 rounded-lg font-black uppercase shadow-sm">Salir</button>
+                <span><span id="txt-connected-as" data-i18n="connectedAs">Conectado como:</span> <span id="user-logged-email"></span></span>
+                <button id="btn-cerrar-sesion" data-i18n="logOut" class="text-[10px] bg-red-600 text-white px-2 py-1 rounded-lg font-black uppercase shadow-sm">Salir</button>
             </div>
             <div class="space-y-3">
                 <input type="text" id="sug-autor" placeholder="Tu nombre o alias" class="w-full px-4 py-3 rounded-2xl bg-white/60 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-pink-500 font-medium text-sm">
                 <textarea id="sug-mensaje" rows="3" placeholder="Tu sugerencia o firma aquí..." class="w-full px-4 py-3 rounded-2xl bg-white/60 border border-slate-300 focus:outline-none focus:ring-2 focus:ring-pink-500 font-medium text-sm resize-none"></textarea>
-                <button id="btn-publicar-sug" class="w-full py-3 font-bold text-white bg-pink-600 rounded-2xl hover:bg-pink-700 transition-all text-sm shadow-md active:scale-95 uppercase tracking-wider">Enviar para Revisión</button>
-                <p id="msg-envio-exito" class="text-xs text-center text-emerald-700 font-bold hidden">¡Enviado! Aparecerá públicamente cuando Amy lo apruebe.</p>
+                <button id="btn-publicar-sug" data-i18n="btnSubmit" class="w-full py-3 font-bold text-white bg-pink-600 rounded-2xl hover:bg-pink-700 transition-all text-sm shadow-md active:scale-95 uppercase tracking-wider">Enviar para Revisión</button>
+                <p id="msg-envio-exito" data-i18n="submitSuccess" class="text-xs text-center text-emerald-700 font-bold hidden">¡Enviado! Aparecerá públicamente cuando Amy lo apruebe.</p>
             </div>
         </div>
+
         <div id="admin-panel" class="hidden mt-8 pt-6 border-t-2 border-dashed border-pink-500 max-w-xl mx-auto text-left">
-            <h3 id="mod-panel-title" class="text-xs font-black text-pink-600 uppercase tracking-widest mb-4 flex items-center gap-1">Panel de Moderación de Amy ⚙️</h3>
+            <h3 id="mod-panel-title" data-i18n="modTitle" class="text-xs font-black text-pink-600 uppercase tracking-widest mb-4 flex items-center gap-1">⚙️ Panel de Moderación de Amy</h3>
             <div id="muro-moderacion" class="space-y-3 max-h-60 overflow-y-auto pr-1">
-                <div id="mod-no-comments" class="text-center text-gray-500 italic text-xs py-2">No hay comentarios pendientes.</div>
+                <div id="mod-no-comments" data-i18n="modNoComments" class="text-center text-gray-500 italic text-xs py-2">🎉 ¡Al día! No hay comentarios pendientes por revisar.</div>
             </div>
         </div>
     </section>
+
     <section class="w-full max-w-3xl glass-card rounded-[2.5rem] p-8 md:p-10 mb-16 mx-4">
-        <h2 id="signatures-board-title" class="text-2xl font-extrabold text-center text-gray-900 mb-6 tracking-tight flex items-center justify-center gap-2">TABLÓN DE FIRMAS Y SUGERENCIAS 📝 📝</h2>
-        <div id="signatures-board-loading" class="text-center text-sm font-medium text-slate-500 italic py-4">Cargando comentarios aprobados...</div>
-        <div id="signatures-board-empty" class="hidden text-center text-sm font-medium text-slate-500 italic py-4">Aún no hay firmas aprobadas en el libro.</div>
+        <h2 id="signatures-board-title" data-i18n="boardTitleSug" class="text-2xl font-extrabold text-center text-gray-900 mb-6 tracking-tight flex items-center justify-center gap-2">📝 TABLÓN DE FIRMAS Y SUGERENCIAS 📝</h2>
+        <div id="signatures-board-loading" data-i18n="boardLoading" class="text-center text-sm font-medium text-slate-500 italic py-4">Cargando comentarios aprobados...</div>
+        <div id="signatures-board-empty" data-i18n="boardEmpty" class="hidden text-center text-sm font-medium text-slate-500 italic py-4">Aún no hay firmas aprobadas en el libro.</div>
         <div id="signatures-list" class="space-y-4 max-h-96 overflow-y-auto pr-2"></div>
     </section>
-    <footer class="mt-8 text-center text-slate-400 text-sm">
+
+    <footer class="mt-8 text-center text-slate-400 text-sm mb-12">
         <div class="flex justify-center gap-4 mb-4 flex-wrap">
-            <a href="#chat-section" id="footer-chat" class="hover:text-pink-400 transition-colors">Chat Global</a>
-            <a href="#apps-section" id="footer-apps" class="hover:text-pink-400 transition-colors">Nuestras Apps</a>
-            <a href="#about-section" id="footer-about" class="hover:text-pink-400 transition-colors">Sobre Nosotros</a>
-            <a href="#firmas-section" id="footer-signatures" class="hover:text-pink-400 transition-colors">Firmas y Sugerencias</a>
+            <a href="#chat-section" id="footer-chat" data-i18n="footerChat" class="hover:text-pink-400 transition-colors">Chat Global</a>
+            <a href="#apps-section" id="footer-apps" data-i18n="footerApps" class="hover:text-pink-400 transition-colors">Nuestras Apps</a>
+            <a href="#about-section" id="footer-about" data-i18n="footerAbout" class="hover:text-pink-400 transition-colors">Sobre Nosotros</a>
+            <a href="#firmas-section" id="footer-signatures" data-i18n="footerSignatures" class="hover:text-pink-400 transition-colors">Firmas y Sugerencias</a>
         </div>
         <p id="copyright" data-i18n="copyright">© 2026 Amy Software. Todos los derechos reservados.</p>
     </footer>
+
     <script type="module" src="app.js"></script>
 </body>
 </html>
