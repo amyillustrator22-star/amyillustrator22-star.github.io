@@ -6,12 +6,10 @@
     <script data-goatcounter="https://amysoftware.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Amy Software - Arcade Central</title>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nabla&display=swap" rel="stylesheet">
-
     <script>
         window.AMY_DICT = {
             sub: { es: "Elige tu entrenamiento mental", en: "Choose your mental training" },
@@ -43,6 +41,11 @@
             comecocosDesc: {
                 es: "Guía al tierno perrito de neón para comer todas las galletas con las letras W, A, S, D y huye de los OVNIs alienígenas.",
                 en: "Guide the cute neon dog to eat all the treats using W, A, S, D keys while escaping from fast alien UFOs."
+            },
+            tortugaTitle: { es: "Tortuga Sprint", en: "Tortuga Sprint" },
+            tortugaDesc: {
+                es: "Sigue el camino correcto entre los cables cruzados antes de que se acabe el tiempo.",
+                en: "Follow the correct path between the crossed wires before the time runs out."
             },
             pipesTitle: { es: "Pipe Mania", en: "Pipe Mania" },
             pipesDesc: {
@@ -224,8 +227,8 @@
                     <div class="bg-gradient-to-br from-amber-400 to-orange-600 text-white p-5 rounded-3xl mb-6 shadow-md">
                         <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     </div>
-                    <h2 class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Tortuga Sprint</h2>
-                    <p id="desc-tortuga" class="text-lg text-gray-700 leading-relaxed font-medium">Sigue el camino correcto entre los cables cruzados antes de que se acabe el tiempo.</p>
+                    <h2 id="title-tortuga" data-i18n="tortugaTitle" class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight">Tortuga Sprint</h2>
+                    <p id="desc-tortuga" data-i18n="tortugaDesc" class="text-lg text-gray-700 leading-relaxed font-medium">Sigue el camino correcto entre los cables cruzados antes de que se acabe el tiempo.</p>
                 </div>
                 <p data-i18n="playBtn" class="mt-6 text-base text-orange-600 font-bold uppercase tracking-wider btn-play-text">Jugar Ahora</p>
             </article>
