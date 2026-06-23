@@ -126,7 +126,7 @@
                 es: "Utilizamos tecnologías propias y de terceros para almacenar información y acceder a los datos de navegación de tu dispositivo con el fin de mostrarte anuncios personalizados, medir su rendimiento y mejorar tu experiencia. Puedes configurar o rechazar su uso haciendo clic en los botones inferiores.",
                 en: "We use our own and third-party technologies to store information and access browsing data on your device to show personalized ads, measure their performance, and improve your experience. You can configure or reject their use using the buttons below."
             },
-            cookie_accept: { es: "Aceptar todo", en: "Accept All" },
+            cookie_accept: { es: "Aceptar Términos y Privacidad", en: "Accept Terms & Privacy" },
             cookie_reject: { es: "Rechazar todo", en: "Reject All" },
             privacy_link_text: { es: "Política de Privacidad y Términos", en: "Privacy Policy & Terms" }
         };
@@ -421,10 +421,11 @@
             <div style="margin-bottom: 25px; font-size: 0.9rem;">
                 <a href="privacidad.html" data-i18n="privacy_link_text" style="color: #00e5ff; text-decoration: none; font-weight: bold;">Política de Privacidad y Términos</a>
             </div>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button onclick="setConsent(true)" data-i18n="cookie_accept" style="background-color: #4caf50; color: white; border: none; padding: 12px 24px; font-size: 0.95rem; font-weight: bold; border-radius: 6px; cursor: pointer; flex: 1;">Aceptar todo</button>
-                <button onclick="setConsent(false)" data-i18n="cookie_reject" style="background-color: #333; color: #aaa; border: 1px solid #444; padding: 12px 24px; font-size: 0.95rem; font-weight: bold; border-radius: 6px; cursor: pointer; flex: 1;">Rechazar todo</button>
-            </div>
+           <div style="display: flex; gap: 10px; justify-content: center;">
+    <!-- Este botón ahora mostrará "Aceptar Términos y Privacidad" gracias al diccionario -->
+    <button onclick="setConsent(true)" data-i18n="cookie_accept" style="background-color: #4caf50; color: white; border: none; padding: 12px 24px; font-size: 0.95rem; font-weight: bold; border-radius: 6px; cursor: pointer; flex: 1;">Aceptar Términos y Privacidad</button>
+    <button onclick="setConsent(false)" data-i18n="cookie_reject" style="background-color: #333; color: #aaa; border: 1px solid #444; padding: 12px 24px; font-size: 0.95rem; font-weight: bold; border-radius: 6px; cursor: pointer; flex: 1;">Rechazar todo</button>
+</div>
         </div>
     </div>
 
