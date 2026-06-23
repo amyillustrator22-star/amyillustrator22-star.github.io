@@ -5,64 +5,444 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pipes - AmySoftware</title>
     
+    <!-- 1. Diccionario de idiomas para Pipes -->
     <script>
         window.AMY_DICT = {
-            "status_msg": {
-                "es": "Juego en construcción, próximamente.",
-                "en": "Game under construction, coming soon."
-            }
+            "title": { "es": "Pipes", "en": "Pipes" },
+            "timer_wait": { "es": "El agua fluye en: ", "en": "Water flows in: " },
+            "flowing": { "es": "¡EL AGUA ESTÁ FLUYENDO!", "en": "WATER IS FLOWING!" },
+            "instructions": { "es": "¡Toca las tuberías para rotarlas!", "en": "Tap pipes to rotate them!" },
+            "btn_flow": { "es": "¡Fluir ya!", "en": "Flow Now!" },
+            "win_msg": { "es": "🎉 ¡Excelente! ¡Circuito Conectado! 🎉", "en": "🎉 Excellent! Path Connected! 🎉" },
+            "lose_msg": { "es": "❌ ¡Juego Terminado! ¡Fuga Detectada! ❌", "en": "❌ Game Over! Leak Detected! ❌" },
+            "btn_retry": { "es": "Reintentar", "en": "Retry" }
         };
     </script>
 
+    <!-- 2. Motor de idiomas -->
     <script src="i18n.js"></script>
 
     <style>
+        :root {
+            --bg-color: #000000; /* Fondo completamente negro */
+            --grid-color: #1a1a1a; /* Contenedor oscuro */
+            --pipe-dry: #666;
+            --pipe-wet: #00bcd4;
+            --start-color: #4caf50;
+            --end-color: #f44336;
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
-            background-color: #1a1a1a;
+            background-color: var(--bg-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #ffffff;
+            color: #fff;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            margin: 0;
-            padding: 20px;
+            padding: 10px;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        #ui-container {
             text-align: center;
-            box-sizing: border-box;
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 400px;
         }
 
         h1 {
-            font-size: 1.5rem;
-            font-weight: normal;
-            color: #eceff1;
-            letter-spacing: 0.5px;
+            font-size: 1.6rem;
+            margin-bottom: 5px;
+            color: #eee;
         }
 
-        /* Estilos ocultos para el Honeypot (trampa para bots de spam) */
-        .visually-hidden-fields {
-            position: absolute;
-            left: -5000px;
-            top: -5000px;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-            opacity: 0;
+        #timer {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ff9800;
+            margin-bottom: 5px;
+        }
+
+        #status {
+            font-size: 1rem;
+            height: 2.5rem;
+            color: #aaa;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #grid-container {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 4px;
+            width: 90vw;
+            max-width: 360px;
+            aspect-ratio: 1;
+            background-color: var(--grid-color);
+            padding: 6px;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(255,255,255,0.05); /* Sutil brillo para separar del negro puro */
+            border: 1px solid #2c2c2c;
+        }
+
+        .cell {
+            background-color: #222;
+            border-radius: 4px;
+            position: relative;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            aspect-ratio: 1;
+        }
+
+        .cell svg {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.2s ease;
+            pointer-events: none;
+        }
+
+        .pipe-path {
+            fill: none;
+            stroke: var(--pipe-dry);
+            stroke-width: 14;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .pipe-path.wet {
+            stroke: var(--pipe-wet);
+        }
+
+        .cell.start .pipe-path { stroke: var(--start-color); }
+        .cell.end .pipe-path { stroke: var(--end-color); }
+        .cell.start .pipe-path.wet, .cell.end .pipe-path.wet { stroke: var(--pipe-wet); }
+
+        #btn-flow, .btn-action {
+            margin-top: 25px;
+            padding: 10px 24px;
+            font-size: 1rem;
+            background-color: var(--pipe-wet);
+            border: none;
+            border-radius: 5px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .btn-action {
+            margin-top: 8px;
+            background-color: #333;
+            border: 1px solid #444;
+            padding: 6px 14px;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 <body>
 
-    <h1 data-i18n="status_msg">Juego en construcción, próximamente.</h1>
-
-    <div class="visually-hidden-fields" aria-hidden="true">
-        <form action="#" method="POST" tabindex="-1">
-            <label for="website_url">Do not fill this field if you are human:</label>
-            <input type="text" id="website_url" name="website_url" autocomplete="off" tabindex="-1">
-            <label for="honeypot_email">Leave empty:</label>
-            <input type="email" id="honeypot_email" name="honeypot_email" autocomplete="off" tabindex="-1">
-        </form>
+    <div id="ui-container">
+        <h1 data-i18n="title">Pipes</h1>
+        <div id="timer"></div>
+        <div id="status" data-i18n="instructions">¡Toca las tuberías para rotarlas!</div>
     </div>
 
+    <div id="grid-container"></div>
+
+    <button id="btn-flow" onclick="triggerEarlyFlow()" data-i18n="btn_flow">¡Fluir ya!</button>
+
+<script>
+    const ROWS = 6;
+    const COLS = 6;
+    let grid = [];
+    let startTime = 30;
+    let timerInterval = null;
+    let flowInterval = null;
+    let isFlowing = false;
+    let gameOver = false;
+
+    const DX = [0, 1, 0, -1];
+    const DY = [-1, 0, 1, 0];
+
+    const PIPE_TYPES = {
+        'I': [true, false, true, false],
+        'L': [true, true, false, false],
+        'T': [true, true, false, true],
+        'X': [true, true, true, true]
+    };
+
+    class Cell {
+        constructor(r, c) {
+            this.r = r;
+            this.c = c;
+            this.isStart = false;
+            this.isEnd = false;
+            this.type = 'I'; 
+            this.rotation = 0; 
+            this.wet = false;
+        }
+
+        getConnections() {
+            const base = PIPE_TYPES[this.type];
+            let actual = [false, false, false, false];
+            for (let i = 0; i < 4; i++) {
+                actual[(i + this.rotation) % 4] = base[i];
+            }
+            return actual;
+        }
+
+        rotate() {
+            if (this.isStart || this.isEnd || isFlowing || gameOver) return;
+            this.rotation = (this.rotation + 1) % 4;
+            this.render();
+        }
+
+        render() {
+            const el = document.getElementById(`cell-${this.r}-${this.c}`);
+            if (!el) return;
+            
+            const svg = el.querySelector('svg');
+            if (svg) {
+                svg.style.transform = `rotate(${this.rotation * 90}deg)`;
+                const paths = svg.querySelectorAll('.pipe-path');
+                paths.forEach(p => {
+                    if (this.wet) p.classList.add('wet');
+                    else p.classList.remove('wet');
+                });
+            }
+        }
+    }
+
+    function getPipeSVG(type) {
+        let paths = '';
+        if (type === 'I') paths = '<path class="pipe-path" d="M 50 0 L 50 100" />';
+        if (type === 'L') paths = '<path class="pipe-path" d="M 50 0 Q 50 50 100 50" />';
+        if (type === 'T') paths = '<path class="pipe-path" d="M 50 0 L 50 50 M 0 50 L 100 50" />';
+        if (type === 'X') paths = '<path class="pipe-path" d="M 50 0 L 50 100 M 0 50 L 100 50" />';
+        return `<svg viewBox="0 0 100 100">${paths}</svg>`;
+    }
+
+    function initGame() {
+        grid = [];
+        isFlowing = false;
+        gameOver = false;
+        startTime = 30;
+        
+        document.getElementById('timer').innerText = `${window.t('timer_wait')}${startTime}s`;
+        document.getElementById('status').innerText = window.t('instructions');
+        document.getElementById('btn-flow').style.display = 'inline-block';
+
+        const container = document.getElementById('grid-container');
+        container.innerHTML = '';
+
+        for (let r = 0; r < ROWS; r++) {
+            grid[r] = [];
+            for (let c = 0; c < COLS; c++) {
+                grid[r][c] = new Cell(r, c);
+            }
+        }
+
+        const startR = 0, startC = Math.floor(Math.random() * (COLS - 2)) + 1;
+        const endR = ROWS - 1, endC = Math.floor(Math.random() * (COLS - 2)) + 1;
+
+        grid[startR][startC].isStart = true;
+        grid[startR][startC].type = 'I'; 
+        grid[startR][startC].rotation = 0;
+
+        grid[endR][endC].isEnd = true;
+        grid[endR][endC].type = 'I';
+        grid[endR][endC].rotation = 0;
+
+        let solutionPath = [];
+        generatePath(startR, startC, endR, endC, new Set([`${startR},${startC}`]), solutionPath);
+        applyPathPipes(solutionPath);
+
+        const types = ['I', 'L', 'T', 'X'];
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                let cell = grid[r][c];
+                if (!solutionPath.some(p => p.r === r && p.c === c)) {
+                    cell.type = types[Math.floor(Math.random() * types.length)];
+                }
+                if (!cell.isStart && !cell.isEnd) {
+                    cell.rotation = Math.floor(Math.random() * 4);
+                }
+            }
+        }
+
+        for (let r = 0; r < ROWS; r++) {
+            for (let c = 0; c < COLS; c++) {
+                const cell = grid[r][c];
+                const div = document.createElement('div');
+                div.id = `cell-${r}-${c}`;
+                div.className = `cell${cell.isStart ? ' start' : ''}${cell.isEnd ? ' end' : ''}`;
+                div.innerHTML = getPipeSVG(cell.type);
+                
+                div.addEventListener('pointerdown', (e) => {
+                    e.preventDefault();
+                    cell.rotate();
+                });
+                
+                container.appendChild(div);
+                cell.render();
+            }
+        }
+
+        clearInterval(timerInterval);
+        clearInterval(flowInterval);
+        timerInterval = setInterval(() => {
+            startTime--;
+            if (startTime <= 0) {
+                clearInterval(timerInterval);
+                startWaterFlow();
+            } else {
+                document.getElementById('timer').innerText = `${window.t('timer_wait')}${startTime}s`;
+            }
+        }, 1000);
+    }
+
+    function generatePath(r, c, er, ec, visited, path) {
+        if (r === er && c === ec) {
+            path.push({r, c});
+            return true;
+        }
+        let dirs = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
+        for (let d of dirs) {
+            let nr = r + DY[d];
+            let nc = c + DX[d];
+            if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && !visited.has(`${nr},${nc}`)) {
+                visited.add(`${nr},${nc}`);
+                path.push({r, c});
+                if (generatePath(nr, nc, er, ec, visited, path)) return true;
+                path.pop();
+                visited.delete(`${nr},${nc}`);
+            }
+        }
+        return false;
+    }
+
+    function applyPathPipes(path) {
+        for (let i = 1; i < path.length - 1; i++) {
+            let prev = path[i-1];
+            let curr = path[i];
+            let next = path[i+1];
+            let d1 = getDir(curr, prev);
+            let d2 = getDir(curr, next);
+            let cell = grid[curr.r][curr.c];
+            
+            if ((d1 % 2) === (d2 % 2)) {
+                cell.type = 'I';
+                cell.rotation = d1 % 2 === 0 ? 0 : 1;
+            } else {
+                cell.type = 'L';
+                if ((d1===0 && d2===1) || (d1===1 && d2===0)) cell.rotation = 0;
+                if ((d1===1 && d2===2) || (d1===2 && d2===1)) cell.rotation = 1;
+                if ((d1===2 && d2===3) || (d1===3 && d2===2)) cell.rotation = 2;
+                if ((d1===3 && d2===0) || (d1===0 && d2===3)) cell.rotation = 3;
+            }
+        }
+    }
+
+    function getDir(from, to) {
+        if (to.r < from.r) return 0;
+        if (to.c > from.c) return 1;
+        if (to.r > from.r) return 2;
+        if (to.c < from.c) return 3;
+        return 0;
+    }
+
+    function triggerEarlyFlow() {
+        if (isFlowing || gameOver) return;
+        clearInterval(timerInterval);
+        startWaterFlow();
+    }
+
+    function startWaterFlow() {
+        isFlowing = true;
+        document.getElementById('btn-flow').style.display = 'none';
+        document.getElementById('timer').innerText = window.t('flowing');
+
+        let startCell = null;
+        for(let r=0; r<ROWS; r++){
+            for(let c=0; c<COLS; c++){
+                if(grid[r][c].isStart) startCell = grid[r][c];
+            }
+        }
+
+        let queue = [startCell];
+        startCell.wet = true;
+        startCell.render();
+
+        flowInterval = setInterval(() => {
+            let nextQueue = [];
+            let expanded = false;
+
+            for (let cell of queue) {
+                let connections = cell.getConnections();
+                for (let d = 0; d < 4; d++) {
+                    if (connections[d]) {
+                        let nr = cell.r + DY[d];
+                        let nc = cell.c + DX[d];
+
+                        if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
+                            let neighbor = grid[nr][nc];
+                            if (!neighbor.wet) {
+                                let neighborConnections = neighbor.getConnections();
+                                let matchingDir = (d + 2) % 4;
+
+                                if (neighborConnections[matchingDir]) {
+                                    neighbor.wet = true;
+                                    neighbor.render();
+                                    nextQueue.push(neighbor);
+                                    expanded = true;
+
+                                    if (neighbor.isEnd) {
+                                        handleGameEnd(true);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (!expanded && !gameOver) {
+                handleGameEnd(false);
+            }
+            queue = nextQueue;
+        }, 400); 
+    }
+
+    function handleGameEnd(won) {
+        gameOver = true;
+        clearInterval(flowInterval);
+        const statusEl = document.getElementById('status');
+        if (won) {
+            statusEl.innerHTML = `<div>${window.t('win_msg')}</div><button class="btn-action" onclick="initGame()">${window.t('btn_retry')}</button>`;
+        } else {
+            statusEl.innerHTML = `<div>${window.t('lose_msg')}</div><button class="btn-action" onclick="initGame()">${window.t('btn_retry')}</button>`;
+        }
+    }
+
+    window.onload = function() {
+        setTimeout(initGame, 50);
+    };
+</script>
 </body>
 </html>
