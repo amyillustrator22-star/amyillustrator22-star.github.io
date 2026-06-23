@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pipes - AmySoftware</title>
     
-    <!-- 1. Diccionario de idiomas para Pipes -->
     <script>
         window.AMY_DICT = {
             "title": { "es": "Pipes", "en": "Pipes" },
@@ -19,7 +18,6 @@
         };
     </script>
 
-    <!-- 2. Motor de idiomas -->
     <script src="i18n.js"></script>
 
     <style>
@@ -62,7 +60,7 @@
             margin-bottom: 20px;
             width: 100%;
             max-width: 400px;
-            background-color: rgba(0, 0, 0, 0.6); /* Fondo semi-transparente para leer bien los textos sobre el fondo de colores */
+            background-color: rgba(0, 0, 0, 0.6); /* Sombreado para leer bien sobre el fondo infantil */
             padding: 10px;
             border-radius: 8px;
         }
@@ -125,7 +123,7 @@
             pointer-events: none;
         }
 
-        /* Diseño de tubería gruesa y estilizada */
+        /* Diseño de tubería gruesa amarilla */
         .pipe-bg {
             fill: none;
             stroke: #0a0a0a;
@@ -143,15 +141,15 @@
             transition: stroke 0.2s ease;
         }
 
-        /* Animación y color del agua fluyendo */
+        /* Efecto de agua neón brillante */
         .pipe-path.wet {
             stroke: var(--pipe-wet);
             filter: drop-shadow(0 0 4px var(--pipe-wet));
         }
 
-        /* Bordes distintivos para entrada y salida */
-        .cell.start { background-color: #1b2e1c; border-color: var(--start-color); }
-        .cell.end { background-color: #331c1a; border-color: var(--end-color); }
+        /* Marcos para la Entrada y Salida */
+        .cell.start { background-color: #1b2e1c; border-color: var(--start-color); border-width: 2px; }
+        .cell.end { background-color: #331c1a; border-color: var(--end-color); border-width: 2px; }
         
         .cell.start .pipe-path { stroke: var(--start-color); }
         .cell.end .pipe-path { stroke: var(--end-color); }
@@ -289,24 +287,32 @@
             }
         }
 
-        // Fijar extremos en los bordes superiores e inferiores
+        // Colocar entrada arriba y salida abajo en columnas aleatorias intermedias
         const startR = 0, startC = Math.floor(Math.random() * (COLS - 2)) + 1;
         const endR = ROWS - 1, endC = Math.floor(Math.random() * (COLS - 2)) + 1;
 
         grid[startR][startC].isStart = true;
         grid[startR][startC].type = 'I'; 
-        grid[startR][startC].rotation = 0;
+        grid[startR][startC].rotation = 0; // Vertical hacia abajo
 
         grid[endR][endC].isEnd = true;
         grid[endR][endC].type = 'I';
-        grid[endR][endC].rotation = 0;
+        grid[endR][endC].rotation = 0; // Vertical hacia arriba
 
-        // Generar solución limpia sin interrupciones
-        let solutionPath = [];
-        generatePath(startR, startC, endR, endC, new Set([`${startR},${startC}`]), solutionPath);
+        // Forzar un camino inicial y final recto para garantizar que no se corte en los bordes
+        let visited = new Set([`${startR},${startC}`, `${startR+1},${startC}`, `${endR},${endC}`, `${endR-1},${endC}`]);
+        let solutionPath = [{r: startR, c: startC}, {r: startR+1, c: startC}];
+        
+        let targetPath = [];
+        generatePath(startR+1, startC, endR-1, endC, visited, targetPath);
+        
+        solutionPath = solutionPath.concat(targetPath);
+        solutionPath.push({r: endR-1, c: endC});
+        solutionPath.push({r: endR, c: endC});
+
         applyPathPipes(solutionPath);
 
-        // Rellenar las celdas vacías con formas válidas aleatorias
+        // Rellenar el resto de la cuadrícula con tuberías variadas aleatorias
         const types = ['I', 'L', 'T', 'X'];
         for (let r = 0; r < ROWS; r++) {
             for (let c = 0; c < COLS; c++) {
@@ -315,14 +321,14 @@
                 if (!isSol) {
                     cell.type = types[Math.floor(Math.random() * types.length)];
                 }
-                // Scramble: Rotación aleatoria inicial para desordenar el puzle al empezar
+                // Desordenar todo el tablero al arrancar menos la entrada y salida estáticas
                 if (!cell.isStart && !cell.isEnd) {
                     cell.rotation = Math.floor(Math.random() * 4);
                 }
             }
         }
 
-        // Renderizado e inyección del DOM
+        // Inyectar elementos gráficos en el DOM
         for (let r = 0; r < ROWS; r++) {
             for (let c = 0; c < COLS; c++) {
                 const cell = grid[r][c];
@@ -356,7 +362,6 @@
 
     function generatePath(r, c, er, ec, visited, path) {
         if (r === er && c === ec) {
-            path.push({r, c});
             return true;
         }
         let dirs = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
@@ -365,7 +370,7 @@
             let nc = c + DX[d];
             if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && !visited.has(`${nr},${nc}`)) {
                 visited.add(`${nr},${nc}`);
-                path.push({r, c});
+                path.push({r: nr, c: nc});
                 if (generatePath(nr, nc, er, ec, visited, path)) return true;
                 path.pop();
                 visited.delete(`${nr},${nc}`);
