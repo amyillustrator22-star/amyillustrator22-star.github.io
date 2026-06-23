@@ -24,12 +24,12 @@
 
     <style>
         :root {
-            --bg-color: #000000; /* Fondo completamente negro */
-            --grid-color: #1a1a1a; /* Contenedor oscuro */
-            --pipe-dry: #666;
-            --pipe-wet: #00bcd4;
+            --bg-color: #000000;
+            --grid-color: #111111;
+            --pipe-dry: #ffeb3b;     /* Amarillo brillante para las tuberías secas */
+            --pipe-wet: #00e5ff;     /* Cyan neón para el agua */
             --start-color: #4caf50;
-            --end-color: #f44336;
+            --end-color: #ff3d00;
         }
 
         * {
@@ -41,7 +41,10 @@
         }
 
         body {
-            background-color: var(--bg-color);
+            background-image: url('pipesfondo.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             color: #fff;
             display: flex;
@@ -56,15 +59,19 @@
 
         #ui-container {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             width: 100%;
             max-width: 400px;
+            background-color: rgba(0, 0, 0, 0.6); /* Fondo semi-transparente para leer bien los textos sobre el fondo de colores */
+            padding: 10px;
+            border-radius: 8px;
         }
 
         h1 {
-            font-size: 1.6rem;
+            font-size: 1.8rem;
             margin-bottom: 5px;
-            color: #eee;
+            color: #fff;
+            letter-spacing: 1px;
         }
 
         #timer {
@@ -77,7 +84,7 @@
         #status {
             font-size: 1rem;
             height: 2.5rem;
-            color: #aaa;
+            color: #bbb;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -87,70 +94,95 @@
         #grid-container {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 4px;
-            width: 90vw;
+            gap: 6px;
+            width: 92vw;
             max-width: 360px;
             aspect-ratio: 1;
             background-color: var(--grid-color);
-            padding: 6px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(255,255,255,0.05); /* Sutil brillo para separar del negro puro */
-            border: 1px solid #2c2c2c;
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(255, 235, 59, 0.05);
+            border: 2px solid #222;
         }
 
         .cell {
-            background-color: #222;
-            border-radius: 4px;
+            background-color: #1e1e1e;
+            border-radius: 6px;
             position: relative;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
             aspect-ratio: 1;
+            border: 1px solid #2a2a2a;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
 
         .cell svg {
             width: 100%;
             height: 100%;
-            transition: transform 0.2s ease;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
+        }
+
+        /* Diseño de tubería gruesa y estilizada */
+        .pipe-bg {
+            fill: none;
+            stroke: #0a0a0a;
+            stroke-width: 24;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
 
         .pipe-path {
             fill: none;
             stroke: var(--pipe-dry);
-            stroke-width: 14;
+            stroke-width: 16;
             stroke-linecap: round;
             stroke-linejoin: round;
+            transition: stroke 0.2s ease;
         }
 
+        /* Animación y color del agua fluyendo */
         .pipe-path.wet {
             stroke: var(--pipe-wet);
+            filter: drop-shadow(0 0 4px var(--pipe-wet));
         }
 
+        /* Bordes distintivos para entrada y salida */
+        .cell.start { background-color: #1b2e1c; border-color: var(--start-color); }
+        .cell.end { background-color: #331c1a; border-color: var(--end-color); }
+        
         .cell.start .pipe-path { stroke: var(--start-color); }
         .cell.end .pipe-path { stroke: var(--end-color); }
         .cell.start .pipe-path.wet, .cell.end .pipe-path.wet { stroke: var(--pipe-wet); }
 
         #btn-flow, .btn-action {
             margin-top: 25px;
-            padding: 10px 24px;
+            padding: 12px 28px;
             font-size: 1rem;
-            background-color: var(--pipe-wet);
+            background-color: #ffeb3b;
+            color: #000;
             border: none;
-            border-radius: 5px;
-            color: white;
+            border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(255,235,59,0.2);
+            transition: transform 0.1s;
+        }
+
+        #btn-flow:active, .btn-action:active {
+            transform: scale(0.96);
         }
 
         .btn-action {
-            margin-top: 8px;
+            margin-top: 10px;
             background-color: #333;
             border: 1px solid #444;
-            padding: 6px 14px;
+            color: #fff;
+            padding: 8px 18px;
             font-size: 0.9rem;
+            box-shadow: none;
         }
     </style>
 </head>
@@ -230,10 +262,10 @@
 
     function getPipeSVG(type) {
         let paths = '';
-        if (type === 'I') paths = '<path class="pipe-path" d="M 50 0 L 50 100" />';
-        if (type === 'L') paths = '<path class="pipe-path" d="M 50 0 Q 50 50 100 50" />';
-        if (type === 'T') paths = '<path class="pipe-path" d="M 50 0 L 50 50 M 0 50 L 100 50" />';
-        if (type === 'X') paths = '<path class="pipe-path" d="M 50 0 L 50 100 M 0 50 L 100 50" />';
+        if (type === 'I') paths = '<path class="pipe-bg" d="M 50 0 L 50 100" /><path class="pipe-path" d="M 50 0 L 50 100" />';
+        if (type === 'L') paths = '<path class="pipe-bg" d="M 50 0 Q 50 50 100 50" /><path class="pipe-path" d="M 50 0 Q 50 50 100 50" />';
+        if (type === 'T') paths = '<path class="pipe-bg" d="M 50 0 L 50 50 M 0 50 L 100 50" /><path class="pipe-path" d="M 50 0 L 50 50 M 0 50 L 100 50" />';
+        if (type === 'X') paths = '<path class="pipe-bg" d="M 50 0 L 50 100 M 0 50 L 100 50" /><path class="pipe-path" d="M 50 0 L 50 100 M 0 50 L 100 50" />';
         return `<svg viewBox="0 0 100 100">${paths}</svg>`;
     }
 
@@ -257,6 +289,7 @@
             }
         }
 
+        // Fijar extremos en los bordes superiores e inferiores
         const startR = 0, startC = Math.floor(Math.random() * (COLS - 2)) + 1;
         const endR = ROWS - 1, endC = Math.floor(Math.random() * (COLS - 2)) + 1;
 
@@ -268,23 +301,28 @@
         grid[endR][endC].type = 'I';
         grid[endR][endC].rotation = 0;
 
+        // Generar solución limpia sin interrupciones
         let solutionPath = [];
         generatePath(startR, startC, endR, endC, new Set([`${startR},${startC}`]), solutionPath);
         applyPathPipes(solutionPath);
 
+        // Rellenar las celdas vacías con formas válidas aleatorias
         const types = ['I', 'L', 'T', 'X'];
         for (let r = 0; r < ROWS; r++) {
             for (let c = 0; c < COLS; c++) {
                 let cell = grid[r][c];
-                if (!solutionPath.some(p => p.r === r && p.c === c)) {
+                const isSol = solutionPath.some(p => p.r === r && p.c === c);
+                if (!isSol) {
                     cell.type = types[Math.floor(Math.random() * types.length)];
                 }
+                // Scramble: Rotación aleatoria inicial para desordenar el puzle al empezar
                 if (!cell.isStart && !cell.isEnd) {
                     cell.rotation = Math.floor(Math.random() * 4);
                 }
             }
         }
 
+        // Renderizado e inyección del DOM
         for (let r = 0; r < ROWS; r++) {
             for (let c = 0; c < COLS; c++) {
                 const cell = grid[r][c];
