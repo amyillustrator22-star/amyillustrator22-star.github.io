@@ -1,532 +1,68 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Pipes</title>
+    <title>Pipes - AmySoftware</title>
+    
+    <script>
+        window.AMY_DICT = {
+            "status_msg": {
+                "es": "Juego en construcción, próximamente.",
+                "en": "Game under construction, coming soon."
+            }
+        };
+    </script>
+
+    <script src="i18n.js"></script>
+
     <style>
-        :root {
-            --bg-color: #1a1a1a;
-            --grid-color: #2c2c2c;
-            --pipe-empty: #444;
-            --pipe-dry: #888;
-            --pipe-wet: #00bcd4;
-            --start-color: #4caf50;
-            --end-color: #f44336;
-        }
-
-        * {
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-user-select: none;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
-            background-color: var(--bg-color);
+            background-color: #1a1a1a;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: #fff;
+            color: #ffffff;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
-            overflow: hidden;
-            touch-action: manipulation;
-        }
-
-        #ui-container {
+            margin: 0;
+            padding: 20px;
             text-align: center;
-            margin-bottom: 15px;
-            width: 100%;
-            max-width: 400px;
-            padding: 0 10px;
+            box-sizing: border-box;
         }
 
         h1 {
             font-size: 1.5rem;
-            margin-bottom: 5px;
-            color: #eee;
+            font-weight: normal;
+            color: #eceff1;
+            letter-spacing: 0.5px;
         }
 
-        #timer {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #ff9800;
-            margin-bottom: 5px;
-        }
-
-        #instruction {
-            font-size: 1rem;
-            color: #aaa;
-            margin-bottom: 10px;
-        }
-
-        /* --- AQUÍ ESTÁ EL ARREGLO DEL MENSAJE CORTADO --- */
-        #status {
-            position: fixed;
-            top: 15%; 
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.95);
-            padding: 20px 30px;
-            border-radius: 12px;
-            z-index: 9999;
-            font-size: 1.2rem;
-            color: #fff;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.8);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            text-align: center;
-            transition: opacity 0.3s;
+        /* Estilos ocultos para el Honeypot (trampa para bots de spam) */
+        .visually-hidden-fields {
+            position: absolute;
+            left: -5000px;
+            top: -5000px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
             opacity: 0;
-            pointer-events: none; 
-        }
-        
-        #status.show {
-            opacity: 1;
-            pointer-events: auto; 
-        }
-
-        #grid-container {
-            display: grid;
-            gap: 4px;
-            width: 90vw;
-            max-width: 380px;
-            aspect-ratio: 1;
-            background-color: var(--grid-color);
-            padding: 4px;
-            border-radius: 8px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-        }
-
-        .cell {
-            background-color: #333;
-            border-radius: 4px;
-            position: relative;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            aspect-ratio: 1;
-        }
-
-        .cell svg {
-            width: 100%;
-            height: 100%;
-            transition: transform 0.2s ease;
-            pointer-events: none;
-        }
-
-        .pipe-path {
-            fill: none;
-            stroke: var(--pipe-dry);
-            stroke-width: 14;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        .pipe-path.wet {
-            stroke: var(--pipe-wet);
-        }
-
-        .cell.start .pipe-path { stroke: var(--start-color); }
-        .cell.end .pipe-path { stroke: var(--end-color); }
-        .cell.start .pipe-path.wet, .cell.end .pipe-path.wet { stroke: var(--pipe-wet); }
-
-        #btn-flow {
-            margin-top: 15px;
-            padding: 10px 20px;
-            font-size: 1rem;
-            background-color: var(--pipe-wet);
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-
-        #btn-flow:active {
-            transform: scale(0.98);
         }
     </style>
 </head>
 <body>
 
-    <div id="ui-container">
-        <h1 id="game-title">Pipe Mania</h1>
-        <div id="timer">Water flows in: 30s</div>
-        <div id="instruction">Tap pipes to rotate them!</div>
+    <h1 data-i18n="status_msg">Juego en construcción, próximamente.</h1>
+
+    <div class="visually-hidden-fields" aria-hidden="true">
+        <form action="#" method="POST" tabindex="-1">
+            <label for="website_url">Do not fill this field if you are human:</label>
+            <input type="text" id="website_url" name="website_url" autocomplete="off" tabindex="-1">
+            <label for="honeypot_email">Leave empty:</label>
+            <input type="email" id="honeypot_email" name="honeypot_email" autocomplete="off" tabindex="-1">
+        </form>
     </div>
 
-    <div id="status"></div>
-
-    <div id="grid-container"></div>
-
-    <button id="btn-flow" onclick="triggerEarlyFlow()">Flow Now!</button>
-
-<script>
-    // Variables de Nivel
-    let currentLevel = 1;
-    let baseTime = 30;
-    let flowSpeed = 400; 
-    
-    // Variables de Cuadrícula
-    let ROWS = 6;
-    let COLS = 6;
-    let grid = [];
-    let startTime = 30;
-    let timerInterval = null;
-    let flowInterval = null;
-    let isFlowing = false;
-    let gameOver = false;
-
-    const DX = [0, 1, 0, -1];
-    const DY = [-1, 0, 1, 0];
-
-    const PIPE_TYPES = {
-        'I': [true, false, true, false], 
-        'L': [true, true, false, false], 
-        'T': [true, true, false, true],  
-        'X': [true, true, true, true]    
-    };
-
-    class Cell {
-        constructor(r, c) {
-            this.r = r;
-            this.c = c;
-            this.isStart = false;
-            this.isEnd = false;
-            this.type = 'I'; 
-            this.rotation = 0; 
-            this.wet = false;
-        }
-
-        getConnections() {
-            const base = PIPE_TYPES[this.type];
-            let actual = [false, false, false, false];
-            for (let i = 0; i < 4; i++) {
-                actual[(i + this.rotation) % 4] = base[i];
-            }
-            return actual;
-        }
-
-        rotate() {
-            if (this.isStart || this.isEnd || isFlowing || gameOver) return;
-            this.rotation = (this.rotation + 1) % 4;
-            this.render();
-        }
-
-        render() {
-            const el = document.getElementById(`cell-${this.r}-${this.c}`);
-            if (!el) return;
-            
-            const svg = el.querySelector('svg');
-            if (svg) {
-                svg.style.transform = `rotate(${this.rotation * 90}deg)`;
-                const paths = svg.querySelectorAll('.pipe-path');
-                paths.forEach(p => {
-                    if (this.wet) p.classList.add('wet');
-                    else p.classList.remove('wet');
-                });
-            }
-        }
-    }
-
-    function getPipeSVG(type) {
-        let paths = '';
-        if (type === 'I') paths = '<path class="pipe-path" d="M 50 0 L 50 100" />';
-        if (type === 'L') paths = '<path class="pipe-path" d="M 50 0 Q 50 50 100 50" />';
-        if (type === 'T') paths = '<path class="pipe-path" d="M 50 0 L 50 50 M 0 50 L 100 50" />';
-        if (type === 'X') paths = '<path class="pipe-path" d="M 50 0 L 50 100 M 0 50 L 100 50" />';
-        return `<svg viewBox="0 0 100 100">${paths}</svg>`;
-    }
-
-    function initGame() {
-        grid = [];
-        isFlowing = false;
-        gameOver = false;
-        
-        // Ajustar dificultad según el nivel dinámicamente
-        ROWS = Math.min(10, 5 + Math.floor(currentLevel / 2)); 
-        COLS = Math.min(10, 5 + Math.floor(currentLevel / 2));
-        startTime = Math.max(10, baseTime - (currentLevel - 1) * 2); 
-        flowSpeed = Math.max(100, 400 - (currentLevel - 1) * 30); 
-
-        document.getElementById('game-title').innerText = `Pipe Mania - Nivel ${currentLevel}`;
-        document.getElementById('timer').innerText = `Water flows in: ${startTime}s`;
-        
-        // Ocultar mensaje final
-        const statusEl = document.getElementById('status');
-        statusEl.classList.remove('show');
-        statusEl.innerHTML = ''; 
-
-        document.getElementById('btn-flow').style.display = 'inline-block';
-
-        const container = document.getElementById('grid-container');
-        container.innerHTML = '';
-        container.style.gridTemplateColumns = `repeat(${COLS}, 1fr)`;
-
-        // Setup blank grid
-        for (let r = 0; r < ROWS; r++) {
-            grid[r] = [];
-            for (let c = 0; c < COLS; c++) {
-                grid[r][c] = new Cell(r, c);
-            }
-        }
-
-        // Define Start and End Points
-        const startR = 0, startC = Math.floor(Math.random() * (COLS - 2)) + 1;
-        const endR = ROWS - 1, endC = Math.floor(Math.random() * (COLS - 2)) + 1;
-
-        grid[startR][startC].isStart = true;
-        grid[startR][startC].type = 'I'; 
-        grid[startR][startC].rotation = 0; 
-
-        grid[endR][endC].isEnd = true;
-        grid[endR][endC].type = 'I';
-        grid[endR][endC].rotation = 0;
-
-        // Generate Path
-        let solutionPath = [];
-        generatePath(startR, startC, endR, endC, new Set([`${startR},${startC}`]), solutionPath);
-
-        // Transform steps into pipes (LA FUNCIÓN QUE SUBISTE ARREGLADA)
-        applyPathPipes(solutionPath);
-
-        // Fill rest with random
-        const types = ['I', 'L', 'T', 'X'];
-        for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                let cell = grid[r][c];
-                if (!solutionPath.some(p => p.r === r && p.c === c)) {
-                    cell.type = types[Math.floor(Math.random() * types.length)];
-                }
-                if (!cell.isStart && !cell.isEnd) {
-                    cell.rotation = Math.floor(Math.random() * 4);
-                }
-            }
-        }
-
-        // Draw elements into DOM
-        for (let r = 0; r < ROWS; r++) {
-            for (let c = 0; c < COLS; c++) {
-                const cell = grid[r][c];
-                const div = document.createElement('div');
-                div.id = `cell-${r}-${c}`;
-                div.className = `cell${cell.isStart ? ' start' : ''}${cell.isEnd ? ' end' : ''}`;
-                div.innerHTML = getPipeSVG(cell.type);
-                
-                div.addEventListener('pointerdown', (e) => {
-                    e.preventDefault();
-                    cell.rotate();
-                });
-                
-                container.appendChild(div);
-                cell.render();
-            }
-        }
-
-        // Countdown
-        clearInterval(timerInterval);
-        clearInterval(flowInterval);
-        timerInterval = setInterval(() => {
-            startTime--;
-            if (startTime <= 0) {
-                clearInterval(timerInterval);
-                startWaterFlow();
-            } else {
-                document.getElementById('timer').innerText = `Water flows in: ${startTime}s`;
-            }
-        }, 1000);
-    }
-
-    function generatePath(r, c, er, ec, visited, path) {
-        if (r === er && c === ec) {
-            path.push({r, c});
-            return true;
-        }
-
-        let dirs = [0, 1, 2, 3].sort(() => Math.random() - 0.5);
-        for (let d of dirs) {
-            let nr = r + DY[d];
-            let nc = c + DX[d];
-
-            if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && !visited.has(`${nr},${nc}`)) {
-                visited.add(`${nr},${nc}`);
-                path.push({r, c});
-                if (generatePath(nr, nc, er, ec, visited, path)) return true;
-                path.pop();
-                visited.delete(`${nr},${nc}`);
-            }
-        }
-        return false;
-    }
-
-   function applyPathPipes(path) {
-    for (let i = 1; i < path.length - 1; i++) {
-        let prev = path[i-1];
-        let curr = path[i];
-        let next = path[i+1];
-        let d1 = getDir(curr, prev);
-        let d2 = getDir(curr, next);
-        let cell = grid[curr.r][curr.c];
-
-        // Normalizar direcciones para comparar
-        // Si las direcciones son opuestas (ej. 0 y 2, 1 y 3), es una tubería recta (T)
-        if (Math.abs(d1 - d2) === 2) {
-            cell.type = 'T';
-            cell.rotation = (d1 % 2 === 0) ? 0 : 1;
-        } else {
-            // Si es una esquina (L)
-            cell.type = 'L';
-            // Calcular la rotación correcta basada en las direcciones
-            if ((d1 === 0 && d2 === 1) || (d1 === 1 && d2 === 0)) cell.rotation = 0;
-            else if ((d1 === 1 && d2 === 2) || (d1 === 2 && d2 === 1)) cell.rotation = 1;
-            else if ((d1 === 2 && d2 === 3) || (d1 === 3 && d2 === 2)) cell.rotation = 2;
-            else if ((d1 === 3 && d2 === 0) || (d1 === 0 && d2 === 3)) cell.rotation = 3;
-        }
-    }
-
-    // Orientar correctamente las tuberías estáticas de inicio y fin
-    if (path.length > 1) {
-        let startCell = grid[path[0].r][path[0].c];
-        let startDir = getDir(path[0], path[1]);
-        startCell.rotation = (startDir === 0 || startDir === 2) ? 0 : 1;
-
-        let endCell = grid[path[path.length - 1].r][path[path.length - 1].c];
-        let endDir = getDir(path[path.length - 1], path[path.length - 2]);
-        endCell.rotation = (endDir === 0 || endDir === 2) ? 0 : 1;
-    }
-}
-
-    function getDir(from, to) {
-        if (to.r < from.r) return 0; 
-        if (to.c > from.c) return 1; 
-        if (to.r > from.r) return 2; 
-        if (to.c < from.c) return 3; 
-        return 0;
-    }
-
-    function triggerEarlyFlow() {
-        if (isFlowing || gameOver) return;
-        clearInterval(timerInterval);
-        startWaterFlow();
-    }
-
-    function startWaterFlow() {
-        isFlowing = true;
-        document.getElementById('btn-flow').style.display = 'none';
-        document.getElementById('timer').innerText = "WATER IS FLOWING!";
-
-        let startCell = null;
-        for(let r=0; r<ROWS; r++){
-            for(let c=0; c<COLS; c++){
-                if(grid[r][c].isStart) startCell = grid[r][c];
-            }
-        }
-
-        let queue = [startCell];
-        startCell.wet = true;
-        startCell.render();
-
-        flowInterval = setInterval(() => {
-            let nextQueue = [];
-            let expanded = false;
-
-            for (let cell of queue) {
-                let connections = cell.getConnections();
-
-                for (let d = 0; d < 4; d++) {
-                    if (connections[d]) { 
-                        let nr = cell.r + DY[d];
-                        let nc = cell.c + DX[d];
-
-                        if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS) {
-                            let neighbor = grid[nr][nc];
-                            if (!neighbor.wet) {
-                                let neighborConnections = neighbor.getConnections();
-                                let matchingDir = (d + 2) % 4; 
-
-                                if (neighborConnections[matchingDir]) {
-                                    neighbor.wet = true;
-                                    neighbor.render();
-                                    nextQueue.push(neighbor);
-                                    expanded = true;
-
-                                    if (neighbor.isEnd) {
-                                        handleGameEnd(true);
-                                        return;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            if (!expanded && !gameOver) {
-                handleGameEnd(false); 
-            }
-            queue = nextQueue;
-        }, flowSpeed); 
-    }
-
-    // --- FUNCIONES DE NIVEL ---
-    function nextLevel() {
-        currentLevel++;
-        initGame();
-    }
-
-    function retryGame() {
-        currentLevel = 1; 
-        initGame();
-    }
-
-    function handleGameEnd(won) {
-        gameOver = true;
-        clearInterval(flowInterval);
-        const statusEl = document.getElementById('status');
-        
-        if (won) {
-            statusEl.innerHTML = `🎉 ¡Nivel ${currentLevel} Superado! 🎉<br><button onclick='nextLevel()' style='margin-top:15px; padding:10px 20px; font-weight:bold; background:#4caf50; border:none; border-radius:5px; color:white; cursor:pointer;'>Siguiente Nivel ➡️</button>`;
-        } else {
-            statusEl.innerHTML = `❌ ¡Fuga Detectada! ❌<br><span style="font-size:0.9rem; color:#f44336;">Llegaste al Nivel ${currentLevel}</span><br><button onclick='retryGame()' style='margin-top:15px; padding:10px 20px; font-weight:bold; background:#f44336; border:none; border-radius:5px; color:white; cursor:pointer;'>Reintentar</button>`;
-        }
-        
-        statusEl.classList.add('show');
-    }
-
-    window.onload = initGame;
-
-    // --- HONEYPOT DE SEGURIDAD INTACTO ---
-    let wasFlowing = false;
-
-    setInterval(() => {
-        if (typeof isFlowing !== 'undefined' && isFlowing) {
-            wasFlowing = true;
-        }
-    }, 30);
-
-    const _originalInit = initGame;
-    initGame = function() {
-        wasFlowing = false;
-        _originalInit();
-    };
-
-    const _win = handleGameEnd;
-    handleGameEnd = function(won) {
-        if (won && !wasFlowing) {
-            console.warn("Intento de manipulación detectado.");
-            return;
-        }
-        _win(won);
-    };
-
-</script>
 </body>
 </html>
