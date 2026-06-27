@@ -83,8 +83,8 @@
             appInstallBtn: { es: "Instalar en Google Play", en: "Install on Google Play" },
             aboutTitle: { es: "ℹ️ SOBRE AMY SOFTWARE", en: "ℹ️ ABOUT AMY SOFTWARE" },
             aboutDesc: {
-                es: "Somos un pequeño estudio independiente que desarrolla aplicaciones y juegos pensados para entretener, conectar e incluir. Este Arcade Center reúne nuestros minijuegos HTML5 más divertidos, con clasificaciones mundiales en tiempo real para que compitas con jugadores de todo el mundo. Síguenos en instagram @amysoftware para estar al día de nuestras publicaciones",
-                en: "We're a small independent studio building apps and games meant to entertain, connect, and include. This Arcade Center brings together our most fun HTML5 mini-games, with real-time global leaderboards so you can compete with players from all over the world. Follow us on @amysoftware in instagram to check our updates"
+                es: "Somos un pequeño estudio independiente que desarrolla aplicaciones y juegos pensados para entretener, conectar e incluir. Este Arcade Center reúne nuestros minijuegos HTML5 más divertidos, con clasificaciones mundiales en tiempo real para que compitas con jugadores de todo el mundo. Desarrollado con pasión por una desarrolladora con TEA. Síguenos en instagram @amysoftware para estar al día de nuestras publicaciones",
+                en: "We're a small independent studio building apps and games meant to entertain, connect, and include. This Arcade Center brings together our most fun HTML5 mini-games, with real-time global leaderboards so you can compete with players from all over the world. Developed by an autistic developer. Follow us on @amysoftware in instagram to check our updates"
             },
             sugTitle: { es: "✍️ SUGERENCIAS Y FIRMAS ✍️", en: "✍️ FEEDBACK & GUESTBOOK ✍️" },
             sugSub: { es: "Déjame tu opinión (Sujeta a moderación previa)", en: "Leave your feedback (Subject to review before publishing)" },
@@ -119,8 +119,6 @@
             footerAbout: { es: "Sobre Nosotros", en: "About Us" },
             footerSignatures: { es: "Firmas y Sugerencias", en: "Guestbook & Feedback" },
             copyright: { es: "© 2026 Amy Software. Todos los derechos reservados.", en: "© 2026 Amy Software. All rights reserved." },
-            
-            // Nuevas claves añadidas para el banner de consentimiento requeridas por Google
             cookie_title: { es: "Control de tu Privacidad", en: "Your Privacy Control" },
             cookie_text: {
                 es: "Utilizamos tecnologías propias y de terceros para almacenar información y acceder a los datos de navegación de tu dispositivo con el fin de mostrarte anuncios personalizados, medir su rendimiento y mejorar tu experiencia. Puedes configurar o rechazar su uso haciendo clic en los botones inferiores.",
@@ -179,7 +177,7 @@
 
     <section class="w-full max-w-3xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-12 mx-4 text-center">
         <p id="intro-text" data-i18n-html="introText" class="text-gray-800 text-base sm:text-lg leading-relaxed font-medium">
-            Bienvenida/o al <strong>Arcade Center</strong> de Amy Software: una colección de minijuegos HTML5 pensada para entrenar tu mente y competir en clasificaciones mundiales, sin descargas ni instalaciones. Elige un juego, supera tu propio récord y compara tu puntuación con el resto de la comunidad.
+            Bienvenida/o al <strong>Arcade Center</strong> de Amy Software: una colección de minijuegos HTML5 pensada para entrenar tu mente y competir en clasificaciones mundiales, sin descargas ni installations. Elige un juego, supera tu propio récord y compara tu puntuación con el resto de la comunidad.
         </p>
     </section>
 
@@ -189,6 +187,27 @@
         </button>
         <iframe id="pantalla-juego" src="" class="w-full rounded-2xl border-4 border-slate-800 bg-black shadow-inner" style="height: 850px !important; min-height: 850px !important;"></iframe>
     </div>
+
+    <section id="apps-section" class="w-full max-w-4xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-16 mx-4 border-2 border-indigo-400/50 shadow-[0_0_30px_rgba(99,102,241,0.25)]">
+        <h2 id="apps-title" data-i18n="appsTitle" class="text-3xl font-black text-center text-gray-900 mb-4 tracking-tight flex items-center justify-center gap-2">📱 NUESTRAS APPS</h2>
+        <p id="apps-desc" data-i18n="appsDesc" class="text-center text-gray-700 font-semibold mb-8 max-w-xl mx-auto">
+            Descubre el resto del ecosistema Amy Software directamente en tu móvil Android.
+        </p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            <div class="bg-gradient-to-br from-purple-600/10 to-transparent backdrop-blur-md rounded-[2rem] p-8 flex flex-col items-center text-center border border-purple-500/30 shadow-md hover:shadow-xl transition-all duration-300">
+                <div class="bg-purple-600 text-white p-4 rounded-2xl mb-4 shadow-md font-bold text-2xl">💖</div>
+                <h3 class="text-xl font-extrabold text-gray-900 mb-2">VibezMatch</h3>
+                <p id="app-vibez-desc" data-i18n="appVibezDesc" class="text-base text-gray-700 mb-6 leading-relaxed font-medium">Tu app de citas inclusiva para la comunidad LGTBI, personas con discapacidad y cualquier neurotipo.</p>
+                <a id="app-link-vibez" data-i18n="appInstallBtn" href="https://play.google.com/store/apps/details?id=com.afy.vibezmatch&hl=es" target="_blank" rel="noopener noreferrer" class="mt-auto px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md tracking-wide transition-all uppercase text-xs">Instalar en Google Play</a>
+            </div>
+            <div class="bg-gradient-to-br from-emerald-600/10 to-transparent backdrop-blur-md rounded-[2rem] p-8 flex flex-col items-center text-center border border-emerald-500/30 shadow-md hover:shadow-xl transition-all duration-300">
+                <div class="bg-emerald-600 text-white p-4 rounded-2xl mb-4 shadow-md font-bold text-2xl">🥗</div>
+                <h3 class="text-xl font-extrabold text-gray-900 mb-2">DietCheck</h3>
+                <p id="app-diet-desc" data-i18n="appDietDesc" class="text-base text-gray-700 mb-6 leading-relaxed font-medium">No sabes que comer cuando sales a un restaurante? Escanea códigos de barras o QR al instante y nuestra IA nutricionista integrada te dirá que comer.</p>
+                <a id="app-link-diet" data-i18n="appInstallBtn" href="https://play.google.com/store/apps/details?id=com.afy.dietcheck&hl=es" target="_blank" rel="noopener noreferrer" class="mt-auto px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md tracking-wide transition-all uppercase text-xs">Instalar en Google Play</a>
+            </div>
+        </div>
+    </section>
 
     <main id="menu-juegos" class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16 px-4">
         
@@ -334,29 +353,10 @@
         </a>
     </section>
 
-    <section id="apps-section" class="w-full max-w-4xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-16 mx-4">
-        <h2 id="apps-title" data-i18n="appsTitle" class="text-2xl font-extrabold text-center text-gray-900 mb-6 tracking-tight flex items-center justify-center gap-2">📱 NUESTRAS APPS</h2>
-        <p id="apps-desc" data-i18n="appsDesc" class="text-center text-gray-700 font-medium mb-8 max-w-xl mx-auto">
-            Descubre el resto del ecosistema Amy Software directamente en tu móvil Android.
-        </p>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div class="bg-white/50 rounded-3xl p-6 flex flex-col items-center text-center shadow-inner border border-white/30">
-                <h3 class="text-lg font-bold text-gray-900 mb-2">VibezMatch</h3>
-                <p id="app-vibez-desc" data-i18n="appVibezDesc" class="text-sm text-gray-700 mb-4 leading-relaxed">Tu app de citas inclusiva para la comunidad LGTBI, personas con discapacidad y cualquier neurotipo.</p>
-                <a id="app-link-vibez" data-i18n="appInstallBtn" href="https://play.google.com/store/apps/details?id=com.afy.vibezmatch&hl=es" target="_blank" rel="noopener noreferrer" class="text-sm text-purple-600 font-bold uppercase tracking-wider hover:underline">Instalar en Google Play</a>
-            </div>
-            <div class="bg-white/50 rounded-3xl p-6 flex flex-col items-center text-center shadow-inner border border-white/30">
-                <h3 class="text-lg font-bold text-gray-900 mb-2">DietCheck</h3>
-                <p id="app-diet-desc" data-i18n="appDietDesc" class="text-sm text-gray-700 mb-4 leading-relaxed">Escanea códigos de barras o QR al instante con IA nutricionista integrada.</p>
-                <a id="app-link-diet" data-i18n="appInstallBtn" href="https://play.google.com/store/apps/details?id=com.afy.dietcheck&hl=es" target="_blank" rel="noopener noreferrer" class="text-sm text-emerald-600 font-bold uppercase tracking-wider hover:underline">Instalar en Google Play</a>
-            </div>
-        </div>
-    </section>
-
     <section id="about-section" class="w-full max-w-2xl glass-card rounded-[2.5rem] p-6 sm:p-8 mb-16 mx-4 text-center">
         <h2 id="about-title" data-i18n="aboutTitle" class="text-2xl font-extrabold text-gray-900 mb-4 tracking-tight flex items-center justify-center gap-2">ℹ️ SOBRE AMY SOFTWARE</h2>
         <p id="about-desc" data-i18n="aboutDesc" class="text-gray-700 font-medium leading-relaxed">
-            Somos un pequeño estudio independiente que desarrolla aplicaciones y juegos pensados para entretener, conectar e incluir. Este Arcade Center reúne nuestros minijuegos HTML5 más divertidos, con clasificaciones mundiales en tiempo real para que compitas con jugadores de todo el mundo.
+            Somos un pequeño estudio independiente que desarrolla aplicaciones y juegos pensados para entretener, conectar e incluir. Este Arcade Center reúne nuestros minijuegos HTML5 más divertidos, con clasificaciones mundiales en tiempo real para que compitas con jugadores de todo el mundo. Síguenos en instagram @amysoftware para estar al día de nuestras publicaciones
         </p>
     </section>
 
@@ -421,11 +421,10 @@
             <div style="margin-bottom: 25px; font-size: 0.9rem;">
                 <a href="privacidad.html" data-i18n="privacy_link_text" style="color: #00e5ff; text-decoration: none; font-weight: bold;">Política de Privacidad y Términos</a>
             </div>
-           <div style="display: flex; gap: 10px; justify-content: center;">
-    <!-- Este botón ahora mostrará "Aceptar Términos y Privacidad" gracias al diccionario -->
-    <button onclick="setConsent(true)" data-i18n="cookie_accept" style="background-color: #4caf50; color: white; border: none; padding: 12px 24px; font-size: 0.95rem; font-weight: bold; border-radius: 6px; cursor: pointer; flex: 1;">Aceptar Términos y Privacidad</button>
-    <button onclick="setConsent(false)" data-i18n="cookie_reject" style="background-color: #333; color: #aaa; border: 1px solid #444; padding: 12px 24px; font-size: 0.95rem; font-weight: bold; border-radius: 6px; cursor: pointer; flex: 1;">Rechazar todo</button>
-</div>
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <button onclick="setConsent(true)" data-i18n="cookie_accept" style="background-color: #4caf50; color: white; border: none; padding: 12px 24px; font-size: 0.95rem; font-weight: bold; border-radius: 6px; cursor: pointer; flex: 1;">Aceptar Términos y Privacidad</button>
+                <button onclick="setConsent(false)" data-i18n="cookie_reject" style="background-color: #333; color: #aaa; border: 1px solid #444; padding: 12px 24px; font-size: 0.95rem; font-weight: bold; border-radius: 6px; cursor: pointer; flex: 1;">Rechazar todo</button>
+            </div>
         </div>
     </div>
 
