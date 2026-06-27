@@ -1,6 +1,6 @@
 // 1. Importaciones oficiales de Firebase SDK (versión modular)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, query, orderBy, limit, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, query, orderBy, limit, getDocs, addDoc, serverTimestamp, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 2. Configuración de Firebase para tu proyecto VibezMatch
 const firebaseConfig = {
@@ -25,7 +25,7 @@ export async function switchLeaderboard(gameId) {
     const rowsContainer = document.getElementById("leaderboard-rows");
     if (!rowsContainer) return;
 
-    // 1. CORREGIDO: Seleccionamos los botones buscando directamente dentro de la sección de Récords Mundiales
+    // 1. Cambiar el estilo visual de los botones
     const buttons = document.querySelectorAll("#board-title + div button");
     buttons.forEach(btn => {
         if (btn.getAttribute("data-game") === gameId) {
@@ -39,20 +39,23 @@ export async function switchLeaderboard(gameId) {
     rowsContainer.innerHTML = `<div id="loading-msg" class="px-4 py-4 text-center text-gray-500 w-full font-medium">Cargando puntuaciones online...</div>`;
 
     try {
-        // Lógica de mapeo: Si es dog_eater va a scores_arcade, si no, usa records_ + gameId
-        const nombreColeccion = (gameId === "dog_eater") ? "scores_arcade" : ("records_" + gameId);
+        // Buscamos siempre en scores_arcade filtrando por el gameId
+        const q = query(
+            collection(db, "scores_arcade"), 
+            where("game", "==", gameId), 
+            orderBy("score", "desc"), 
+            limit(10)
+        );
         
-        const q = query(collection(db, nombreColeccion), orderBy("score", "desc"), limit(10));
         const querySnapshot = await getDocs(q);
-
         rowsContainer.innerHTML = ""; // Limpiar contenedor
 
         if (querySnapshot.empty) {
-            rowsContainer.innerHTML = `<div class="px-4 py-4 text-center text-gray-500 w-full italic">¡Nadie ha registrado récords aún! Sé el primero.</div>`;
+            rowsContainer.innerHTML = `<div class="px-4 py-4 text-center text-gray-500 w-full italic">¡Nadie ha registrado récords aún para el juego '${gameId}'! Sé el primero.</div>`;
             return;
         }
 
-        // 4. CORREGIDO: Renderizado limpio usando una variable clásica de incremento para evitar NaN
+        // 4. Renderizar las filas con las puntuaciones devueltas
         let index = 1;
         querySnapshot.forEach((doc) => {
             const data = doc.data();
@@ -71,7 +74,11 @@ export async function switchLeaderboard(gameId) {
         });
 
     } catch (error) {
-        console.error("Error al obtener marcadores de Firestore: ", error);
+        // MODO DIAGNÓSTICO EN CONSOLA (F12)
+        console.error("%c--- ERROR CRÍTICO EN FIRESTORE ---", "color: white; background: red; font-weight: bold; padding: 4px;");
+        console.error("Mensaje:", error.message);
+        console.error("Código de error:", error.code);
+        
         rowsContainer.innerHTML = `<div class="px-4 py-4 text-center text-red-600 w-full font-bold">Error al conectar con los récords mundiales.</div>`;
     }
 }
