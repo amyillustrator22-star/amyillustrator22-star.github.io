@@ -90,12 +90,15 @@ async function enviarSugerencia() {
 
     const autorInput = document.getElementById("sug-autor");
     const mensajeInput = document.getElementById("sug-mensaje");
+    // LEEMOS EL CAMPO DE EMAIL DEL HTML (Asegúrate de que el id en tu HTML sea "sug-email")
+    const emailInput = document.getElementById("sug-email") || document.getElementById("sug-correo");
     const msgExito = document.getElementById("msg-envio-exito");
 
     if (!autorInput || !mensajeInput) return;
 
     const autor = autorInput.value.trim();
     const mensaje = mensajeInput.value.trim();
+    const email = emailInput ? emailInput.value.trim() : "";
 
     if (autor === "" || mensaje === "") {
         alert("Por favor, rellena tu nombre y el comentario.");
@@ -107,6 +110,7 @@ async function enviarSugerencia() {
         await addDoc(collection(db, "sugerencias"), {
             author: autor,
             message: mensaje,
+            email: email, // <--- Ahora sí añadimos el correo al documento de Firebase
             approved: false, // Se guarda como falso para moderación previa por tu parte
             timestamp: serverTimestamp()
         });
@@ -114,14 +118,18 @@ async function enviarSugerencia() {
         // Limpiar formulario y mostrar éxito
         autorInput.value = "";
         mensajeInput.value = "";
+        if (emailInput) emailInput.value = "";
+        
         if (msgExito) {
             msgExito.classList.remove("hidden");
             setTimeout(() => msgExito.classList.add("hidden"), 5000);
+        } else {
+            alert("¡Comentario enviado con éxito! Aparecerá cuando sea moderado.");
         }
 
     } catch (error) {
         console.error("Error al guardar la sugerencia en Firestore: ", error);
-        alert("Error al enviar el comentario.");
+        alert("Error al enviar el comentario. Revisa los permisos.");
     }
 }
 
