@@ -55,19 +55,19 @@ export async function switchLeaderboard(gameId) {
             return;
         }
 
-        // 4. Renderizar las filas con las puntuaciones devueltas
+        // 4. Renderizar las filas con las puntuaciones devueltas (¡CON LAS BANDERITAS!)
         let index = 1;
         querySnapshot.forEach((doc) => {
             const data = doc.data();
             const player = data.player || "Anónimo";
             const score = data.score ?? 0;
+            const country = data.country || "🏴‍☠️"; // 🌟 Recuperamos el país guardado
 
             const row = document.createElement("div");
             row.className = "grid grid-cols-3 px-4 py-3 font-medium text-gray-800 border-b border-black/5";
             row.innerHTML = `
                 <div>${index}°</div>
-                <div class="truncate">${player}</div>
-                <div class="text-right font-bold text-slate-900">${score}</div>
+                <div class="truncate">${country} ${player}</div> <div class="text-right font-bold text-slate-900">${score}</div>
             `;
             rowsContainer.appendChild(row);
             index++;
