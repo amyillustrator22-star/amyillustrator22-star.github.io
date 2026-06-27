@@ -24,7 +24,7 @@ try {
 }
 
 // FUNCIÓN PARA CAMBIAR RÉCORDS
-async function switchLeaderboard(gameId) {
+export async function switchLeaderboard(gameId) {
     const rowsContainer = document.getElementById("leaderboard-rows");
     if (!rowsContainer) return;
 
