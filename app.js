@@ -21,13 +21,12 @@ const db = getFirestore(app);
  * LÓGICA DE LOS RÉCORDS MUNDIALES (LEADERBOARDS)
  * ==========================================
  */
-// ¡AQUÍ ESTÁ EL CAMBIO! Añadimos "export" al principio de la función
 export async function switchLeaderboard(gameId) {
     const rowsContainer = document.getElementById("leaderboard-rows");
     if (!rowsContainer) return;
 
-    // 1. Cambiar el estilo visual de los botones
-    const buttons = document.querySelectorAll("#apps-section + section button[id^='btn-']");
+    // 1. CORREGIDO: Seleccionamos los botones buscando directamente dentro de la sección de Récords Mundiales
+    const buttons = document.querySelectorAll("#board-title + div button");
     buttons.forEach(btn => {
         if (btn.getAttribute("data-game") === gameId) {
             btn.className = "px-4 py-2 text-sm font-bold rounded-xl transition-all duration-200 bg-pink-600 text-white shadow-md";
@@ -53,7 +52,7 @@ export async function switchLeaderboard(gameId) {
             return;
         }
 
-        // 4. Renderizar las filas con las puntuaciones devueltas
+        // 4. CORREGIDO: Renderizado limpio usando una variable clásica de incremento para evitar NaN
         let index = 1;
         querySnapshot.forEach((doc) => {
             const data = doc.data();
@@ -83,7 +82,6 @@ export async function switchLeaderboard(gameId) {
  * ==========================================
  */
 async function enviarSugerencia() {
-    // VERIFICACIÓN CRÍTICA DE SEGURIDAD: CONTROL DEL HONEYPOT
     const honeypot = document.getElementById("sys_security_feedback_hp");
     if (honeypot && honeypot.value !== "") {
         console.warn("Intento de spam bloqueado por el Honeypot.");
@@ -102,7 +100,7 @@ async function enviarSugerencia() {
     const email = emailInput ? emailInput.value.trim() : "";
 
     if (autor === "" || mensaje === "") {
-        alert("Por favor, rellena tu nombre and el comentario.");
+        alert("Por favor, rellena tu nombre y el comentario.");
         return;
     }
 
@@ -142,5 +140,5 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// EXPOSICIÓN GLOBAL PARA EL HTML (Mantenemos esto por si acaso)
+// EXPOSICIÓN GLOBAL PARA EL HTML
 window.switchLeaderboard = switchLeaderboard;
