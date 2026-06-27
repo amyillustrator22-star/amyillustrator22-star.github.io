@@ -13,10 +13,30 @@
         "collectionGroup": "sugerencias",
         "queryScope": "COLLECTION",
         "fields": [
-          { "fieldPath": "approved", "order": "ASCENDING" },
-          { "fieldPath": "timestamp", "order": "ASCENDING" }
+          {
+            "fieldPath": "approved",
+            "order": "ASCENDING"
+          },
+          {
+            "fieldPath": "timestamp",
+            "order": "ASCENDING"
+          }
         ]
       }
     ]
-  }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
 }

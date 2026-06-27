@@ -3,9 +3,8 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { getFirestore, collection, query, orderBy, limit, getDocs, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 2. Configuración de Firebase para tu proyecto VibezMatch
-// (Asegúrate de comprobar estas credenciales con las de tu consola de Firebase)
 const firebaseConfig = {
-    apiKey: "AIzaSy...", // Reemplaza aquí con la Web API Key real de tu proyecto VibezMatch
+    apiKey: "AIzaSy...", 
     authDomain: "vibezmatch-91c6d.firebaseapp.com",
     projectId: "vibezmatch-91c6d",
     storageBucket: "vibezmatch-91c6d.appspot.com",
@@ -26,7 +25,7 @@ async function switchLeaderboard(gameId) {
     const rowsContainer = document.getElementById("leaderboard-rows");
     if (!rowsContainer) return;
 
-    // 1. Cambiar el estilo visual de los botones para marcar cuál está activo
+    // 1. Cambiar el estilo visual de los botones
     const buttons = document.querySelectorAll("#apps-section + section button[id^='btn-']");
     buttons.forEach(btn => {
         if (btn.getAttribute("data-game") === gameId) {
@@ -40,8 +39,11 @@ async function switchLeaderboard(gameId) {
     rowsContainer.innerHTML = `<div id="loading-msg" class="px-4 py-4 text-center text-gray-500 w-full font-medium">Cargando puntuaciones online...</div>`;
 
     try {
-        // 3. Consulta a la colección específica del juego en Firestore
-        const q = query(collection(db, "records_" + gameId), orderBy("score", "desc"), limit(10));
+        // --- AQUÍ ESTÁ EL CAMBIO PARA QUE FUNCIONE ---
+        // Si el gameId es dog_eater, usamos scores_arcade. Si es otro, seguimos con el estándar records_
+        const nombreColeccion = (gameId === "dog_eater") ? "scores_arcade" : ("records_" + gameId);
+        
+        const q = query(collection(db, nombreColeccion), orderBy("score", "desc"), limit(10));
         const querySnapshot = await getDocs(q);
 
         rowsContainer.innerHTML = ""; // Limpiar contenedor
@@ -51,7 +53,7 @@ async function switchLeaderboard(gameId) {
             return;
         }
 
-        // 4. Renderizar las filas con las puntuaciones devueltas
+        // 4. Renderizar las filas
         let index = 1;
         querySnapshot.forEach((doc) => {
             const data = doc.data();
@@ -81,16 +83,14 @@ async function switchLeaderboard(gameId) {
  * ==========================================
  */
 async function enviarSugerencia() {
-    // VERIFICACIÓN CRÍTICA DE SEGURIDAD: CONTROL DEL HONEYPOT
     const honeypot = document.getElementById("sys_security_feedback_hp");
     if (honeypot && honeypot.value !== "") {
         console.warn("Intento de spam bloqueado por el Honeypot.");
-        return; // Detiene la ejecución en silencio si un bot completó el campo oculto
+        return; 
     }
 
     const autorInput = document.getElementById("sug-autor");
     const mensajeInput = document.getElementById("sug-mensaje");
-    // LEEMOS EL CAMPO DE EMAIL DEL HTML (Asegúrate de que el id en tu HTML sea "sug-email")
     const emailInput = document.getElementById("sug-email") || document.getElementById("sug-correo");
     const msgExito = document.getElementById("msg-envio-exito");
 
@@ -106,16 +106,14 @@ async function enviarSugerencia() {
     }
 
     try {
-        // Enviar a la colección de sugerencias de Firestore
         await addDoc(collection(db, "sugerencias"), {
             author: autor,
             message: mensaje,
-            email: email, // <--- Ahora sí añadimos el correo al documento de Firebase
-            approved: false, // Se guarda como falso para moderación previa por tu parte
+            email: email, 
+            approved: false, 
             timestamp: serverTimestamp()
         });
 
-        // Limpiar formulario y mostrar éxito
         autorInput.value = "";
         mensajeInput.value = "";
         if (emailInput) emailInput.value = "";
@@ -133,16 +131,13 @@ async function enviarSugerencia() {
     }
 }
 
-// Cargar marcadores iniciales al iniciar la página
 window.addEventListener("DOMContentLoaded", () => {
     switchLeaderboard("vibez_fly");
 
-    // Vincular el evento click del botón de enviar comentarios si existe en el DOM
     const btnPublicar = document.getElementById("btn-publicar-sug");
     if (btnPublicar) {
         btnPublicar.addEventListener("click", enviarSugerencia);
     }
 });
 
-// EXPOSICIÓN GLOBAL PARA EL HTML (Obligatorio al trabajar con type="module")
 window.switchLeaderboard = switchLeaderboard;
