@@ -65,3 +65,30 @@ exports.limpiarChatGlobal = onSchedule("every 48 hours", async (event) => {
     }
     return null;
 });
+// =========================================================================
+// 🔍 VERIFICAR SI UN EMAIL EXISTE EN FIREBASE AUTHENTICATION (Para la Web)
+// =========================================================================
+const { onRequest } = require("firebase-functions/v2/https");
+
+exports.verificarUsuarioAuth = onRequest({ cors: true }, async (req, res) => {
+    const email = req.query.email || (req.body && req.body.email);
+
+    if (!email) {
+        return res.status(400).send({ error: "Falta el campo email." });
+    }
+
+    try {
+        // Buscamos el usuario directamente en Firebase Authentication usando el SDK de Admin
+        const userRecord = await admin.auth().getUserByEmail(email.trim().toLowerCase());
+        
+        // Si lo encuentra, devolvemos que sí existe
+        return res.status(200).send({ existe: true, uid: userRecord.uid });
+    } catch (error) {
+        if (error.code === "auth/user-not-found") {
+            // Si Auth responde que no existe el usuario
+            return res.status(200).send({ existe: false });
+        }
+        logger.error("Error al consultar Firebase Auth:", error);
+        return res.status(500).send({ error: "Error interno del servidor." });
+    }
+});
