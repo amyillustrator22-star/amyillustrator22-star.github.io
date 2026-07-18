@@ -376,19 +376,27 @@
             document.getElementById('back-to-login-btn').classList.add('hidden');
             switchAuthTab('login');
         }
-        function toggleAdminMode() {
-            isAdminMode = !isAdminMode;
-            const btn = document.getElementById('admin-toggle-btn');
-            if (isAdminMode) {
-                btn.innerText = t('adminModeOn');
-                btn.className = "px-3 py-1.5 bg-red-600 border border-red-500 text-white rounded-xl text-xs font-bold transition-all hover:bg-red-500 animate-pulse";
-                document.querySelectorAll('.admin-action').forEach(b => b.classList.remove('hidden'));
-            } else {
-                btn.innerText = t('adminModeOff');
-                btn.className = "px-3 py-1.5 bg-gray-800 border border-gray-700 text-purple-400 rounded-xl text-xs font-bold transition-all hover:bg-gray-700";
-                document.querySelectorAll('.admin-action').forEach(b => b.classList.add('hidden'));
-            }
-        }
+      function toggleAdminMode() {
+    // 🌟 VALIDACIÓN DIRECTA POR CORREO ELECTRÓNICO
+    const CORREO_ADMIN = "amyillustrator22@gmail.com"; 
+
+    if (!currentUser || currentUser.email !== CORREO_ADMIN) {
+        alert(t('adminOnlyAlert'));
+        return;
+    }
+
+    isAdminMode = !isAdminMode;
+    const btn = document.getElementById('admin-toggle-btn');
+    if (isAdminMode) {
+        btn.innerText = t('adminModeOn');
+        btn.className = "px-3 py-1.5 bg-red-600 border border-red-500 text-white rounded-xl text-xs font-bold transition-all hover:bg-red-500 animate-pulse";
+        document.querySelectorAll('.admin-action').forEach(b => b.classList.remove('hidden'));
+    } else {
+        btn.innerText = t('adminModeOff');
+        btn.className = "px-3 py-1.5 bg-gray-800 border border-gray-700 text-purple-400 rounded-xl text-xs font-bold transition-all hover:bg-gray-700";
+        document.querySelectorAll('.admin-action').forEach(b => b.classList.add('hidden'));
+    }
+}
         function togglePasswordVisibility() {
             const pwdInput = document.getElementById('auth-password');
             const iconClosed = document.getElementById('eye-icon-closed');
