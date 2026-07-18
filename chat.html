@@ -71,7 +71,8 @@
 
         let unsubscribeChat = null;
         let currentUser = null;
-        let aliasGuardadoChat = ""; // Guarda el nombre que elija el usuario en el modal
+        let aliasGuardadoChat = "";
+        let isAdminMode = false; // Movidito aquí al módulo principal
 
         // Escuchar el estado de autenticación y verificar baneos
         onAuthStateChanged(auth, async (user) => {
@@ -132,7 +133,6 @@
             }
         };
 
-        // Nueva función de puente para el clic directo
         window.handleAuthSubmitDirect = function() {
             console.log("¡Clic directo detectado!");
             handleAuthSubmit();
@@ -142,7 +142,6 @@
             await signOut(auth);
         };
 
-        // Lógica de la Sala Global con Selección de Alias
         window.acceptRulesAndEnter = function() {
             const inputAlias = document.getElementById('chat-user-alias').value.trim();
             if (!inputAlias) {
@@ -150,7 +149,6 @@
                 return;
             }
             
-            // Asignamos el alias escrito a la sesión actual del chat
             aliasGuardadoChat = inputAlias;
 
             document.getElementById('rules-modal').classList.add('hidden');
@@ -174,11 +172,7 @@
 
                 snapshot.forEach((docSnap) => {
                     const data = docSnap.data();
-                    
-                    // Sincronizado al 100% con los campos de la app en Kotlin (usuario y texto)
                     const userIdentifier = data.usuario || ''; 
-                    
-                    // Compara con el alias elegido en el formulario para saber si el mensaje es del cliente actual
                     const isMine = userIdentifier === aliasGuardadoChat; 
                     const text = data.texto || '';
                     const timeString = data.timestamp ? new Date(data.timestamp.toDate()).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
@@ -230,7 +224,6 @@
             input.value = ''; 
 
             try {
-                // Inyectamos el alias personalizado validado en lugar del correo o fallbacks estáticos
                 await addDoc(collection(db, 'chat_global'), {
                     texto: text,
                     usuario: aliasGuardadoChat, 
@@ -254,6 +247,28 @@
                 alert(t('adminOnlyAlert'));
             }
         }
+
+        // 🌟 FUNCIÓN DE ADMIN CORRECTAMENTE ANCLADA AL MÓDULO
+        window.toggleAdminMode = function() {
+            const CORREO_ADMIN = "amyillustrator22@gmail.com"; 
+
+            if (!currentUser || currentUser.email !== CORREO_ADMIN) {
+                alert(t('adminOnlyAlert'));
+                return;
+            }
+
+            isAdminMode = !isAdminMode;
+            const btn = document.getElementById('admin-toggle-btn');
+            if (isAdminMode) {
+                btn.innerText = t('adminModeOn');
+                btn.className = "px-3 py-1.5 bg-red-600 border border-red-500 text-white rounded-xl text-xs font-bold transition-all hover:bg-red-500 animate-pulse";
+                document.querySelectorAll('.admin-action').forEach(b => b.classList.remove('hidden'));
+            } else {
+                btn.innerText = t('adminModeOff');
+                btn.className = "px-3 py-1.5 bg-gray-800 border border-gray-700 text-purple-400 rounded-xl text-xs font-bold transition-all hover:bg-gray-700";
+                document.querySelectorAll('.admin-action').forEach(b => b.classList.add('hidden'));
+            }
+        };
         
     </script>
 
@@ -349,7 +364,7 @@
 
     <script>
         let currentMode = 'login';
-        let isAdminMode = false;
+        
         function switchAuthTab(tab) {
             currentMode = tab;
             document.getElementById('auth-submit-btn').innerText = tab === 'login' ? t('loginBtn') : t('createAccountBtn');
@@ -376,27 +391,6 @@
             document.getElementById('back-to-login-btn').classList.add('hidden');
             switchAuthTab('login');
         }
-      function toggleAdminMode() {
-    // 🌟 VALIDACIÓN DIRECTA POR CORREO ELECTRÓNICO
-    const CORREO_ADMIN = "amyillustrator22@gmail.com"; 
-
-    if (!currentUser || currentUser.email !== CORREO_ADMIN) {
-        alert(t('adminOnlyAlert'));
-        return;
-    }
-
-    isAdminMode = !isAdminMode;
-    const btn = document.getElementById('admin-toggle-btn');
-    if (isAdminMode) {
-        btn.innerText = t('adminModeOn');
-        btn.className = "px-3 py-1.5 bg-red-600 border border-red-500 text-white rounded-xl text-xs font-bold transition-all hover:bg-red-500 animate-pulse";
-        document.querySelectorAll('.admin-action').forEach(b => b.classList.remove('hidden'));
-    } else {
-        btn.innerText = t('adminModeOff');
-        btn.className = "px-3 py-1.5 bg-gray-800 border border-gray-700 text-purple-400 rounded-xl text-xs font-bold transition-all hover:bg-gray-700";
-        document.querySelectorAll('.admin-action').forEach(b => b.classList.add('hidden'));
-    }
-}
         function togglePasswordVisibility() {
             const pwdInput = document.getElementById('auth-password');
             const iconClosed = document.getElementById('eye-icon-closed');
